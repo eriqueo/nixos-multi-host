@@ -563,8 +563,10 @@ services.ssh-agent.enable = true;
         # Terminal
         "$mod, Return, exec, konsole"
 
-         "$mod SHIFT, bracketleft, exec, hyprctl keyword monitor 'eDP-1,2560x1600@165,2560x0,1.60'"   # Laptop on right (external auto-left)
-         "$mod SHIFT, bracketright, exec, hyprctl keyword monitor 'eDP-1,2560x1600@165,0x0,1.60'"    # Laptop on left (external auto-right)
+        # Monitor layout switching (FIXED)
+          "$mod SHIFT, bracketleft, exec, hyprctl keyword monitor 'eDP-1,2560x1600@165,0x0,1.60'"      # Super+Shift+[ = Laptop LEFT, external right
+          "$mod SHIFT, bracketright, exec, hyprctl keyword monitor 'eDP-1,2560x1600@165,2560x0,1.60'"  # Super+Shift+] = Laptop RIGHT, external left
+          
         # Window movement (preserved from existing config)
         "$mod, left, movewindow, l"
         "$mod, right, movewindow, r"
