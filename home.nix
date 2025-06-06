@@ -27,7 +27,7 @@
     obsidian espanso
   ] 
   
-  # 🔄 CONDITIONAL PACKAGES
+  # 🔄 CONDITIONAL PACKAGESsssssss
   
   # Server-only packages
   ++ lib.optionals (osConfig.server or false) [
