@@ -559,6 +559,12 @@ services.ssh-agent.enable = true;
    	   exec-once = "waybar &";
       "$mod" = "SUPER";
       
+      bindm = [
+        # Mouse bindings for moving/resizing
+        "$mod, mouse:272, movewindow"           # Drag windows with Super + left click
+        "$mod, mouse:273, resizewindow"         # Resize windows with Super + right click
+      ];
+      
       bind = [
         # Terminal
         "$mod, Return, exec, konsole"
@@ -566,37 +572,46 @@ services.ssh-agent.enable = true;
         # Monitor layout switching (FIXED)
         "$mod SHIFT, bracketleft, exec, hyprctl keyword monitor 'eDP-1,2560x1600@165,0x0,1.60' && hyprctl keyword monitor 'DP-2,1920x1080@60,2560x0,1'"    # Laptop LEFT, external RIGHT
           "$mod SHIFT, bracketright, exec, hyprctl keyword monitor 'DP-2,1920x1080@60,0x0,1' && hyprctl keyword monitor 'eDP-1,2560x1600@165,1920x0,1.60'"   # External LEFT, laptop RIGHT
-        # Window movement (preserved from existing config)
-        "$mod, left, movewindow, l"
-        "$mod, right, movewindow, r"
-        "$mod, up, movewindow, u" 
-        "$mod, down, movewindow, d"
+  # ===== FOCUS SWITCHING (just mod + arrows) =====
+  "$mod, left, movefocus, l"              # Focus left window
+  "$mod, right, movefocus, r"             # Focus right window  
+  "$mod, up, movefocus, u"                # Focus up window
+  "$mod, down, movefocus, d"              # Focus down window
+  
+  # ===== WINDOW MANAGEMENT (just mod) =====
+  "$mod, F, fullscreen"                   # Fullscreen
+  "$mod, Q, killactive"                   # Close window
+  "$mod, V, togglefloating"               # Toggle floating
         
-        # Monitor switching (preserved)
-        "$mod CTRL, left, focusmonitor, -1"
-        "$mod CTRL, right, focusmonitor, +1"
+ # ===== SEND WINDOW TO WORKSPACE (ctrl + mod + key) =====
+  "CTRL $mod, 1, movetoworkspace, 1"      # Send window to workspace 1
+  "CTRL $mod, 2, movetoworkspace, 2"      # Send window to workspace 2
+  "CTRL $mod, 3, movetoworkspace, 3"      # Send window to workspace 3
+  "CTRL $mod, 4, movetoworkspace, 4"      # Send window to workspace 4
+  "CTRL $mod, 5, movetoworkspace, 5"      # Send window to workspace 5
+  "CTRL $mod, left, movetoworkspace, -1"  # Send window to previous workspace
+  "CTRL $mod, right, movetoworkspace, +1" # Send window to next workspace
         
-        # Workspace switching (preserved)
-        "$mod ALT CTRL, left, workspace, -1"
-        "$mod ALT CTRL, right, workspace, +1"
-        "$mod ALT CTRL, 1, workspace, 1"
-        "$mod ALT CTRL, 2, workspace, 2"
-        "$mod ALT CTRL, 3, workspace, 3"
-        "$mod ALT CTRL, 4, workspace, 4"
-        "$mod ALT CTRL, 5, workspace, 5"
+  # ===== WORKSPACE SWITCHING (ctrl + mod + alt + key) =====
+  "CTRL $mod ALT, 1, workspace, 1"        # Switch view to workspace 1
+  "CTRL $mod ALT, 2, workspace, 2"        # Switch view to workspace 2
+  "CTRL $mod ALT, 3, workspace, 3"        # Switch view to workspace 3
+  "CTRL $mod ALT, 4, workspace, 4"        # Switch view to workspace 4
+  "CTRL $mod ALT, 5, workspace, 5"        # Switch view to workspace 5
+  "CTRL $mod ALT, left, workspace, -1"    # Switch view to previous workspace
+  "CTRL $mod ALT, right, workspace, +1"   # Switch view to next workspace
         
-        # Focus movement (tiling shortcuts)
-        "$mod, H, movefocus, l"
-        "$mod, L, movefocus, r"
-        "$mod, K, movefocus, u"
-        "$mod, J, movefocus, d"
         
         # Alternative focus with arrows  
         "$mod SHIFT, left, movefocus, l"
         "$mod SHIFT, right, movefocus, r"
         "$mod SHIFT, up, movefocus, u"
         "$mod SHIFT, down, movefocus, d"
-        
+         # ===== WINDOW ARRANGEMENT (mod + alt + arrows) =====
+  "$mod ALT, left, movewindow, l"         # Move window to the left position
+  "$mod ALT, right, movewindow, r"        # Move window to the right position  
+  "$mod ALT, up, movewindow, u"           # Move window to the top position
+  "$mod ALT, down, movewindow, d"         # Move window to the bottom position
         # Familiar cycling
         "ALT, Tab, cyclenext"
         "ALT SHIFT, Tab, cyclenext, prev"
