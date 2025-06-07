@@ -53,8 +53,7 @@
       jq yq pandoc p7zip rsync sshfs rclone xclip
       tmux bat eza fzf ripgrep btop
 
-      inputs.zen-browser.packages.${pkgs.system}.default
-      # Universal system tools
+            # Universal system tools
       usbutils pciutils dmidecode powertop lvm2 cryptsetup
       nfs-utils samba
       
