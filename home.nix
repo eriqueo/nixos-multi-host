@@ -46,14 +46,35 @@
     # GUI applications
     firefox discord telegram-desktop spotify
     libreoffice gimp vscode
-    
+    wev              # Event viewer (what you just added)
+    wl-clipboard     # Clipboard utilities (wl-copy, wl-paste)
+    grim             # Screenshot backend
+    slurp            # Area selection for screenshots
+    grimblast        # Enhanced screenshot tool
     # Media clients
     vlc mpv
-    grim
-    slurp
-    wl-clipboard
-    # Desktop utilities
-    pavucontrol brightnessctl blueman
+    # Hyprland-specific utilities
+      hyprpicker       # Color picker
+      hyprcursor       # Cursor management
+      hyprpaper        # Wallpaper daemon
+      hypridle         # Idle management
+      hyprlock         # Screen locker
+  # Notifications and launchers
+  dunst            # Notification daemon
+  wofi             # Application launcher
+  waybar           # Status bar
+       # System management
+  brightnessctl    # Brightness control
+  playerctl        # Media player control
+  pamixer          # Audio control
+  blueman		   #bluetooth
+  pavucontrol
+  # File management
+  ranger           # Terminal file manager
+  xdg-utils        # Open files with default apps
+  
+  # Network/system info
+  networkmanagerapplet  # Network management
   ];
 
   # ✅ UNIVERSAL ENVIRONMENT VARIABLES
