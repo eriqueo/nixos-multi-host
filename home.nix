@@ -688,7 +688,252 @@ services.ssh-agent.enable = true;
       };
     };
   };
+# Add this to your home.nix in the desktop conditional section
 
+# Add this to your home.nix in the desktop conditional section
+
+  # Waybar configuration (desktop only)
+  programs.waybar = lib.mkIf (osConfig.desktop or false) {
+    enable = true;
+    package = pkgs.waybar.overrideAttrs (oldAttrs: {
+      mesonFlags = oldAttrs.mesonFlags ++ [ "-Dexperimental=true" ];
+    });
+    systemd.enable = true;
+    
+    settings = {
+      mainBar = {
+        layer = "top";
+        position = "top";
+        height = 34;
+        spacing = 4;
+        
+        modules-left = [ "hyprland/workspaces" "hyprland/window" ];
+        modules-center = [ "clock" ];
+        modules-right = [ "pulseaudio" "network" "cpu" "memory" "battery" "tray" ];
+        
+        "hyprland/workspaces" = {
+          disable-scroll = true;
+          all-outputs = true;
+          format = "{icon}";
+          format-icons = {
+            "1" = "1";
+            "2" = "2";
+            "3" = "3";
+            "4" = "4";
+            "5" = "5";
+            urgent = "";
+            focused = "";
+            default = "";
+          };
+          persistent-workspaces = {
+            "*" = 5; # Show 5 workspaces on all monitors
+          };
+        };
+        
+        "hyprland/window" = {
+          format = "{}";
+          max-length = 50;
+          separate-outputs = true;
+        };
+        
+        clock = {
+          timezone = "America/Denver";
+          format = "{:%H:%M}";
+          format-alt = "{:%Y-%m-%d}";
+          tooltip-format = "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>";
+        };
+        
+        cpu = {
+          format = "{usage}% ";
+          tooltip = false;
+          interval = 1;
+        };
+        
+        memory = {
+          format = "{}% ";
+          interval = 1;
+        };
+        
+        network = {
+          format-wifi = "{essid} ({signalStrength}%) ";
+          format-ethernet = "{ipaddr}/{cidr} ";
+          format-linked = "{ifname} (No IP) ";
+          format-disconnected = "Disconnected ⚠";
+          on-click = "nm-connection-editor";
+          tooltip-format = "{ifname} via {gwaddr}";
+        };
+        
+        pulseaudio = {
+          format = "{volume}% {icon} {format_source}";
+          format-bluetooth = "{volume}% {icon} {format_source}";
+          format-bluetooth-muted = " {icon} {format_source}";
+          format-muted = " {format_source}";
+          format-source = "{volume}% ";
+          format-source-muted = "";
+          format-icons = {
+            headphone = "";
+            hands-free = "";
+            headset = "";
+            default = ["" "" ""];
+          };
+          on-click = "pavucontrol";
+        };
+        
+        battery = {
+          states = {
+            warning = 30;
+            critical = 15;
+          };
+          format = "{capacity}% {icon}";
+          format-charging = "{capacity}% ";
+          format-plugged = "{capacity}% ";
+          format-alt = "{time} {icon}";
+          format-icons = ["" "" "" "" ""];
+        };
+        
+        tray = {
+          spacing = 10;
+        };
+      };
+    };
+    
+    style = ''
+      * {
+        border: none;
+        border-radius: 0;
+        font-family: "JetBrains Mono", "DejaVu Sans", monospace;
+        font-size: 13px;
+        min-height: 0;
+      }
+      
+      window#waybar {
+        background-color: rgba(43, 48, 59, 0.8);
+        border-bottom: 3px solid rgba(100, 114, 125, 0.5);
+        color: #ffffff;
+        transition-property: background-color;
+        transition-duration: .5s;
+      }
+      
+      window#waybar.hidden {
+        opacity: 0.2;
+      }
+      
+      #workspaces {
+        margin: 0 4px;
+      }
+      
+      #workspaces button {
+        padding: 0 8px;
+        background-color: transparent;
+        color: #ffffff;
+        border-bottom: 3px solid transparent;
+        border-radius: 0;
+      }
+      
+      #workspaces button:hover {
+        background: rgba(0, 0, 0, 0.2);
+        box-shadow: inset 0 -3px #ffffff;
+      }
+      
+      #workspaces button.active {
+        background-color: #64727D;
+        border-bottom: 3px solid #ffffff;
+      }
+      
+      #workspaces button.urgent {
+        background-color: #eb4d4b;
+      }
+      
+      #window,
+      #clock,
+      #battery,
+      #cpu,
+      #memory,
+      #network,
+      #pulseaudio,
+      #tray {
+        padding: 0 10px;
+        color: #ffffff;
+      }
+      
+      #window {
+        margin: 0 4px;
+        font-weight: bold;
+      }
+      
+      #clock {
+        background-color: #64727D;
+        font-weight: bold;
+      }
+      
+      #battery {
+        background-color: #ffffff;
+        color: #000000;
+      }
+      
+      #battery.charging, #battery.plugged {
+        color: #ffffff;
+        background-color: #26A65B;
+      }
+      
+      @keyframes blink {
+        to {
+          background-color: #ffffff;
+          color: #000000;
+        }
+      }
+      
+      #battery.critical:not(.charging) {
+        background-color: #f53c3c;
+        color: #ffffff;
+        animation-name: blink;
+        animation-duration: 0.5s;
+        animation-timing-function: linear;
+        animation-iteration-count: infinite;
+        animation-direction: alternate;
+      }
+      
+      #cpu {
+        background-color: #2ecc71;
+        color: #000000;
+      }
+      
+      #memory {
+        background-color: #9b59b6;
+      }
+      
+      #network {
+        background-color: #2980b9;
+      }
+      
+      #network.disconnected {
+        background-color: #f53c3c;
+      }
+      
+      #pulseaudio {
+        background-color: #f1c40f;
+        color: #000000;
+      }
+      
+      #pulseaudio.muted {
+        background-color: #90b1b1;
+        color: #2a5c45;
+      }
+      
+      #tray {
+        background-color: #2980b9;
+      }
+      
+      #tray > .passive {
+        -gtk-icon-effect: dim;
+      }
+      
+      #tray > .needs-attention {
+        -gtk-icon-effect: highlight;
+        background-color: #eb4d4b;
+      }
+    '';
+  };
   # Enable Home Manager self-management
   programs.home-manager.enable = true;
 }
