@@ -28,8 +28,18 @@
     boot.loader.systemd-boot ={
      enable = true;
      configurationLimit = 10;
+      consoleMode = "auto";
+ 		 # Force reinstallation
+ 		 extraInstallCommands = ''
+  		  ${pkgs.efibootmgr}/bin/efibootmgr --create --disk /dev/nvme1n1 --part 1 --label "NixOS" --loader '\EFI\systemd\systemd-bootx64.efi' || true
+ 		 '';
      };
-    boot.loader.efi.canTouchEfiVariables = true;
+     
+    boot.loader.efi = {
+          canTouchEfiVariables = true;
+          efiSysMountPoint = "/boot";
+        };   
+
     boot.loader.timeout = 5;
     # Timezone and locale
     time.timeZone = "America/Denver";
