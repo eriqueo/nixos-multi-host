@@ -916,23 +916,24 @@ in
         gaps_in = 5;
         gaps_out = 10;
         border_size = 2;
-        "col.active_border" = "rgb(${builtins.substring 1 6 theme.accent}) rgb(${builtins.substring 1 6 theme.accent-bright}) 45deg";
-        "col.inactive_border" = "rgb(${builtins.substring 1 6 theme.border})";
+        "col.active_border" = "rgb(5e81ac) rgb(81a1c1) 45deg";
+        "col.inactive_border" = "rgb(434c5e)";
         layout = "dwindle";
       };
       
       decoration = {
         rounding = 8;
         blur = {
-          enabled = true;
-          size = 6;
-          passes = 2;
+        enabled = true;
+        size = 6;
+        passes = 2;
+        new_optimizations = true;
+        ignore_opacity = true;
+        noise = 0.0117;
+        contrast = 1.0;
+        brightness = 1.0;
+        xray = false;
         };
-        drop_shadow = true;
-        shadow_range = 6;
-        shadow_render_power = 3;
-        "col.shadow" = "rgba(${builtins.substring 1 6 theme.bg-darker}80)";
-      };
 
          # Nordic shadow settings
       drop_shadow = true;
@@ -989,6 +990,8 @@ in
       animate_mouse_windowdragging = true;
       enable_swallow = true;
       swallow_regex = "^(kitty)$";
+    };
+      };
     };
   };
 
