@@ -25,9 +25,12 @@
     # ✅ UNIVERSAL SYSTEM CONFIG
     
     # Boot configuration
-    boot.loader.systemd-boot.enable = true;
+    boot.loader.systemd-boot ={
+     enable = true;
+     configurationLimit = 10;
+     };
     boot.loader.efi.canTouchEfiVariables = true;
-
+    boot.loader.timeout = 5;
     # Timezone and locale
     time.timeZone = "America/Denver";
     i18n.defaultLocale = "en_US.UTF-8";
@@ -58,7 +61,23 @@
       # Hyprland desktop environment essentials
       waybar wofi mako grim slurp wl-clipboard
       pavucontrol brightnessctl
+
+      efibootmgr
       
+      services.greetd = lib.mkIf config.desktop {
+        enable = true;
+        settings = {
+          default_session = {
+            command = "${pkgs.greetd.tuigreet}/bin/tuigreet --time --cmd Hyprland";
+            user = "greeter";
+          };
+          # Auto-login (optional - remove these lines if you want to see login screen)
+          initial_session = {
+            command = "Hyprland";
+            user = "eric";
+          };
+        };
+      };
       # KDE Applications (familiar tools)
       kdePackages.konsole kdePackages.dolphin kdePackages.kate kdePackages.yakuake kdePackages.gwenview kdePackages.kdeconnect-kde kdePackages.ark kdePackages.okular
       
