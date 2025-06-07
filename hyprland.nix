@@ -61,7 +61,7 @@ in
       # Key bindings
       bind = [
         # Terminal and system
-        "$mod, Return, exec, konsole"
+        "$mod, Return, exec, kitty"
         "$mod SHIFT, L, exec, hyprlock"
         "$mod, N, exec, notify-send 'Test' 'Notification system working'"
         "$mod, grave, exec, swaync-client -t -sw"
