@@ -699,7 +699,103 @@ in
   };
 
   # Starship prompt (universal)
-  programs.starship.enable = true;
+  # Replace your existing "programs.starship.enable = true;" with this full configuration
+  
+  programs.starship = {
+    enable = true;
+    settings = {
+      # Main prompt format
+      format = lib.concatStrings [
+        "$directory"
+        "$git_branch"
+        "$git_status"
+        "$nodejs"
+        "$python"
+        "$rust"
+        "$nix_shell"
+        "$cmd_duration"
+        "$line_break"
+        "$character"
+      ];
+      
+      # Nordic color palette for starship
+      palette = "nordic";
+      palettes.nordic = {
+        # Use our theme colors
+        accent = theme.accent;
+        accent-bright = theme.accent-bright;
+        red = theme.red;
+        green = theme.green;
+        yellow = theme.yellow;
+        blue = theme.accent;
+        purple = theme.purple;
+        orange = theme.orange;
+      };
+      
+      # Character (prompt symbol)
+      character = {
+        success_symbol = "[❯](accent)";
+        error_symbol = "[❯](red)";
+      };
+      
+      # Directory styling
+      directory = {
+        style = "bold accent";
+        truncation_length = 3;
+        truncation_symbol = "…/";
+      };
+      
+      # Git branch
+      git_branch = {
+        style = "accent-bright";
+        format = "[$symbol$branch]($style) ";
+        symbol = " ";
+      };
+      
+      # Git status
+      git_status = {
+        style = "red";
+      };
+      
+      # Command duration
+      cmd_duration = {
+        style = "yellow";
+        format = "[$duration]($style) ";
+        min_time = 2000;
+      };
+      
+      # Programming languages
+      nodejs = {
+        style = "green";
+        format = "[$symbol($version)]($style) ";
+        symbol = "⬢ ";
+      };
+      
+      python = {
+        style = "blue";
+        format = "[$symbol($version)]($style) ";
+        symbol = "🐍 ";
+      };
+      
+      rust = {
+        style = "orange";
+        format = "[$symbol($version)]($style) ";
+        symbol = "🦀 ";
+      };
+      
+      # Nix shell indicator
+      nix_shell = {
+        style = "purple";
+        format = "[$symbol$state]($style) ";
+        symbol = "❄️ ";
+      };
+      
+      # Disable package for cleaner look
+      package = {
+        disabled = true;
+      };
+    };
+  };
 
   # 🔄 HYPRLAND CONFIGURATION (laptop only)
   wayland.windowManager.hyprland = lib.mkIf (osConfig.desktop or false) {
@@ -1215,196 +1311,6 @@ in
       map ctrl+shift+minus change_font_size all -2.0
       map ctrl+shift+backspace change_font_size all 0
     '';
-  };
-
-  # Add this starship configuration to your home.nix
-  # This creates a Nordic-themed terminal prompt
-  
-  programs.starship = {
-    enable = true;
-    settings = {
-      # Main prompt format
-      format = lib.concatStrings [
-        "$username"
-        "$hostname"
-        "$directory"
-        "$git_branch"
-        "$git_status"
-        "$nodejs"
-        "$python"
-        "$rust"
-        "$nix_shell"
-        "$cmd_duration"
-        "$line_break"
-        "$character"
-      ];
-      
-      # Nordic color palette for starship
-      palette = "nordic";
-      palettes.nordic = {
-        # Use our theme colors
-        bg = theme.bg;
-        fg = theme.fg;
-        fg-dim = theme.fg-dim;
-        accent = theme.accent;
-        accent-bright = theme.accent-bright;
-        red = theme.red;
-        green = theme.green;
-        yellow = theme.yellow;
-        blue = theme.accent;
-        purple = theme.purple;
-        orange = theme.orange;
-      };
-      
-      # Character (prompt symbol)
-      character = {
-        success_symbol = "[❯](accent)";
-        error_symbol = "[❯](red)";
-        vimcmd_symbol = "[❮](accent)";
-      };
-      
-      # Directory styling
-      directory = {
-        style = "bold accent";
-        truncation_length = 3;
-        truncation_symbol = "…/";
-        home_symbol = "~";
-        read_only_style = "red";
-        read_only = "🔒";
-      };
-      
-      # Git branch
-      git_branch = {
-        style = "accent-bright";
-        format = "[$symbol$branch(:$remote_branch)]($style) ";
-        symbol = " ";
-      };
-      
-      # Git status
-      git_status = {
-        style = "red";
-        format = "([\\[$all_status$ahead_behind\\]]($style) )";
-        conflicted = "⚔️";
-        ahead = "🏎️💨×${count}";
-        behind = "🐌×${count}";
-        diverged = "🔱🏎️💨×${ahead_count}🐌×${behind_count}";
-        untracked = "🛤️×${count}";
-        stashed = "📦";
-        modified = "📝×${count}";
-        staged = "🗃️×${count}";
-        renamed = "📛×${count}";
-        deleted = "🗑️×${count}";
-      };
-      
-      # Username (only show if not default user)
-      username = {
-        style_user = "bold yellow";
-        style_root = "bold red";
-        format = "[$user]($style)@";
-        show_always = false;
-      };
-      
-      # Hostname (only show if SSH)
-      hostname = {
-        ssh_only = true;
-        style = "bold green";
-        format = "[$hostname]($style) ";
-      };
-      
-      # Command duration
-      cmd_duration = {
-        style = "yellow";
-        format = "[$duration]($style) ";
-        min_time = 2000; # Show duration if > 2 seconds
-      };
-      
-      # Programming languages
-      nodejs = {
-        style = "green";
-        format = "[$symbol($version)]($style) ";
-        symbol = "⬢ ";
-      };
-      
-      python = {
-        style = "blue";
-        format = "[$symbol$pyenv_prefix($version)(\\($virtualenv\\))]($style) ";
-        symbol = "🐍 ";
-      };
-      
-      rust = {
-        style = "orange";
-        format = "[$symbol($version)]($style) ";
-        symbol = "🦀 ";
-      };
-      
-      # Nix shell indicator
-      nix_shell = {
-        style = "purple";
-        format = "[$symbol$state(\\($name\\))]($style) ";
-        symbol = "❄️ ";
-      };
-      
-      # Package version (disabled for cleaner look)
-      package = {
-        disabled = true;
-      };
-      
-      # Time (optional - uncomment if you want time in prompt)
-      # time = {
-      #   disabled = false;
-      #   style = "fg-dim";
-      #   format = "[$time]($style) ";
-      # };
-      
-      # Line break for multi-line prompt
-      line_break = {
-        disabled = false;
-      };
-      
-      # Battery (for laptops)
-      battery = {
-        full_symbol = "🔋";
-        charging_symbol = "🔌";
-        discharging_symbol = "⚡";
-        unknown_symbol = "❓";
-        empty_symbol = "❗";
-        
-        display = [
-          {
-            threshold = 15;
-            style = "bold red";
-          }
-          {
-            threshold = 50;
-            style = "bold yellow";
-          }
-          {
-            threshold = 80;
-            style = "bold green";
-          }
-        ];
-      };
-      
-      # Memory usage (optional)
-      memory_usage = {
-        disabled = true;
-        threshold = 70;
-        style = "bold red";
-        format = "[$symbol$ram]($style) ";
-        symbol = "🐏 ";
-      };
-      
-      # Status (exit codes)
-      status = {
-        style = "red";
-        symbol = "❌";
-        not_executable_symbol = "🚫";
-        not_found_symbol = "🔍";
-        sigint_symbol = "🧱";
-        signal_symbol = "⚡";
-        disabled = false;
-      };
-    };
   };
 
   # Enable Home Manager self-management
