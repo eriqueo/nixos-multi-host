@@ -2,6 +2,51 @@
 { config, pkgs, lib, osConfig, ... }:
 
 {
+let
+  # Nordic Color Palette
+  nordic-blue = {
+    # Base colors
+    bg = "#2e3440";           # Dark blue-grey background
+    bg-alt = "#3b4252";       # Slightly lighter background
+    bg-darker = "#1a1d23";    # Darker variant
+    
+    # Foreground colors  
+    fg = "#eceff4";           # Light foreground
+    fg-alt = "#d8dee9";       # Slightly dimmer foreground
+    fg-dim = "#4c566a";       # Dimmed text
+    
+    # Accent colors (blue variant)
+    accent = "#5e81ac";       # Nordic blue
+    accent-bright = "#81a1c1"; # Brighter blue
+    accent-dim = "#4c7398";   # Dimmer blue
+    
+    # Status colors
+    red = "#bf616a";          # Nordic red
+    orange = "#d08770";       # Nordic orange  
+    yellow = "#ebcb8b";       # Nordic yellow
+    green = "#a3be8c";        # Nordic green
+    purple = "#b48ead";       # Nordic purple
+    
+    # UI colors
+    border = "#434c5e";       # Border color
+    selection = "#4c566a";    # Selection background
+    urgent = "#bf616a";       # Urgent/warning color
+  };
+  
+  # Theme selection - change this to switch themes later
+  theme = nordic-blue;
+  
+  # Font configuration
+  fonts = {
+    mono = "CaskaydiaCove Nerd Font";
+    sans = "Inter";
+    size = {
+      normal = "13";
+      large = "15";
+    };
+  };
+
+in {
   home.username = "eric";
   home.homeDirectory = "/home/eric";
   home.stateVersion = "23.05";
@@ -48,7 +93,10 @@
     libreoffice gimp vscode
     wev              # Event viewer
     wl-clipboard     # Clipboard utilities (wl-copy, wl-paste)
-   
+
+   (nerdfonts.override { fonts = [ "CascadiaCode" ]; })
+   inter
+   nordic  # The Nordic GTK theme
     
     # Media clients
     vlc mpv
