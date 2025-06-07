@@ -1093,6 +1093,9 @@ in
   # Add this new programs.kitty section to your home.nix
   # (This creates a Nordic terminal theme with transparency)
   
+  # Add this new programs.kitty section to your home.nix
+  # (This creates a Nordic terminal theme with transparency)
+  
   programs.kitty = lib.mkIf (osConfig.desktop or false) {
     enable = true;
     font = {
@@ -1186,12 +1189,7 @@ in
       copy_on_select = true;
       strip_trailing_spaces = "smart";
       
-      # Keyboard shortcuts (Nordic-friendly)
-      map = "ctrl+shift+c copy_to_clipboard";
-      map = "ctrl+shift+v paste_from_clipboard";
-      map = "ctrl+shift+equal change_font_size all +2.0";
-      map = "ctrl+shift+minus change_font_size all -2.0";
-      map = "ctrl+shift+backspace change_font_size all 0";
+      # Keyboard shortcuts (Nordic-friendly) - move to extraConfig instead
     };
     
     # Additional kitty configuration
@@ -1209,6 +1207,13 @@ in
       
       # Performance tweaks
       wayland_titlebar_color background
+      
+      # Keyboard shortcuts (fixed - can't use multiple 'map' in settings)
+      map ctrl+shift+c copy_to_clipboard
+      map ctrl+shift+v paste_from_clipboard
+      map ctrl+shift+equal change_font_size all +2.0
+      map ctrl+shift+minus change_font_size all -2.0
+      map ctrl+shift+backspace change_font_size all 0
     '';
   };
 
