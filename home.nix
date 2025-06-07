@@ -851,8 +851,8 @@ in
         height = 34;
         spacing = 4;
         
-        modules-left = [ "hyprland/workspaces" "hyprland/window" ];
-        modules-center = [ "clock" ];
+        modules-left = [ "hyprland/workspaces"  ];
+        modules-center = [ "clock" "hyprland/window" ];
         modules-right = [ "pulseaudio" "network" "cpu" "memory" "battery" "tray" ];
         
         "hyprland/workspaces" = {
@@ -945,17 +945,16 @@ in
       * {
         border: none;
         border-radius: 0;
-        font-family: "JetBrains Mono", "DejaVu Sans", monospace;
-        font-size: 13px;
+        font-family: "${fonts.mono}", monospace;
+        font-size: ${fonts.size.normal}px;
         min-height: 0;
       }
       
       window#waybar {
-        background-color: rgba(43, 48, 59, 0.8);
-        border-bottom: 3px solid rgba(100, 114, 125, 0.5);
-        color: #ffffff;
-        transition-property: background-color;
-        transition-duration: .5s;
+        background-color: ${theme.bg};
+        border-bottom: 2px solid ${theme.accent};
+        color: ${theme.fg};
+        opacity: 0.95;
       }
       
       window#waybar.hidden {
@@ -969,24 +968,26 @@ in
       #workspaces button {
         padding: 0 8px;
         background-color: transparent;
-        color: #ffffff;
+        color: ${theme.fg-alt};
         border-bottom: 3px solid transparent;
         border-radius: 0;
       }
       
       #workspaces button:hover {
-        background: rgba(0, 0, 0, 0.2);
-        box-shadow: inset 0 -3px #ffffff;
+        background: ${theme.bg-alt};
+        color: ${theme.fg};
       }
       
-      #workspaces button.active {
-        background-color: #64727D;
-        border-bottom: 3px solid #ffffff;
+     #workspaces button.active {
+        background-color: ${theme.accent};
+        color: ${theme.bg};
+        border-bottom: 2px solid ${theme.accent-bright};
       }
       
-      #workspaces button.urgent {
-        background-color: #eb4d4b;
-      }
+     #workspaces button.urgent {
+         background-color: ${theme.urgent};
+         color: ${theme.fg};
+       }
       
       #window,
       #clock,
@@ -996,76 +997,86 @@ in
       #network,
       #pulseaudio,
       #tray {
-        padding: 0 10px;
-        color: #ffffff;
+       padding: 0 10px;
+       color: ${theme.fg};
+       background: ${theme.bg-alt};
+       margin: 2px;
+       border-radius: 4px;
       }
       
       #window {
+        background: transparent;
         margin: 0 4px;
+        color: ${theme.accent};
         font-weight: bold;
       }
       
       #clock {
-        background-color: #64727D;
+        background: ${theme.accent};
+        color: ${theme.bg};
         font-weight: bold;
       }
-      
+          
       #battery {
-        background-color: #ffffff;
-        color: #000000;
+        background: ${theme.green};
+        color: ${theme.bg};
       }
-      
+          
       #battery.charging, #battery.plugged {
-        color: #ffffff;
-        background-color: #26A65B;
+        background: ${theme.accent-bright};
+        color: ${theme.bg};
       }
       
       @keyframes blink {
         to {
-          background-color: #ffffff;
+          background-color: ${theme.urgent};
           color: #000000;
         }
       }
       
+      #battery.warning:not(.charging) {
+         background: ${theme.yellow};
+         color: ${theme.bg};
+      }
+          
       #battery.critical:not(.charging) {
-        background-color: #f53c3c;
-        color: #ffffff;
-        animation-name: blink;
-        animation-duration: 0.5s;
-        animation-timing-function: linear;
-        animation-iteration-count: infinite;
-        animation-direction: alternate;
+         background: ${theme.red};
+         color: ${theme.fg};
+         animation: blink 0.5s linear infinite alternate;
       }
       
-      #cpu {
-        background-color: #2ecc71;
-        color: #000000;
+     #cpu {
+         background: ${theme.accent-dim};
+         color: ${theme.fg};
       }
-      
+          
       #memory {
-        background-color: #9b59b6;
+         background: ${theme.purple};
+         color: ${theme.fg};
       }
-      
+          
       #network {
-        background-color: #2980b9;
+         background: ${theme.accent-bright};
+         color: ${theme.bg};
       }
-      
+          
       #network.disconnected {
-        background-color: #f53c3c;
+         background: ${theme.red};
+         color: ${theme.fg};
       }
       
       #pulseaudio {
-        background-color: #f1c40f;
-        color: #000000;
+         background: ${theme.yellow};
+         color: ${theme.bg};
       }
-      
+    
       #pulseaudio.muted {
-        background-color: #90b1b1;
-        color: #2a5c45;
+         background: ${theme.fg-dim};
+         color: ${theme.fg};
       }
-      
+    
       #tray {
-        background-color: #2980b9;
+         background: ${theme.bg-alt};
       }
       
       #tray > .passive {
@@ -1074,7 +1085,7 @@ in
       
       #tray > .needs-attention {
         -gtk-icon-effect: highlight;
-        background-color: #eb4d4b;
+        background-color: ${theme.red};
       }
     '';
   };
