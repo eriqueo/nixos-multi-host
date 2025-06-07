@@ -94,9 +94,10 @@ in
     wev              # Event viewer
     wl-clipboard     # Clipboard utilities (wl-copy, wl-paste)
 
-   (nerdfonts.override { fonts = [ "CascadiaCode" ]; })
-   inter
-   nordic  # The Nordic GTK theme
+    #Nordic themes
+	nerd-fonts.caskaydia-cove
+    inter
+    nordic  # The Nordic GTK theme
     
     # Media clients
     vlc mpv
