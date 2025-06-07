@@ -420,7 +420,7 @@ in
       nixsearch = "nix search nixpkgs";
       nixclean = "nix-collect-garbage -d";
       nixgen = "sudo nix-env --list-generations --profile /nix/var/nix/profiles/system";
-      
+      nixhyp = "sudo micro /etc/nixos/hyprland.nix";
       # Remote services via Tailscale
       cameras = "firefox http://100.110.68.48:5000";
       home-assistant = "firefox http://100.110.68.48:8123";

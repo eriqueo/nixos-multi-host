@@ -124,7 +124,7 @@ in
           # Applications
           "$mod, Space, exec, wofi --show drun"
           "$mod, E, exec, dolphin"
-          "$mod, B, exec, brave"
+          "$mod, B, exec, zen"
           
           # Function keys
           ", XF86AudioRaiseVolume, exec, wpctl set-volume @DEFAULT_AUDIO_SINK@ +5%"
