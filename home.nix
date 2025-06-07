@@ -48,7 +48,7 @@
     libreoffice gimp vscode
     wev              # Event viewer
     wl-clipboard     # Clipboard utilities (wl-copy, wl-paste)
-    hyprshot        # Enhanced screenshot tool
+   
     
     # Media clients
     vlc mpv
@@ -59,9 +59,11 @@
     hyprpaper        # Wallpaper daemon
     hypridle         # Idle management
     hyprlock         # Screen locker
-    
+    hyprshot        # Enhanced screenshot tool
     # Notifications and launchers
-    dunst            # Notification daemon
+    
+    swaync           # SwayNC notification center
+    libnotify        # For notify-send command
     wofi             # Application launcher
     # NOTE: waybar removed - provided by programs.waybar
     
@@ -115,6 +117,90 @@
     "workspace/scripts/.keep".text = "";
     "workspace/dotfiles/.keep".text = "";
     "coding/projects/.keep".text = "";
+    You add them inside the existing {} block, not as separate home.file sections. Here's how to do it correctly:
+    nix# Workspace directory structure
+    home.file = {
+      "workspace/projects/.keep".text = "";
+      "workspace/scripts/.keep".text = "";
+      "workspace/dotfiles/.keep".text = "";
+      "coding/projects/.keep".text = "";
+      "Pictures/screenshots/.keep".text = "";  # Add this line
+      
+      # Add the new config files here (inside the same block)
+      ".config/hypr/hypridle.conf".text = ''
+        general {
+          lock_cmd = pidof hyprlock || hyprlock
+          before_sleep_cmd = loginctl lock-session
+          after_sleep_cmd = hyprctl dispatch dpms on
+        }
+    
+        listener {
+          timeout = 150
+          on-timeout = brightnessctl -s set 10
+          on-resume = brightnessctl -r
+        }
+    
+        listener {
+          timeout = 300
+          on-timeout = loginctl lock-session
+        }
+    
+        listener {
+          timeout = 330
+          on-timeout = hyprctl dispatch dpms off
+          on-resume = hyprctl dispatch dpms on
+        }
+    
+        listener {
+          timeout = 1800
+          on-timeout = systemctl suspend
+        }
+      '';
+    
+      ".config/hypr/hyprlock.conf".text = ''
+        background {
+          monitor =
+          path = ~/Pictures/wallpaper.jpg
+          blur_passes = 3
+          blur_size = 8
+        }
+    
+        input-field {
+          monitor =
+          size = 200, 50
+          position = 0, -80
+          dots_center = true
+          fade_on_empty = false
+          font_color = rgb(202, 211, 245)
+          inner_color = rgb(91, 96, 120)
+          outer_color = rgb(24, 25, 38)
+          outline_thickness = 5
+          placeholder_text = <b>Password...</b>
+          shadow_passes = 2
+        }
+    
+        label {
+          monitor =
+          text = Hi $USER
+          color = rgba(200, 200, 200, 1.0)
+          font_size = 25
+          font_family = JetBrains Mono
+          position = 0, 80
+          halign = center
+          valign = center
+        }
+      '';
+    
+      ".config/swaync/config.json".text = ''
+        {
+          "positionX": "right",
+          "positionY": "top",
+          "timeout": 10,
+          "notification-icon-size": 64,
+          "control-center-width": 500,
+          "control-center-height": 600
+        }
+      '';
   };
 
   # ✅ UNIVERSAL GIT CONFIGURATION
@@ -579,6 +665,9 @@
     settings = {
       exec-once = [
       	"waybar"
+      	"swaync"                    # Notification daemon
+      	"hypridle"                  # Idle management
+      	"hyprpaper"                 # Wallpaper (if you want wallpapers)
       ];
       "$mod" = "SUPER";
       
@@ -591,7 +680,14 @@
       bind = [
         # Terminal
         "$mod, Return, exec, konsole"
+        # Screen locking
+        "$mod SHIFT, L, exec, hyprlock"
         
+        # Quick notifications test
+        "$mod, N, exec, notify-send 'Test' 'Notification system working'"
+        
+        # SwayNC control
+        "$mod, grave, exec, swaync-client -t -sw"  # Toggle notification center
         # Monitor layout switching
         "$mod SHIFT, bracketleft, exec, hyprctl keyword monitor 'eDP-1,2560x1600@165,0x0,1.60' && hyprctl keyword monitor 'DP-2,1920x1080@60,2560x0,1'"    # Laptop LEFT, external RIGHT
         "$mod SHIFT, bracketright, exec, hyprctl keyword monitor 'DP-2,1920x1080@60,0x0,1' && hyprctl keyword monitor 'eDP-1,2560x1600@165,1920x0,1.60'"   # External LEFT, laptop RIGHT
@@ -650,8 +746,13 @@
          "SHIFT, Print, exec, hyprshot -m region -o ~/Pictures/screenshots/ --clipboard-only" # Area to clipboard
         # "CTRL, Print, exec, hyprshot -m output -o ~/Pictures/screenshots/ --clipboard-only"  # Screen to clipboard
         # Application launcher
-        "$mod, R, exec, wofi --show drun"
+                
+        # App launcher with Space (like macOS Spotlight)
+        "$mod, Space, exec, wofi --show drun"  # Change from R to Space
         
+        # File manager with E
+        "$mod, E, exec, dolphin"  # Or nautilus if you prefer
+        "$mod, B, exec, brave"
         # Function keys
         ", XF86AudioRaiseVolume, exec, wpctl set-volume @DEFAULT_AUDIO_SINK@ +5%"
         ", XF86AudioLowerVolume, exec, wpctl set-volume @DEFAULT_AUDIO_SINK@ -5%"
