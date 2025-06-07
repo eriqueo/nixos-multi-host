@@ -1,7 +1,4 @@
 # home.nix - Heartwood Craft User Configuration
-{ config, pkgs, lib, osConfig, ... }:
-
-{
 let
   # Nordic Color Palette
   nordic-blue = {
@@ -46,7 +43,10 @@ let
     };
   };
 
-in {
+in 
+{ config, pkgs, lib, osConfig, ... }:
+
+{
   home.username = "eric";
   home.homeDirectory = "/home/eric";
   home.stateVersion = "23.05";
