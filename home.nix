@@ -27,7 +27,7 @@
     obsidian espanso
   ] 
   
-  # 🔄 CONDITIONAL PACKAGESsssssss
+  # 🔄 CONDITIONAL PACKAGES
   
   # Server-only packages
   ++ lib.optionals (osConfig.server or false) [
@@ -46,35 +46,40 @@
     # GUI applications
     firefox discord telegram-desktop spotify
     libreoffice gimp vscode
-    wev              # Event viewer (what you just added)
+    wev              # Event viewer
     wl-clipboard     # Clipboard utilities (wl-copy, wl-paste)
     grim             # Screenshot backend
     slurp            # Area selection for screenshots
     grimblast        # Enhanced screenshot tool
+    
     # Media clients
     vlc mpv
+    
     # Hyprland-specific utilities
-      hyprpicker       # Color picker
-      hyprcursor       # Cursor management
-      hyprpaper        # Wallpaper daemon
-      hypridle         # Idle management
-      hyprlock         # Screen locker
-  # Notifications and launchers
-  dunst            # Notification daemon
-  wofi             # Application launcher
-  waybar           # Status bar
-       # System management
-  brightnessctl    # Brightness control
-  playerctl        # Media player control
-  pamixer          # Audio control
-  blueman		   #bluetooth
-  pavucontrol
-  # File management
-  ranger           # Terminal file manager
-  xdg-utils        # Open files with default apps
-  
-  # Network/system info
-  networkmanagerapplet  # Network management
+    hyprpicker       # Color picker
+    hyprcursor       # Cursor management
+    hyprpaper        # Wallpaper daemon
+    hypridle         # Idle management
+    hyprlock         # Screen locker
+    
+    # Notifications and launchers
+    dunst            # Notification daemon
+    wofi             # Application launcher
+    # NOTE: waybar removed - provided by programs.waybar
+    
+    # System management
+    brightnessctl    # Brightness control
+    playerctl        # Media player control
+    pamixer          # Audio control
+    blueman          # Bluetooth
+    pavucontrol
+    
+    # File management
+    ranger           # Terminal file manager
+    xdg-utils        # Open files with default apps
+    
+    # Network/system info
+    networkmanagerapplet  # Network management
   ];
 
   # ✅ UNIVERSAL ENVIRONMENT VARIABLES
@@ -139,17 +144,18 @@
       visual = "!gitk";
     };
   };
+
+  # SSH configuration
+  programs.ssh = {
+    enable = true;
+    extraConfig = ''
+      AddKeysToAgent yes
+      IdentityFile ~/.ssh/id_ed25519
+      IdentitiesOnly yes
+    '';
+  };
   
-programs.ssh = {
-  enable     = true;       # installs ssh client binaries
-  extraConfig = ''
-    AddKeysToAgent yes
-    
-    IdentityFile ~/.ssh/id_ed25519
-    IdentitiesOnly yes
-  '';
-};
-services.ssh-agent.enable = true;
+  services.ssh-agent.enable = true;
 
   # ✅ ZSH CONFIGURATION WITH CONDITIONAL ALIASES
   programs.zsh = {
@@ -168,9 +174,7 @@ services.ssh-agent.enable = true;
     };
     
     defaultKeymap = "emacs";
-
-  
-       
+    
     # 🔄 CONDITIONAL ALIASES
     shellAliases = {
       # Universal file management
@@ -322,9 +326,7 @@ services.ssh-agent.enable = true;
     };
     
     # Advanced shell functions for business workflow integration
-    initContent = lib.mkOrder 550 ''    
-    
-      
+    initContent = lib.mkOrder 550 ''
       ${lib.optionalString (osConfig.server or false) ''
         # Enhanced grebuild function for server
         grebuild() {
@@ -577,7 +579,7 @@ services.ssh-agent.enable = true;
   wayland.windowManager.hyprland = lib.mkIf (osConfig.desktop or false) {
     enable = true;
     settings = {
-   	   exec-once = "waybar &";
+      exec-once = "waybar &";
       "$mod" = "SUPER";
       
       bindm = [
@@ -589,64 +591,63 @@ services.ssh-agent.enable = true;
       bind = [
         # Terminal
         "$mod, Return, exec, konsole"
-
-        # Monitor layout switching (FIXED)
+        
+        # Monitor layout switching
         "$mod SHIFT, bracketleft, exec, hyprctl keyword monitor 'eDP-1,2560x1600@165,0x0,1.60' && hyprctl keyword monitor 'DP-2,1920x1080@60,2560x0,1'"    # Laptop LEFT, external RIGHT
-          "$mod SHIFT, bracketright, exec, hyprctl keyword monitor 'DP-2,1920x1080@60,0x0,1' && hyprctl keyword monitor 'eDP-1,2560x1600@165,1920x0,1.60'"   # External LEFT, laptop RIGHT
-  # ===== FOCUS SWITCHING (just mod + arrows) =====
-  "$mod, left, movefocus, l"              # Focus left window
-  "$mod, right, movefocus, r"             # Focus right window  
-  "$mod, up, movefocus, u"                # Focus up window
-  "$mod, down, movefocus, d"              # Focus down window
-  
-  # ===== WINDOW MANAGEMENT (just mod) =====
-  "$mod, F, fullscreen"                   # Fullscreen
-  "$mod, Q, killactive"                   # Close window
-  "$mod, V, togglefloating"               # Toggle floating
+        "$mod SHIFT, bracketright, exec, hyprctl keyword monitor 'DP-2,1920x1080@60,0x0,1' && hyprctl keyword monitor 'eDP-1,2560x1600@165,1920x0,1.60'"   # External LEFT, laptop RIGHT
         
- # ===== SEND WINDOW TO WORKSPACE (ctrl + mod + key) =====
-  "CTRL $mod, 1, movetoworkspace, 1"      # Send window to workspace 1
-  "CTRL $mod, 2, movetoworkspace, 2"      # Send window to workspace 2
-  "CTRL $mod, 3, movetoworkspace, 3"      # Send window to workspace 3
-  "CTRL $mod, 4, movetoworkspace, 4"      # Send window to workspace 4
-  "CTRL $mod, 5, movetoworkspace, 5"      # Send window to workspace 5
-  "CTRL $mod, left, movetoworkspace, -1"  # Send window to previous workspace
-  "CTRL $mod, right, movetoworkspace, +1" # Send window to next workspace
+        # ===== FOCUS SWITCHING (just mod + arrows) =====
+        "$mod, left, movefocus, l"              # Focus left window
+        "$mod, right, movefocus, r"             # Focus right window  
+        "$mod, up, movefocus, u"                # Focus up window
+        "$mod, down, movefocus, d"              # Focus down window
         
-  # ===== WORKSPACE SWITCHING (ctrl + mod + alt + key) =====
-  "CTRL $mod ALT, 1, workspace, 1"        # Switch view to workspace 1
-  "CTRL $mod ALT, 2, workspace, 2"        # Switch view to workspace 2
-  "CTRL $mod ALT, 3, workspace, 3"        # Switch view to workspace 3
-  "CTRL $mod ALT, 4, workspace, 4"        # Switch view to workspace 4
-  "CTRL $mod ALT, 5, workspace, 5"        # Switch view to workspace 5
-  "CTRL $mod ALT, left, workspace, -1"    # Switch view to previous workspace
-  "CTRL $mod ALT, right, workspace, +1"   # Switch view to next workspace
+        # ===== WINDOW MANAGEMENT (just mod) =====
+        "$mod, F, fullscreen"                   # Fullscreen
+        "$mod, Q, killactive"                   # Close window
+        "$mod, V, togglefloating"               # Toggle floating
         
+        # ===== SEND WINDOW TO WORKSPACE (ctrl + mod + key) =====
+        "CTRL $mod, 1, movetoworkspace, 1"      # Send window to workspace 1
+        "CTRL $mod, 2, movetoworkspace, 2"      # Send window to workspace 2
+        "CTRL $mod, 3, movetoworkspace, 3"      # Send window to workspace 3
+        "CTRL $mod, 4, movetoworkspace, 4"      # Send window to workspace 4
+        "CTRL $mod, 5, movetoworkspace, 5"      # Send window to workspace 5
+        "CTRL $mod, left, movetoworkspace, -1"  # Send window to previous workspace
+        "CTRL $mod, right, movetoworkspace, +1" # Send window to next workspace
+        
+        # ===== WORKSPACE SWITCHING (ctrl + mod + alt + key) =====
+        "CTRL $mod ALT, 1, workspace, 1"        # Switch view to workspace 1
+        "CTRL $mod ALT, 2, workspace, 2"        # Switch view to workspace 2
+        "CTRL $mod ALT, 3, workspace, 3"        # Switch view to workspace 3
+        "CTRL $mod ALT, 4, workspace, 4"        # Switch view to workspace 4
+        "CTRL $mod ALT, 5, workspace, 5"        # Switch view to workspace 5
+        "CTRL $mod ALT, left, workspace, -1"    # Switch view to previous workspace
+        "CTRL $mod ALT, right, workspace, +1"   # Switch view to next workspace
         
         # Alternative focus with arrows  
         "$mod SHIFT, left, movefocus, l"
         "$mod SHIFT, right, movefocus, r"
         "$mod SHIFT, up, movefocus, u"
         "$mod SHIFT, down, movefocus, d"
-         # ===== WINDOW ARRANGEMENT (mod + alt + arrows) =====
-  "$mod ALT, left, movewindow, l"         # Move window to the left position
-  "$mod ALT, right, movewindow, r"        # Move window to the right position  
-  "$mod ALT, up, movewindow, u"           # Move window to the top position
-  "$mod ALT, down, movewindow, d"         # Move window to the bottom position
+        
+        # ===== WINDOW ARRANGEMENT (mod + alt + arrows) =====
+        "$mod ALT, left, movewindow, l"         # Move window to the left position
+        "$mod ALT, right, movewindow, r"        # Move window to the right position  
+        "$mod ALT, up, movewindow, u"           # Move window to the top position
+        "$mod ALT, down, movewindow, d"         # Move window to the bottom position
+        
         # Familiar cycling
         "ALT, Tab, cyclenext"
         "ALT SHIFT, Tab, cyclenext, prev"
-
-", Print, exec, grimblast --notify copysave active"        # Window screenshot
-"SHIFT, Print, exec, grimblast --notify copysave area"     # Area selection  
-"CTRL, Print, exec, grimblast --notify copysave screen"    # Full screen
-
-
-        # Tiling controls
-        "$mod, Q, killactive"
-        "$mod, V, togglefloating"
+        
+        # Screenshots
+        ", Print, exec, grimblast --notify copysave active"        # Window screenshot
+        "SHIFT, Print, exec, grimblast --notify copysave area"     # Area selection  
+        "CTRL, Print, exec, grimblast --notify copysave screen"    # Full screen
+        
+        # Application launcher
         "$mod, R, exec, wofi --show drun"
-        "$mod, F, fullscreen"
         
         # Function keys
         ", XF86AudioRaiseVolume, exec, wpctl set-volume @DEFAULT_AUDIO_SINK@ +5%"
@@ -688,9 +689,6 @@ services.ssh-agent.enable = true;
       };
     };
   };
-# Add this to your home.nix in the desktop conditional section
-
-# Add this to your home.nix in the desktop conditional section
 
   # Waybar configuration (desktop only)
   programs.waybar = lib.mkIf (osConfig.desktop or false) {
@@ -934,6 +932,7 @@ services.ssh-agent.enable = true;
       }
     '';
   };
+
   # Enable Home Manager self-management
   programs.home-manager.enable = true;
 }
