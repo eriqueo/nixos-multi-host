@@ -637,10 +637,10 @@ services.ssh-agent.enable = true;
         "ALT, Tab, cyclenext"
         "ALT SHIFT, Tab, cyclenext, prev"
 
-        # Screenshot on “Print” key
-       # "Print, exec, grim ~/Pictures/screenshot_$(date +%Y%m%d_%H%M%S).png"
-        # or, if you prefer slurp+grim for region:
-        # "Print, exec, grim -g \'$(slurp)\' - | wl-copy"
+", Print, exec, grimblast --notify copysave active"        # Window screenshot
+"SHIFT, Print, exec, grimblast --notify copysave area"     # Area selection  
+"CTRL, Print, exec, grimblast --notify copysave screen"    # Full screen
+
 
         # Tiling controls
         "$mod, Q, killactive"
