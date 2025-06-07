@@ -924,16 +924,15 @@ in
       decoration = {
         rounding = 8;
         blur = {
-        enabled = true;
-        size = 6;
-        passes = 2;
-        new_optimizations = true;
-        ignore_opacity = true;
-        noise = 0.0117;
-        contrast = 1.0;
-        brightness = 1.0;
-        xray = false;
+          enabled = true;
+          size = 6;
+          passes = 2;
         };
+        drop_shadow = true;
+        shadow_range = 6;
+        shadow_render_power = 3;
+        "col.shadow" = "rgba(${builtins.substring 1 6 theme.bg-darker}80)";
+      };
 
          # Nordic shadow settings
       drop_shadow = true;
@@ -992,7 +991,6 @@ in
       swallow_regex = "^(kitty)$";
     };
       };
-    };
   };
 
   # Waybar configuration (desktop only)
