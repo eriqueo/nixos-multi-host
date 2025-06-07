@@ -803,7 +803,7 @@ in
     settings = {
       exec-once = [
       	"waybar"
-      	"swaync"                    # Notification daemon
+      	"swaynotificationcenter"                    # Notification daemon
       	"hypridle"                  # Idle management
       	"hyprpaper"                 # Wallpaper (if you want wallpapers)
       ];
@@ -916,18 +916,81 @@ in
         gaps_in = 5;
         gaps_out = 10;
         border_size = 2;
-        "col.active_border" = "rgba(33ccffee)";
-        "col.inactive_border" = "rgba(595959aa)";
+        "col.active_border" = "rgb(${builtins.substring 1 6 theme.accent}) rgb(${builtins.substring 1 6 theme.accent-bright}) 45deg";
+        "col.inactive_border" = "rgb(${builtins.substring 1 6 theme.border})";
         layout = "dwindle";
       };
       
       decoration = {
         rounding = 8;
         blur = {
-          enabled = true;
-          size = 3;
-          passes = 1;
+        enabled = true;
+        size = 6;
+        passes = 2;
+        new_optimizations = true;
+        ignore_opacity = true;
+        noise = 0.0117;
+        contrast = 1.0;
+        brightness = 1.0;
+        xray = false;
         };
+
+         # Nordic shadow settings
+      drop_shadow = true;
+      shadow_range = 6;
+      shadow_render_power = 3;
+      shadow_offset = "0 2";
+      "col.shadow" = "rgba(${builtins.substring 1 6 theme.bg-darker}80)";
+      "col.shadow_inactive" = "rgba(${builtins.substring 1 6 theme.bg-darker}40)";
+      
+      # Dimming inactive windows (optional Nordic effect)
+      dim_inactive = false;
+      dim_strength = 0.1;
+    };
+    
+    # Nordic animation settings (optional - makes it feel smoother)
+    animations = {
+      enabled = true;
+      
+      bezier = [
+        "wind, 0.05, 0.9, 0.1, 1.05"
+        "winIn, 0.1, 1.1, 0.1, 1.1" 
+        "winOut, 0.3, -0.3, 0, 1"
+        "liner, 1, 1, 1, 1"
+      ];
+      
+      animation = [
+        "windows, 1, 6, wind, slide"
+        "windowsIn, 1, 6, winIn, slide"
+        "windowsOut, 1, 5, winOut, slide"
+        "windowsMove, 1, 5, wind, slide"
+        "border, 1, 1, liner"
+        "borderangle, 1, 30, liner, loop"
+        "fade, 1, 10, default"
+        "workspaces, 1, 5, wind"
+      ];
+    };
+    
+    # Nordic workspace settings
+    dwindle = {
+      pseudotile = true;
+      preserve_split = true;
+      smart_split = false;
+      smart_resizing = true;
+    };
+    
+    # Nordic misc settings
+    misc = {
+      disable_hyprland_logo = true;
+      disable_splash_rendering = true;
+      mouse_move_enables_dpms = true;
+      key_press_enables_dpms = true;
+      vrr = 0;
+      animate_manual_resizes = true;
+      animate_mouse_windowdragging = true;
+      enable_swallow = true;
+      swallow_regex = "^(kitty)$";
+    };
       };
     };
   };
