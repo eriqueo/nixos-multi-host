@@ -1,5 +1,3 @@
-
-
 let
   # Import Nordic theme from the main config (you'll pass this in)
   # For now, defining it here - you can import it later
@@ -35,44 +33,9 @@ let
   };
 in
 
-{
 # hyprland.nix - Dedicated Hyprland Configuration
 { config, pkgs, lib, osConfig, ... }:
   
-  let
-    # Import Nordic theme from the main config (you'll pass this in)
-    # For now, defining it here - you can import it later
-    nordic-blue = {
-      bg = "#2e3440";
-      bg-alt = "#3b4252";
-      bg-darker = "#1a1d23";
-      fg = "#eceff4";
-      fg-alt = "#d8dee9";
-      fg-dim = "#4c566a";
-      accent = "#5e81ac";
-      accent-bright = "#81a1c1";
-      accent-dim = "#4c7398";
-      red = "#bf616a";
-      orange = "#d08770";
-      yellow = "#ebcb8b";
-      green = "#a3be8c";
-      purple = "#b48ead";
-      border = "#434c5e";
-      selection = "#4c566a";
-      urgent = "#bf616a";
-    };
-    
-    theme = nordic-blue;
-    
-    fonts = {
-      mono = "CaskaydiaCove Nerd Font";
-      sans = "Inter";
-      size = {
-        normal = "13";
-        large = "15";
-      };
-    };
-  in
   
   {
     # Hyprland configuration (desktop only)
