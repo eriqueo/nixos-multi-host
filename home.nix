@@ -113,13 +113,6 @@
 
   # Workspace directory structure
   home.file = {
-    "workspace/projects/.keep".text = "";
-    "workspace/scripts/.keep".text = "";
-    "workspace/dotfiles/.keep".text = "";
-    "coding/projects/.keep".text = "";
-    You add them inside the existing {} block, not as separate home.file sections. Here's how to do it correctly:
-    nix# Workspace directory structure
-    home.file = {
       "workspace/projects/.keep".text = "";
       "workspace/scripts/.keep".text = "";
       "workspace/dotfiles/.keep".text = "";
