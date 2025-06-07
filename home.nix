@@ -577,7 +577,9 @@
   wayland.windowManager.hyprland = lib.mkIf (osConfig.desktop or false) {
     enable = true;
     settings = {
-      
+      exec-once = [
+      	"waybar"
+      ];
       "$mod" = "SUPER";
       
       bindm = [
@@ -697,7 +699,7 @@
     package = pkgs.waybar.overrideAttrs (oldAttrs: {
       mesonFlags = oldAttrs.mesonFlags ++ [ "-Dexperimental=true" ];
     });
-    systemd.enable = true;
+    systemd.enable = false;
     
     settings = {
       mainBar = {
