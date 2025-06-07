@@ -935,14 +935,15 @@ in
         xray = false;
         };
 
-         # Nordic shadow settings
-      drop_shadow = true;
-      shadow_range = 6;
-      shadow_render_power = 3;
-      shadow_offset = "0 2";
-      "col.shadow" = "rgba(${builtins.substring 1 6 theme.bg-darker}80)";
-      "col.shadow_inactive" = "rgba(${builtins.substring 1 6 theme.bg-darker}40)";
-      
+		# Nordic shadow settings
+		shadow {
+		    enabled = true
+		    range = 6
+		    render_power = 3
+		    offset = "0 2"
+		    color = "rgba(${builtins.substring 1 6 theme.bg-darker}80)"
+		    color_inactive = "rgba(${builtins.substring 1 6 theme.bg-darker}40)"
+		}
       # Dimming inactive windows (optional Nordic effect)
       dim_inactive = false;
       dim_strength = 0.1;
