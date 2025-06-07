@@ -62,7 +62,7 @@
     hyprshot        # Enhanced screenshot tool
     # Notifications and launchers
     
-    swaync           # SwayNC notification center
+    swaynotificationcenter           # SwayNC notification center
     libnotify        # For notify-send command
     wofi             # Application launcher
     # NOTE: waybar removed - provided by programs.waybar
