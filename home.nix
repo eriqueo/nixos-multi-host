@@ -48,9 +48,7 @@
     libreoffice gimp vscode
     wev              # Event viewer
     wl-clipboard     # Clipboard utilities (wl-copy, wl-paste)
-    grim             # Screenshot backend
-    slurp            # Area selection for screenshots
-    grimblast        # Enhanced screenshot tool
+    hyprshot        # Enhanced screenshot tool
     
     # Media clients
     vlc mpv
@@ -579,7 +577,7 @@
   wayland.windowManager.hyprland = lib.mkIf (osConfig.desktop or false) {
     enable = true;
     settings = {
-      exec-once = "waybar &";
+      
       "$mod" = "SUPER";
       
       bindm = [
@@ -642,10 +640,13 @@
         "ALT SHIFT, Tab, cyclenext, prev"
         
         # Screenshots
-        ", Print, exec, grimblast --notify copysave active"        # Window screenshot
-        "SHIFT, Print, exec, grimblast --notify copysave area"     # Area selection  
-        "CTRL, Print, exec, grimblast --notify copysave screen"    # Full screen
-        
+        ", Print, exec, hyprshot -m region -o ~/Pictures/screenshots/"          # Area screenshot
+        #"SHIFT, Print, exec, hyprshot -m window -o ~/Pictures/screenshots/"     # window selection  
+        "CTRL, Print, exec, hyprshot -m output -o ~/Pictures/screenshots/"      # Full screen/monitor
+        # Optional: If you want clipboard + save (most useful):
+        # ", Print, exec, hyprshot -m window -o ~/Pictures/screenshots/ --clipboard-only"     # Window to clipboard
+         "SHIFT, Print, exec, hyprshot -m region -o ~/Pictures/screenshots/ --clipboard-only" # Area to clipboard
+        # "CTRL, Print, exec, hyprshot -m output -o ~/Pictures/screenshots/ --clipboard-only"  # Screen to clipboard
         # Application launcher
         "$mod, R, exec, wofi --show drun"
         
