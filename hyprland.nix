@@ -38,7 +38,7 @@ in
 
 {
 # hyprland.nix - Dedicated Hyprland Configuration
-  { config, pkgs, lib, osConfig, ... }:
+{ config, pkgs, lib, osConfig, ... }:
   
   let
     # Import Nordic theme from the main config (you'll pass this in)
