@@ -990,7 +990,6 @@ in
       enable_swallow = true;
       swallow_regex = "^(kitty)$";
     };
-      };
   };
 
   # Waybar configuration (desktop only)
