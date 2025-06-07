@@ -1090,6 +1090,128 @@ in
     '';
   };
 
+  # Add this new programs.kitty section to your home.nix
+  # (This creates a Nordic terminal theme with transparency)
+  
+  programs.kitty = lib.mkIf (osConfig.desktop or false) {
+    enable = true;
+    font = {
+      name = fonts.mono;
+      size = 13;
+    };
+    settings = {
+      # Nordic color scheme for terminal
+      background = theme.bg;
+      foreground = theme.fg;
+      
+      # Cursor colors
+      cursor = theme.fg;
+      cursor_text_color = theme.bg;
+      
+      # Selection colors
+      selection_background = theme.selection;
+      selection_foreground = theme.fg;
+      
+      # URL colors
+      url_color = theme.accent-bright;
+      
+      # Terminal colors (ANSI)
+      # Black
+      color0 = theme.bg-darker;
+      color8 = theme.fg-dim;
+      
+      # Red  
+      color1 = theme.red;
+      color9 = theme.red;
+      
+      # Green
+      color2 = theme.green;
+      color10 = theme.green;
+      
+      # Yellow
+      color3 = theme.yellow;
+      color11 = theme.yellow;
+      
+      # Blue
+      color4 = theme.accent;
+      color12 = theme.accent-bright;
+      
+      # Magenta
+      color5 = theme.purple;
+      color13 = theme.purple;
+      
+      # Cyan
+      color6 = theme.accent-bright;
+      color14 = theme.accent-bright;
+      
+      # White
+      color7 = theme.fg;
+      color15 = theme.fg;
+      
+      # Visual settings (like the video)
+      background_opacity = "0.9";           # Transparency to see wallpaper
+      background_blur = 32;                 # Blur effect
+      
+      # Window settings
+      window_padding_width = 12;            # Nice padding
+      hide_window_decorations = true;       # Clean look
+      confirm_os_window_close = 0;          # No annoying popups
+      
+      # Tab bar (Nordic themed)
+      tab_bar_edge = "top";
+      tab_bar_style = "powerline";
+      tab_powerline_style = "slanted";
+      
+      # Tab colors
+      active_tab_background = theme.accent;
+      active_tab_foreground = theme.bg;
+      inactive_tab_background = theme.bg-alt;
+      inactive_tab_foreground = theme.fg-alt;
+      tab_bar_background = theme.bg;
+      
+      # Bell settings
+      enable_audio_bell = false;
+      visual_bell_duration = "0.0";
+      
+      # Performance
+      repaint_delay = 10;
+      input_delay = 3;
+      sync_to_monitor = true;
+      
+      # Scrolling
+      scrollback_lines = 10000;
+      wheel_scroll_multiplier = "5.0";
+      
+      # Mouse
+      copy_on_select = true;
+      strip_trailing_spaces = "smart";
+      
+      # Keyboard shortcuts (Nordic-friendly)
+      map = "ctrl+shift+c copy_to_clipboard";
+      map = "ctrl+shift+v paste_from_clipboard";
+      map = "ctrl+shift+equal change_font_size all +2.0";
+      map = "ctrl+shift+minus change_font_size all -2.0";
+      map = "ctrl+shift+backspace change_font_size all 0";
+    };
+    
+    # Additional kitty configuration
+    extraConfig = ''
+      # Nordic-specific terminal enhancements
+      modify_font cell_height 110%
+      modify_font baseline 2
+      
+      # Cursor customization
+      cursor_shape block
+      cursor_blink_interval 0
+      
+      # Selection customization
+      rectangle_select_modifiers ctrl+alt
+      
+      # Performance tweaks
+      wayland_titlebar_color background
+    '';
+  };
+
   # Enable Home Manager self-management
   programs.home-manager.enable = true;
 }
