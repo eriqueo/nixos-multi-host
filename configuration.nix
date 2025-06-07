@@ -64,20 +64,7 @@
 
       efibootmgr
       
-      services.greetd = lib.mkIf config.desktop {
-        enable = true;
-        settings = {
-          default_session = {
-            command = "${pkgs.greetd.tuigreet}/bin/tuigreet --time --cmd Hyprland";
-            user = "greeter";
-          };
-          # Auto-login (optional - remove these lines if you want to see login screen)
-          initial_session = {
-            command = "Hyprland";
-            user = "eric";
-          };
-        };
-      };
+    
       # KDE Applications (familiar tools)
       kdePackages.konsole kdePackages.dolphin kdePackages.kate kdePackages.yakuake kdePackages.gwenview kdePackages.kdeconnect-kde kdePackages.ark kdePackages.okular
       
@@ -122,6 +109,22 @@
 
     # Tailscale VPN
     services.tailscale.enable = true;
+    
+# Display manager (laptop only) - ADD HERE
+services.greetd = lib.mkIf config.desktop {
+  enable = true;
+  settings = {
+    default_session = {
+      command = "${pkgs.greetd.tuigreet}/bin/tuigreet --time --cmd Hyprland";
+      user = "greeter";
+    };
+    initial_session = {
+      command = "Hyprland";
+      user = "eric";
+    };
+  };
+};
+
 
     # 👤 USERS CONFIGURATION
     users.users.eric = {
