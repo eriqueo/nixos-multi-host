@@ -54,84 +54,126 @@ in
   home.stateVersion = "23.05";
 
   # ✅ UNIVERSAL PACKAGES
-  home.packages = with pkgs; [
-    # Modern CLI replacements
-    bat eza fzf ripgrep htop btop tree tmux neofetch
-    
-    # Development tools
-    python3 nodejs gh speedtest-cli nmap wireguard-tools
-    
-    # Data processing utilities
-    jq yq pandoc zip unzip p7zip
-    
-    # Network and file management
-    curl wget rsync sshfs rclone
-    
-    # System utilities
-    xclip
-    
-    # Universal productivity
-    obsidian espanso
-  ] 
+# ████ CORE PACKAGES (Both machines)
+home.packages = with pkgs; [
+  # Modern CLI replacements
+  bat          # Better cat
+  eza          # Better ls  
+  fzf          # Fuzzy finder
+  ripgrep      # Better grep
+  btop         # Better htop (remove htop)
+  tree         # Directory viewer
+  tmux         # Terminal multiplexer
+  neofetch     # System info
   
-  # 🔄 CONDITIONAL PACKAGES
+  # Development tools
+  python3      # Python environment
+  nodejs       # Node.js runtime
+  gh           # GitHub CLI
+  speedtest-cli # Network speed test
+  nmap         # Network scanner
+  wireguard-tools # VPN tools
   
-  # Server-only packages
-  ++ lib.optionals (osConfig.server or false) [
-    # OCR and document processing
-    tesseract imagemagick poppler_utils
-    
-    # Container management
-    podman-compose
-    
-    # System monitoring
-    iotop lsof
-  ]
+  # Data processing utilities
+  jq           # JSON processor
+  yq           # YAML processor
+  pandoc       # Document converter
+  zip unzip p7zip # Compression tools
   
-  # Desktop packages (laptop)
-  ++ lib.optionals (osConfig.desktop or false) [
-    # GUI applications
-    firefox discord telegram-desktop spotify
-    libreoffice gimp vscode
-    wev              # Event viewer
-    wl-clipboard     # Clipboard utilities (wl-copy, wl-paste)
+  # Network and file management  
+  curl         # URL transfer
+  wget         # Web downloader
+  rsync        # File sync
+  sshfs        # SSH filesystem
+  rclone       # Cloud sync
+  
+  # System utilities
+  xclip        # X11 clipboard
+  
+  # Universal productivity
+  obsidian     # Knowledge management
+  espanso      # Text expansion
+  
+  # Wayland clipboard (both need these)
+  wl-clipboard     # Clipboard utilities
+  cliphist         # Clipboard history
+  wl-clip-persist  # Keep clipboard after app close
+]
 
-    #Nordic themes
-	nerd-fonts.caskaydia-cove
-    inter
-    nordic  # The Nordic GTK theme
-    
-    # Media clients
-    vlc mpv
-    
-    # Hyprland-specific utilities
-    hyprpicker       # Color picker
-    hyprcursor       # Cursor management
-    hyprpaper        # Wallpaper daemon
-    hypridle         # Idle management
-    hyprlock         # Screen locker
-    hyprshot        # Enhanced screenshot tool
-    # Notifications and launchers
-    
-    swaynotificationcenter           # SwayNC notification center
-    libnotify        # For notify-send command
-    wofi             # Application launcher
-    # NOTE: waybar removed - provided by programs.waybar
-    
-    # System management
-    brightnessctl    # Brightness control
-    playerctl        # Media player control
-    pamixer          # Audio control
-    blueman          # Bluetooth
-    pavucontrol
-    
-    # File management
-    ranger           # Terminal file manager
-    xdg-utils        # Open files with default apps
-    
-    # Network/system info
-    networkmanagerapplet  # Network management
-  ];
+# ████ CONDITIONAL PACKAGES
+++ lib.optionals (osConfig.networking.hostName == "laptop") [
+  # GUI applications
+  #firefox          # Keep as secondary browser
+  # brave          # REMOVED - too heavy
+  #zen-browser      # Primary browser  
+  ungoogled-chromium         # Lightweight testing
+  librewolf        # Privacy browser for extensions
+  # google-chrome  # REMOVED - proprietary
+  discord          # Keep discord
+  #telegram-desktop # Keep telegram
+  spotify          # Keep spotify
+  libreoffice      # Keep office suite
+  gimp             # Keep image editor
+  vscode           # Primary editor
+  wev              # Event viewer
+  
+  # Desktop environment
+  caskaydia-cove-nerd-font  # Keep your font
+  inter            # Keep inter font
+  nordic           # Keep theme
+  
+  # Media clients
+  vlc              # Keep as backup player
+  mpv              # Primary media player
+  # celluloid      # REMOVED - mpv is enough
+  # rhythmbox      # REMOVED - use spotify
+  
+  # Hyprland utilities
+  hyprpicker       # Color picker
+  hyprcursor       # Cursor management
+  hyprpaper        # Wallpaper daemon
+  hypridle         # Idle management
+  hyprlock         # Screen locker
+  hyprshot         # Screenshot tool
+  # grim slurp     # REMOVED - hyprshot handles this
+  
+  # Notifications and launchers
+  swaynotificationcenter  # Notifications
+  libnotify        # Notify-send command
+  wofi             # Application launcher
+  # waybar removed - provided by programs.waybar
+  
+  # System management
+  brightnessctl    # Brightness control
+  playerctl        # Media control
+  pamixer          # Audio control
+  blueman          # Bluetooth
+  pavucontrol      # Audio control GUI
+  
+  # File management
+  thunar                    # Better themed file manager
+  thunar-volman            # Auto-mount volumes
+  thunar-archive-plugin    # Right-click extract/compress
+  ranger           # Terminal file manager
+  xdg_utils        # Default app handling
+  
+  # Network info
+  networkmanagerapplet  # Network management
+]
+
+++ lib.optionals (osConfig.networking.hostName == "homeserver") [
+  # Server-only packages
+  tesseract        # OCR engine
+  imagemagick      # Image processing
+  poppler_utils    # PDF utilities
+  
+  # Container management
+  podman-compose   # Docker-compose for podman
+  
+  # System monitoring
+  iotop            # IO monitoring
+  lsof             # List open files
+];
 
   # ✅ UNIVERSAL ENVIRONMENT VARIABLES
   home.sessionVariables = {

@@ -49,6 +49,20 @@ in
           "hypridle"
           "hyprpaper"
         ];
+        # Monitor setup - external monitor on left, laptop on right
+        monitor = DP-2, 1920x1080@60, 0x0, 1          # Dell external  Left
+        monitor = eDP-1, 2560x1600@165, 1920x0, 1.6   # Laptop Right
+        
+		# Named workspace assignments (all in one place)
+		workspace = 1:Web, monitor:DP-2, default:true
+		workspace = 2:Mail, monitor:DP-2, default:true
+		workspace = 3:JT, monitor:DP-2, default:true 
+		workspace = 4:Notes, monitor:DP-2, default:true
+		workspace = 5:AI, monitor:eDP-1, default:true
+		workspace = 6:Code, monitor:DP-2, default:true
+		workspace = 7:Media, monitor:DP-2, default:true
+		workspace = 8:Misc, monitor:DP-2, default:true 
+        
         
         # Modifier key
         "$mod" = "SUPER";
@@ -57,12 +71,14 @@ in
         bindm = [
           "$mod, mouse:272, movewindow"
           "$mod, mouse:273, resizewindow"
+                     # Middle click paste binding (if not working automatically)
+      	  "mouse:274, exec, wl-paste -p | wl-copy"
         ];
         
         # Key bindings
         bind = [
           # Terminal and system
-          "$mod, Return, exec, konsole"
+          "$mod, Return, exec, kitty"
           "$mod SHIFT, L, exec, hyprlock"
           "$mod, N, exec, notify-send 'Test' 'Notification system working'"
           "$mod, grave, exec, swaync-client -t -sw"
@@ -76,6 +92,9 @@ in
           "$mod, right, movefocus, r"
           "$mod, up, movefocus, u"
           "$mod, down, movefocus, d"
+          # Optional: Focus monitor
+          "$mod, comma, focusmonitor, l"
+          "$mod, period, focusmonitor, r"
           
           # Window management
           "$mod, F, fullscreen"
@@ -111,6 +130,9 @@ in
           "$mod ALT, right, movewindow, r"
           "$mod ALT, up, movewindow, u"
           "$mod ALT, down, movewindow, d"
+          # Keybinds to move workspaces between monitors
+          "$mod ALT, comma, movecurrentworkspacetomonitor, l"
+          "$mod ALT, period, movecurrentworkspacetomonitor, r"
           
           # Window cycling
           "ALT, Tab, cyclenext"
@@ -124,19 +146,22 @@ in
           # Applications
           "$mod, Space, exec, wofi --show drun"
           "$mod, E, exec, dolphin"
-          "$mod, B, exec, zen"
+          "$mod, B, exec, librewolf"
+          
+
           
           # Function keys
           ", XF86AudioRaiseVolume, exec, wpctl set-volume @DEFAULT_AUDIO_SINK@ +5%"
           ", XF86AudioLowerVolume, exec, wpctl set-volume @DEFAULT_AUDIO_SINK@ -5%"
           ", XF86AudioMute, exec, wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"
           ", XF86MonBrightnessUp, exec, brightnessctl set +10%"
-          ", XF86MonBrightnessDown, exec, brightnessctl set 10%-"
+          ", XF86MonBrightnessDown, exec, brightnessctl set 10%-"       
         ];
         
         # Input configuration
         input = {
-          follow_mouse = 0;
+          follow_mouse = 1;
+          float_switch_override_focus = 1  # Floating windows always get focus
           kb_layout = "us";
           
           touchpad = {
@@ -218,6 +243,12 @@ in
           smart_resizing = true;
         };
         
+        # Better mouse settings
+        device:logitech-wireless-receiver-mouse {  # Replace with your mouse name from `hyprctl devices`
+            middle_button_emulation = false
+        }
+        
+              
         # Misc settings
         misc = {
           disable_hyprland_logo = true;
@@ -255,19 +286,13 @@ in
           "hyprland/workspaces" = {
             disable-scroll = true;
             all-outputs = true;
-            format = "{icon}";
-            format-icons = {
-              "1" = "1";
-              "2" = "2";
-              "3" = "3";
-              "4" = "4";
-              "5" = "5";
+            format = "{name}";
               urgent = "";
               focused = "";
               default = "";
             };
             persistent-workspaces = {
-              "*" = 5; # Show 5 workspaces on all monitors
+             "*" = [ 1 2 3 4 5 6 7 8 ];  # Add 6 7 8 here
             };
           };
           
