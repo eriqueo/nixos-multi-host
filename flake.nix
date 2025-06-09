@@ -59,12 +59,12 @@
             home-manager.useUserPackages = true;
             home-manager.users.eric = import ./home.nix;
           }
-          {
+           ({ pkgs, ... }: {
             environment.systemPackages = with pkgs; [
               librewolf
               ungoogled-chromium
             ];
-          }
+          })
           {
             # LAPTOP CONFIGURATION
             networking.hostName = "heartwood-laptop";
