@@ -10,7 +10,7 @@
     };
   };
 
-  outputs = { self, nixpkgs, home-manager, zen-browser, ... }: {
+  outputs = { self, nixpkgs, home-manager, ... }: {
     nixosConfigurations = {
       
       # 🖥️ SERVER - Complete AI Business Intelligence Platform
