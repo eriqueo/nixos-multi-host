@@ -10,7 +10,7 @@
     };
   };
 
-  outputs = { self, nixpkgs, home-manager, ... }: {
+  outputs = { self, nixpkgs, home-manager, zen-browser, ... }: {
     nixosConfigurations = {
       
       # 🖥️ SERVER - Complete AI Business Intelligence Platform
@@ -58,6 +58,12 @@
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
             home-manager.users.eric = import ./home.nix;
+          }
+          {
+            environment.systemPackages = with pkgs; [
+              librewolf
+              ungoogled-chromium
+            ];
           }
           {
             # LAPTOP CONFIGURATION

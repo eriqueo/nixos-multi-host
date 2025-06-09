@@ -79,7 +79,8 @@
       kdePackages.konsole kdePackages.dolphin kdePackages.kate kdePackages.yakuake kdePackages.gwenview kdePackages.kdeconnect-kde kdePackages.ark kdePackages.okular
       
       # Browsers
-      firefox brave
+       librewolf
+       ungoogled-chromium
       
       # Development & Productivity
       vscode obsidian libreoffice
