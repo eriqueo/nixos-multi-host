@@ -5,16 +5,16 @@
   # 📺 MEDIA SERVER SERVICES
   
   # Native Jellyfin service
-  services.jellyfin = lib.mkIf config.media.server {
+  services.jellyfin = {
     enable = true;
   };
 
   # Container services
-  virtualisation.oci-containers.containers = lib.mkMerge [
+  virtualisation.oci-containers.containers = [
     
     # Media Stack (server only)
-    (lib.mkIf config.media.server {
-      gluetun = {
+   {
+    gluetun = {
         image = "qmcgaw/gluetun:latest";
         autoStart = true;
         extraOptions = [ "--cap-add=NET_ADMIN" "--device=/dev/net/tun" ];
@@ -28,9 +28,9 @@
           TZ = "NL#340";
         };
         ports = [ "8080:8080" ];
-      };
+    };
 
-      qbittorrent = {
+    qbittorrent = {
         image = "lscr.io/linuxserver/qbittorrent:latest";
         autoStart = true;
         dependsOn = [ "gluetun" ];
@@ -46,9 +46,9 @@
           TZ = "America/Denver";
           WEBUI_PORT = "8080";
         };
-      };
+    };
 
-      sonarr = {
+    sonarr = {
         image = "lscr.io/linuxserver/sonarr:latest";
         autoStart = true;
         ports = [ "8989:8989" ];
@@ -61,9 +61,9 @@
           PGID = "1000";
           TZ = "America/Denver";
         };
-      };
+    };
 
-      radarr = {
+    radarr = {
         image = "lscr.io/linuxserver/radarr:latest";
         autoStart = true;
         ports = [ "7878:7878" ];
@@ -76,9 +76,9 @@
           PGID = "1000";
           TZ = "America/Denver";
         };
-      };
+    };
 
-      lidarr = {
+    lidarr = {
         image = "lscr.io/linuxserver/lidarr:latest";
         autoStart = true;
         ports = [ "8686:8686" ];
@@ -91,9 +91,9 @@
           PGID = "1000";
           TZ = "America/Denver";
         };
-      };
+    };
 
-      prowlarr = {
+    prowlarr = {
         image = "lscr.io/linuxserver/prowlarr:latest";
         autoStart = true;
         ports = [ "9696:9696" ];
@@ -105,9 +105,9 @@
           PGID = "1000";
           TZ = "America/Denver";
         };
-      };
+    };
 
-      navidrome = {
+    navidrome = {
         image = "deluan/navidrome:latest";
         autoStart = true;
         ports = [ "4533:4533" ];
@@ -122,9 +122,9 @@
           ND_BASEURL = "";
           TZ = "America/Denver";
         };
-      };
+    };
 
-      immich = {
+    immich = {
         image = "ghcr.io/immich-app/immich-server:release";
         autoStart = true;
         ports = [ "2283:3001" ];
@@ -141,9 +141,9 @@
           TZ = "America/Denver";
         };
         dependsOn = [ "immich-postgres" "immich-redis" ];
-      };
+    };
 
-      immich-postgres = {
+    immich-postgres = {
         image = "tensorchord/pgvecto-rs:pg14-v0.2.0";
         autoStart = true;
         volumes = [
@@ -155,20 +155,19 @@
           POSTGRES_DB = "immich";
           TZ = "America/Denver";
         };
-      };
+    };
 
-      immich-redis = {
+    immich-redis = {
         image = "redis:6.2-alpine";
         autoStart = true;
         environment = {
           TZ = "America/Denver";
         };
-      };
-    })
+    };
+    }
 
     # Surveillance Stack (server only)
-    (lib.mkIf config.surveillance.server {
-      frigate = {
+    frigate = {
         image = "ghcr.io/blakeblackshear/frigate:stable";
         autoStart = true;
         extraOptions = [
@@ -177,8 +176,8 @@
           "--device=/dev/dri:/dev/dri"
           "--tmpfs=/tmp/cache:size=1g"
           "--shm-size=512m"
-	  "--memory =6g"
-	  "--cpus=2.0"
+	        "--memory =6g"
+	        "--cpus=2.0"
         ];
         environment = {
           FRIGATE_RTSP_PASSWORD = "iL0wwlm?";
@@ -196,9 +195,9 @@
           "8555:8555/tcp"
           "8555:8555/udp"
         ];
-      };
+    };
 
-      home-assistant = {
+    home-assistant = {
         image = "ghcr.io/home-assistant/home-assistant:stable";
         autoStart = true;
         extraOptions = [ "--network=host" ];
@@ -211,13 +210,12 @@
         ];
         ports = [ "8123:8123" ];
       };
-    })
   ];
 
   # 💼 BUSINESS INTELLIGENCE SERVICES
 
   # PostgreSQL database (server only)
-  services.postgresql = lib.mkIf config.business.server {
+  services.postgresql = {
     enable = true;
     package = pkgs.postgresql_15;
     
@@ -288,7 +286,7 @@
   };
 
   # Redis cache (server only)
-  services.redis.servers.business = lib.mkIf config.business.server {
+  services.redis.servers.business = {
     enable = true;
     port = 6379;
     bind = "127.0.0.1";
@@ -297,7 +295,7 @@
   # 🤖 AI SERVICES
 
   # Ollama AI service (server only)
-  services.ollama = lib.mkIf config.ai.server {
+  services.ollama = {
     enable = true;
     acceleration = false; # CPU-only for data sovereignty
     host = "127.0.0.1";
@@ -307,7 +305,7 @@
   # 📹 SURVEILLANCE CONFIGURATION
 
   # MQTT broker (server only)
-  services.mosquitto = lib.mkIf config.surveillance.server {
+  services.mosquitto = {
     enable = true;
     listeners = [{
       address = "127.0.0.1";
@@ -319,7 +317,7 @@
   };
 
   # Frigate configuration service (server only)
-  systemd.services.frigate-config = lib.mkIf config.surveillance.server {
+  systemd.services.frigate-config = {
     description = "Generate Frigate configuration";
     wantedBy = [ "podman-frigate.service" ];
     before = [ "podman-frigate.service" ];
@@ -330,247 +328,247 @@
     script = ''
       mkdir -p /opt/surveillance/frigate/config
       cat > /opt/surveillance/frigate/config/config.yaml << 'EOF'
-mqtt:
-  enabled: true
-  host: 127.0.0.1
-  port: 1883
+        mqtt:
+          enabled: true
+          host: 127.0.0.1
+          port: 1883
 
-detectors:
-  cpu1:
-    type: cpu
-    num_threads: 2
+        detectors:
+          cpu1:
+            type: cpu
+            num_threads: 2
 
-ffmpeg: &ffmpeg_defaults
-  input_args:
-    - -rtsp_transport
-    - tcp
-    - -fflags
-    - +genpts
-    - -avoid_negative_ts
-    - make_zero
+        ffmpeg: &ffmpeg_defaults
+          input_args:
+            - -rtsp_transport
+            - tcp
+            - -fflags
+            - +genpts
+            - -avoid_negative_ts
+            - make_zero
 
-cameras:
-  cobra_cam_1:
-    ffmpeg:
-      <<: *ffmpeg_defaults
-      inputs:
-        - path: rtsp://admin:il0wwlm%3F@192.168.1.101:554/ch01/0
-          roles: [ record ]
-    detect:
-      enabled: false
-    record: { enabled: true, retain: { days: 7, mode: motion } }
-    motion:
-      mask:
-        - "0.506,0.004,0.521,0.147,0.632,0.417,0.857,0.627,0.892,0.663,0.863,0.79,0.925,1,1,0.993,0.996,0.009"
-    
-  cobra_cam_2:
-    ffmpeg:
-      <<: *ffmpeg_defaults
-      inputs:
-        - path: rtsp://admin:il0wwlm%3F@192.168.1.102:554/ch01/0
-          roles: [ record ]
-    detect:
-      enabled: false
-    record: { enabled: true, retain: { days: 7, mode: motion } }
-    motion:
-      mask:
-        - "0.095,0.507,0.261,0.578,0.251,0.743,0.08,0.708"
-        - "0.328,0.229,0.262,0.144,0.208,0.326,0.28,0.383,0.482,0.323,0.488,0.295"
-    
-  cobra_cam_3:
-    ffmpeg:
-      <<: *ffmpeg_defaults
-      inputs:
-        - path: rtsp://admin:il0wwlm%3F@192.168.1.103:554/ch01/0
-          roles: [ detect, record ]
-    detect: 
-      enabled: true
-      width: 320
-      height: 240
-      fps: 3
-    record: { enabled: true, retain: { days: 7, mode: motion } }
-    snapshots: { enabled: true, timestamp: true, bounding_box: true, retain: { default: 14 } }
-    zones:
-      sidewalk:
-        coordinates: "0.132,0.468,0.996,0.7,0.993,0.998,0.003,0.996,0.007,0.5"
+        cameras:
+          cobra_cam_1:
+            ffmpeg:
+              <<: *ffmpeg_defaults
+              inputs:
+                - path: rtsp://admin:il0wwlm%3F@192.168.1.101:554/ch01/0
+                  roles: [ record ]
+            detect:
+              enabled: false
+            record: { enabled: true, retain: { days: 7, mode: motion } }
+            motion:
+              mask:
+                - "0.506,0.004,0.521,0.147,0.632,0.417,0.857,0.627,0.892,0.663,0.863,0.79,0.925,1,1,0.993,0.996,0.009"
+            
+          cobra_cam_2:
+            ffmpeg:
+              <<: *ffmpeg_defaults
+              inputs:
+                - path: rtsp://admin:il0wwlm%3F@192.168.1.102:554/ch01/0
+                  roles: [ record ]
+            detect:
+              enabled: false
+            record: { enabled: true, retain: { days: 7, mode: motion } }
+            motion:
+              mask:
+                - "0.095,0.507,0.261,0.578,0.251,0.743,0.08,0.708"
+                - "0.328,0.229,0.262,0.144,0.208,0.326,0.28,0.383,0.482,0.323,0.488,0.295"
+            
+          cobra_cam_3:
+            ffmpeg:
+              <<: *ffmpeg_defaults
+              inputs:
+                - path: rtsp://admin:il0wwlm%3F@192.168.1.103:554/ch01/0
+                  roles: [ detect, record ]
+            detect: 
+              enabled: true
+              width: 320
+              height: 240
+              fps: 3
+            record: { enabled: true, retain: { days: 7, mode: motion } }
+            snapshots: { enabled: true, timestamp: true, bounding_box: true, retain: { default: 14 } }
+            zones:
+              sidewalk:
+                coordinates: "0.132,0.468,0.996,0.7,0.993,0.998,0.003,0.996,0.007,0.5"
+                objects:
+                  - person
+                  - car
+                  - truck
+                  - bicycle
+                  - motorcycle
+          
+            
+          cobra_cam_4:
+            ffmpeg:
+              <<: *ffmpeg_defaults
+              inputs:
+                - path: rtsp://192.168.1.104:554/ch01/0
+                  roles: [ record ]
+            detect:
+              enabled: false
+            record: { enabled: true, retain: { days: 7, mode: motion } }
+
         objects:
-          - person
-          - car
-          - truck
-          - bicycle
-          - motorcycle
-   
-    
-  cobra_cam_4:
-    ffmpeg:
-      <<: *ffmpeg_defaults
-      inputs:
-        - path: rtsp://192.168.1.104:554/ch01/0
-          roles: [ record ]
-    detect:
-      enabled: false
-    record: { enabled: true, retain: { days: 7, mode: motion } }
+          track: [ person, car, truck, bicycle, motorcycle, dog, cat ]
 
-objects:
-  track: [ person, car, truck, bicycle, motorcycle, dog, cat ]
+        go2rtc:
+          streams:
+            cobra_cam_1: [ "rtsp://admin:il0wwlm%3F@192.168.1.101:554/ch01/0" ]
+            cobra_cam_2: [ "rtsp://admin:il0wwlm%3F@192.168.1.102:554/ch01/0" ]
+            cobra_cam_3: [ "rtsp://admin:il0wwlm%3F@192.168.1.103:554/ch01/0" ]
+            cobra_cam_4: [ "rtsp://192.168.1.104:554/ch01/0" ]
 
-go2rtc:
-  streams:
-    cobra_cam_1: [ "rtsp://admin:il0wwlm%3F@192.168.1.101:554/ch01/0" ]
-    cobra_cam_2: [ "rtsp://admin:il0wwlm%3F@192.168.1.102:554/ch01/0" ]
-    cobra_cam_3: [ "rtsp://admin:il0wwlm%3F@192.168.1.103:554/ch01/0" ]
-    cobra_cam_4: [ "rtsp://192.168.1.104:554/ch01/0" ]
+        ui:
+          live_mode: mse
+          timezone: America/Denver
 
-ui:
-  live_mode: mse
-  timezone: America/Denver
+        record:
+          enabled: true
+          retain:
+            days: 7
+            mode: motion
+          events:
+            retain:
+              default: 30
+              mode: motion
+            objects: [ person, car, truck ]
 
-record:
-  enabled: true
-  retain:
-    days: 7
-    mode: motion
-  events:
-    retain:
-      default: 30
-      mode: motion
-    objects: [ person, car, truck ]
+        motion:
+          threshold: 25
+          contour_area: 15
+          delta_alpha: 0.2
+          frame_alpha: 0.01
+          frame_height: 100
+          improve_contrast: true
 
-motion:
-  threshold: 25
-  contour_area: 15
-  delta_alpha: 0.2
-  frame_alpha: 0.01
-  frame_height: 100
-  improve_contrast: true
-
-logger:
-  default: info
-  logs:
-    frigate.record: debug
-    frigate.detect: info
-EOF
-      chown eric:users /opt/surveillance/frigate/config/config.yaml
-    '';
-  };
-
-  # 📁 STORAGE CONFIGURATION
-
-  # Create required directories (server only)
-  systemd.tmpfiles.rules = lib.mkIf config.server [
-    # Media directories
-    "d /mnt/media 0755 eric users -"
-    "d /mnt/media/tv 0755 eric users -"
-    "d /mnt/media/movies 0755 eric users -"
-    "d /mnt/media/music 0755 eric users -"
-    "d /mnt/media/pictures 0755 eric users -"
-    "d /mnt/media/downloads 0755 eric users -"
-    "d /mnt/media/surveillance 0755 eric users -"
-    "d /mnt/media/surveillance/frigate 0755 eric users -"
-    "d /mnt/media/surveillance/frigate/media 0755 eric users -"
-    
-    # Container config directories
-    "d /opt/downloads 0755 eric users -"
-    "d /opt/downloads/qbittorrent 0755 eric users -"
-    "d /opt/downloads/sonarr 0755 eric users -"
-    "d /opt/downloads/radarr 0755 eric users -"
-    "d /opt/downloads/lidarr 0755 eric users -"
-    "d /opt/downloads/prowlarr 0755 eric users -"
-    "d /opt/downloads/navidrome 0755 eric users -"
-    "d /opt/downloads/immich 0755 eric users -"
-    "d /opt/downloads/immich/postgres 0755 eric users -"
-    
-    # Surveillance directories
-    "d /opt/surveillance 0755 eric users -"
-    "d /opt/surveillance/frigate 0755 eric users -"
-    "d /opt/surveillance/frigate/config 0755 eric users -"
-    "d /opt/surveillance/home-assistant 0755 eric users -"
-    "d /opt/surveillance/home-assistant/config 0755 eric users -"
-    
-    # Business directories
-    "d /opt/business 0755 eric users -"
-    "d /opt/business/api 0755 eric users -"
-    "d /opt/business/dashboard 0755 eric users -"
-    "d /opt/business/receipts 0755 eric users -"
-    "d /opt/business/uploads 0755 eric users -"
-    "d /opt/business/processed 0755 eric users -"
-    "d /opt/business/backups 0755 eric users -"
-    
-    # ADHD tools
-    "d /opt/adhd-tools 0755 eric users -"
-    "d /opt/adhd-tools/context-snapshots 0755 eric users -"
-    "d /opt/adhd-tools/energy-tracking 0755 eric users -"
-    "d /opt/adhd-tools/focus-logs 0755 eric users -"
-    "d /opt/adhd-tools/scripts 0755 eric users -"
-    
-    # AI directories
-    "d /opt/ai 0755 eric users -"
-    "d /opt/ai/models 0755 eric users -"
-    "d /opt/ai/context-snapshots 0755 eric users -"
-    "d /opt/ai/document-embeddings 0755 eric users -"
-  ];
-
-   
-
-
-  # AI model setup service (server only)
-  systemd.services.ai-model-setup = lib.mkIf config.ai.server {
-    description = "Download and configure business-focused AI models";
-    serviceConfig = {
-      Type = "oneshot";
-      User = "eric";
-      ExecStart = pkgs.writeShellScript "setup-ai-models" ''
-        # Wait for Ollama service to be ready
-        sleep 10
-        
-        # Download efficient business-focused models
-        ${pkgs.ollama}/bin/ollama pull llama3.2:3b
-        ${pkgs.ollama}/bin/ollama pull nomic-embed-text
-        
-        echo "AI models ready for business intelligence processing"
-        echo "Chat model: llama3.2:3b"
-        echo "Embeddings: nomic-embed-text"
-      '';
+        logger:
+          default: info
+          logs:
+            frigate.record: debug
+            frigate.detect: info
+        EOF
+          chown eric:users /opt/surveillance/frigate/config/config.yaml
+        '';
     };
-    wantedBy = [ "multi-user.target" ];
-    after = [ "ollama.service" ];
-    requires = [ "ollama.service" ];
-  };
 
-  # Business database backup service (server only)
-  systemd.services.business-backup = lib.mkIf config.business.server {
-    description = "Daily backup of business database";
-    serviceConfig = {
-      Type = "oneshot";
-      User = "postgres";
-      ExecStart = pkgs.writeShellScript "business-backup" ''
-        DATE=$(date +%Y%m%d_%H%M%S)
-        ${pkgs.postgresql}/bin/pg_dump \
-          -U business_user \
-          -h localhost \
-          heartwood_business \
-          | gzip > /opt/business/backups/heartwood_business_$DATE.sql.gz
-        
-        # Retain only last 30 days of backups
-        find /opt/business/backups -name "heartwood_business_*.sql.gz" -mtime +30 -delete
-        
-        echo "Database backup completed: heartwood_business_$DATE.sql.gz"
-      '';
+# 📁 STORAGE CONFIGURATION
+
+# Create required directories (server only)
+  systemd.tmpfiles.rules = [
+      # Media directories
+      "d /mnt/media 0755 eric users -"
+      "d /mnt/media/tv 0755 eric users -"
+      "d /mnt/media/movies 0755 eric users -"
+      "d /mnt/media/music 0755 eric users -"
+      "d /mnt/media/pictures 0755 eric users -"
+      "d /mnt/media/downloads 0755 eric users -"
+      "d /mnt/media/surveillance 0755 eric users -"
+      "d /mnt/media/surveillance/frigate 0755 eric users -"
+      "d /mnt/media/surveillance/frigate/media 0755 eric users -"
+      
+      # Container config directories
+      "d /opt/downloads 0755 eric users -"
+      "d /opt/downloads/qbittorrent 0755 eric users -"
+      "d /opt/downloads/sonarr 0755 eric users -"
+      "d /opt/downloads/radarr 0755 eric users -"
+      "d /opt/downloads/lidarr 0755 eric users -"
+      "d /opt/downloads/prowlarr 0755 eric users -"
+      "d /opt/downloads/navidrome 0755 eric users -"
+      "d /opt/downloads/immich 0755 eric users -"
+      "d /opt/downloads/immich/postgres 0755 eric users -"
+      
+      # Surveillance directories
+      "d /opt/surveillance 0755 eric users -"
+      "d /opt/surveillance/frigate 0755 eric users -"
+      "d /opt/surveillance/frigate/config 0755 eric users -"
+      "d /opt/surveillance/home-assistant 0755 eric users -"
+      "d /opt/surveillance/home-assistant/config 0755 eric users -"
+      
+      # Business directories
+      "d /opt/business 0755 eric users -"
+      "d /opt/business/api 0755 eric users -"
+      "d /opt/business/dashboard 0755 eric users -"
+      "d /opt/business/receipts 0755 eric users -"
+      "d /opt/business/uploads 0755 eric users -"
+      "d /opt/business/processed 0755 eric users -"
+      "d /opt/business/backups 0755 eric users -"
+      
+      # ADHD tools
+      "d /opt/adhd-tools 0755 eric users -"
+      "d /opt/adhd-tools/context-snapshots 0755 eric users -"
+      "d /opt/adhd-tools/energy-tracking 0755 eric users -"
+      "d /opt/adhd-tools/focus-logs 0755 eric users -"
+      "d /opt/adhd-tools/scripts 0755 eric users -"
+      
+      # AI directories
+      "d /opt/ai 0755 eric users -"
+      "d /opt/ai/models 0755 eric users -"
+      "d /opt/ai/context-snapshots 0755 eric users -"
+      "d /opt/ai/document-embeddings 0755 eric users -"
+    ];
+
+    
+
+
+    # AI model setup service (server only)
+  systemd.services.ai-model-setup = {
+      description = "Download and configure business-focused AI models";
+      serviceConfig = {
+        Type = "oneshot";
+        User = "eric";
+        ExecStart = pkgs.writeShellScript "setup-ai-models" ''
+          # Wait for Ollama service to be ready
+          sleep 10
+          
+          # Download efficient business-focused models
+          ${pkgs.ollama}/bin/ollama pull llama3.2:3b
+          ${pkgs.ollama}/bin/ollama pull nomic-embed-text
+          
+          echo "AI models ready for business intelligence processing"
+          echo "Chat model: llama3.2:3b"
+          echo "Embeddings: nomic-embed-text"
+        '';
+      };
+      wantedBy = [ "multi-user.target" ];
+      after = [ "ollama.service" ];
+      requires = [ "ollama.service" ];
     };
-  };
 
-  # Schedule daily backups at 2 AM (server only)
-  systemd.timers.business-backup = lib.mkIf config.business.server {
-    description = "Daily business database backup";
-    wantedBy = [ "timers.target" ];
-    timerConfig = {
-      OnCalendar = "02:00";
-      Persistent = true;
+    # Business database backup service (server only)
+  systemd.services.business-backup = {
+      description = "Daily backup of business database";
+      serviceConfig = {
+        Type = "oneshot";
+        User = "postgres";
+        ExecStart = pkgs.writeShellScript "business-backup" ''
+          DATE=$(date +%Y%m%d_%H%M%S)
+          ${pkgs.postgresql}/bin/pg_dump \
+            -U business_user \
+            -h localhost \
+            heartwood_business \
+            | gzip > /opt/business/backups/heartwood_business_$DATE.sql.gz
+          
+          # Retain only last 30 days of backups
+          find /opt/business/backups -name "heartwood_business_*.sql.gz" -mtime +30 -delete
+          
+          echo "Database backup completed: heartwood_business_$DATE.sql.gz"
+        '';
+      };
     };
-  };
 
-  # ADHD tools scripts deployment (server only)
-  environment.etc = lib.mkIf config.business.server {
+    # Schedule daily backups at 2 AM (server only)
+  systemd.timers.business-backup = {
+      description = "Daily business database backup";
+      wantedBy = [ "timers.target" ];
+      timerConfig = {
+        OnCalendar = "02:00";
+        Persistent = true;
+      };
+    };
+
+    # ADHD tools scripts deployment (server only)
+  environment.etc = {
     "adhd-tools/energy-tracker.py" = {
       text = ''
         #!/usr/bin/env python3

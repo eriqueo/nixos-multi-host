@@ -119,15 +119,6 @@ in
 	package = pkgs.ungoogled-chromium;
 	};
 
-	programs.thunar = {
-		enable = true;
-		plugins = with pkgs.xfce; [
-		thunar-archive-plugin
-		thunar-volman
-		];
-	};
-
-    programs.xfconf.enable = true;
 
 
   # Enable Home Manager self-management
