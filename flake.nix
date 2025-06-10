@@ -12,8 +12,6 @@
 
   outputs = { self, nixpkgs, home-manager, ... }: {
     nixosConfigurations = {
-      
-      # 🖥️ SERVER - Complete AI Business Intelligence Platform
       homeserver = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         modules = [
@@ -23,13 +21,10 @@
           {
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
-            home-manager.users.eric = import ./home.nix;
+            home-manager.users.eric = import ./hosts/server/home.nix;
           }
           {
-            # SERVER CONFIGURATION - Define all options here
             networking.hostName = "homeserver";
-            
-            # Service flags - What runs on server
             media.server = true;
             media.client = true;
             surveillance.server = true;
@@ -38,8 +33,6 @@
             business.client = true;
             ai.server = true;
             ai.client = true;
-            
-            # Hardware flags
             desktop = false;
             laptop = false;
             server = true;
@@ -47,8 +40,7 @@
         ];
       };
 
-      # 💻 LAPTOP - Complete Client + Development Environment
-      laptop = nixpkgs.lib.nixosSystem {
+      "heartwood-laptop" = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         modules = [
           ./configuration.nix
@@ -57,19 +49,10 @@
           {
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
-            home-manager.users.eric = import ./home.nix;
+            home-manager.users.eric = import ./hosts/laptop/home.nix;
           }
-           ({ pkgs, ... }: {
-            environment.systemPackages = with pkgs; [
-              librewolf
-              ungoogled-chromium
-            ];
-          })
           {
-            # LAPTOP CONFIGURATION
             networking.hostName = "heartwood-laptop";
-            
-            # Service flags - Client access only
             media.server = false;
             media.client = true;
             surveillance.server = false;
@@ -78,8 +61,6 @@
             business.client = true;
             ai.server = false;
             ai.client = true;
-            
-            # Hardware flags
             desktop = true;
             laptop = true;
             server = false;

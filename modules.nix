@@ -510,32 +510,8 @@ EOF
     "d /opt/ai/document-embeddings 0755 eric users -"
   ];
 
-  # Business packages (server)
-  
-  # Combined package configuration
-  environment.systemPackages = 
-    # Business server packages
-    lib.optionals config.business.server (with pkgs; [
-      tesseract imagemagick poppler_utils
-      python3Packages.fastapi python3Packages.uvicorn
-      python3Packages.sqlalchemy python3Packages.alembic
-      python3Packages.psycopg2 python3Packages.asyncpg
-      python3Packages.pandas python3Packages.streamlit
-      python3Packages.python-multipart python3Packages.python-dotenv
-      python3Packages.pillow python3Packages.opencv4
-      python3Packages.pytesseract python3Packages.pdf2image
-      python3Packages.httpx python3Packages.requests
-      python3Packages.plotly python3Packages.altair
-      python3Packages.torch python3Packages.transformers
-      python3Packages.sentence-transformers python3Packages.langchain
-      python3Packages.openai python3Packages.numpy
-      python3Packages.scikit-learn python3Packages.matplotlib
-      python3Packages.seaborn postgresql
-    ])
-    # Client packages
-	++ lib.optionals (config.media.client || config.business.client || config.surveillance.client) (with pkgs; [
-  	ffmpeg-full vlc mpv cifs-utils postgresql
-	]);
+   
+
 
   # AI model setup service (server only)
   systemd.services.ai-model-setup = lib.mkIf config.ai.server {
