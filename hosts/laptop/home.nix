@@ -95,6 +95,7 @@ in
 		}
 		'';
 	};
+	
 	programs.firefox = {
 	enable = true;
 	package = pkgs.librewolf;
@@ -112,10 +113,12 @@ in
 		};
 	};
 	};
+
 	programs.chromium = {
 	enable = true;
 	package = pkgs.ungoogled-chromium;
 	};
+
 	programs.thunar = {
 		enable = true;
 		plugins = with pkgs.xfce; [
@@ -123,6 +126,7 @@ in
 		thunar-volman
 		];
 	};
+
     programs.xfconf.enable = true;
 
 
