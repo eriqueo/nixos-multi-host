@@ -17,19 +17,21 @@
     ffmpeg-full
     ollama
   ];
-  wayland.windowManager.hyprland = {
-  	enable = true;
-  	settings = {
-  		exec-once = "waybar &";
-  		mainMod = "SUPER";
-  		bind = [
-  			"$mainMod, Return, exec, konsole"
-  			"$mainMod, Q, killactive"
-  			"$mainMod, F, fullscreen"
-  			"$mainMod, Space, exec, wofi --show drun "
-  		];
-  	};
+wayland.windowManager.hyprland = {
+  enable = true;
+  settings = {
+    exec-once = "waybar &";
+    # ...other settings that don't depend on order
   };
+  extraConfig = ''
+    mainMod = SUPER
+    bind = $mainMod, Return, exec, konsole
+    bind = $mainMod, Q, killactive
+    bind = $mainMod, F, fullscreen
+    bind = $mainMod, Space, exec, wofi --show drun 
+  '';
+};
+
 
   
 
