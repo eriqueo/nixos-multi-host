@@ -24,7 +24,7 @@ wayland.windowManager.hyprland = {
     # ...other settings that don't depend on order
   };
   extraConfig = ''
-    mainMod = SUPER
+    $mainMod = SUPER
     bind = $mainMod, Return, exec, konsole
     bind = $mainMod, Q, killactive
     bind = $mainMod, F, fullscreen
