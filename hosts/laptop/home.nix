@@ -19,13 +19,15 @@ in
   home.packages = with pkgs; [ 
     waybar wofi mako grim slurp wl-clipboard
 	pavucontrol brightnessctl
-    kdePackages.konsole kdePackages.dolphin kdePackages.kate kdePackages.yakuake kdePackages.gwenview kdePackages.kdeconnect-kde kdePackages.ark kdePackages.okular
-    firefox brave
+    kitty thunar imv kdePackages.kdeconnect-kde engrampa zathura
+    firefox brave  
     vscode obsidian libreoffice
     protonmail-bridge
     vlc qbittorrent discord telegram-desktop thunderbird
     gimp inkscape blender
     blueman timeshift udiskie redshift
+    hyprshot hyprpaper hyprlock hypridle
+
     ffmpeg-full
     ollama
   ];
@@ -37,6 +39,9 @@ wayland.windowManager.hyprland = {
       bind = $mod, Q, killactive
       bind = $mod, F, fullscreen
       bind = $mod, Space, exec, wofi --show drun
+	  bind = , Print, exec, hyprshot -m region -o ~/Pictures/Screenshots
+	  bind = SHIFT, Print, exec, hyprshot -m region -c
+
     '';
     settings = {
       exec-once = [ "waybar" ];
@@ -47,8 +52,8 @@ wayland.windowManager.hyprland = {
         gaps_in = 5;
         gaps_out = 10;
         border_size = 2;
-        "col.active_border" = "rgb(${theme.accent})";
-        "col.inactive_border" = "rgb(434c5e)";
+        "col.active_border" = "(${theme.accent})";
+        "col.inactive_border" = "#434c5e#";
         layout = "dwindle";
       };
       decoration.rounding = 8;
@@ -90,8 +95,27 @@ wayland.windowManager.hyprland = {
       }
     '';
   };
-
-
+programs.firefox = {
+  enable = true;
+  package = pkgs.librewolf;
+  policies = {
+    DisableTelemetry = true;
+    Preferences = {
+      "privacy.resistFingerprinting" = false;
+      # ... other preferences
+    };
+    ExtensionSettings = {
+      "uBlock0@raymondhill.net" = {
+        install_url = "https://addons.mozilla.org/firefox/downloads/latest/ublock-origin/latest.xpi";
+        installation_mode = "force_installed";
+      };
+    };
+  };
+};
+programs.chromium = {
+  enable = true;
+  package = pkgs.ungoogled-chromium;
+};
   
 
   # Enable Home Manager self-management
