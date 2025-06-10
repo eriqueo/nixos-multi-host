@@ -123,7 +123,8 @@
     };
 
     hardware.graphics = lib.mkIf config.desktop { enable = true; };
-
+    services.gvfs.enable = true;     # For mounting, trash, network drives, etc.
+  services.tumbler.enable = true;  # For thumbnail previews in Thunar
     services.libinput.enable = true;
     services.libinput.touchpad = {
       naturalScrolling = true;
