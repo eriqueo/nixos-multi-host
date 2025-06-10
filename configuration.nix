@@ -108,7 +108,7 @@
     programs.hyprland = lib.mkIf config.desktop {
       enable = true;
       xwayland.enable = true;
-      # No keybindings here! Just enable it.
+      
     };
 
 

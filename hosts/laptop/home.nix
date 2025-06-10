@@ -21,12 +21,12 @@
   	enable = true;
   	settings = {
   		exec-once = "waybar &";
-  		"%mod" = "SUPER";
+  		mainMod = "SUPER";
   		bind = [
-  			"%mod, Return, exec, konsole"
-  			"%mod, Q, killactive"
-  			"%mod, F, fullscreen"
-  			"%mod, Space, exec, wofi --show drun "
+  			"$mainMod, Return, exec, konsole"
+  			"$mainMod, Q, killactive"
+  			"$mainMod, F, fullscreen"
+  			"$mainMod, Space, exec, wofi --show drun "
   		];
   	};
   };
