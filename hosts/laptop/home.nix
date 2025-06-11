@@ -204,7 +204,7 @@ in
 		style = ''
 		* {
 			font-family: "${fonts.mono}", monospace;
-			font-size: ${fonts.size}px;
+			font-size: ${fonts.size.normal}px;
 		}
 		window#waybar {
 			background-color: ${theme.bg};
