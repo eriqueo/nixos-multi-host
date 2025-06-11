@@ -10,10 +10,8 @@
   };
 
   # Container services
-  virtualisation.oci-containers.containers = [
-    
+  virtualisation.oci-containers.containers = {   
     # Media Stack (server only)
-   {
     gluetun = {
         image = "qmcgaw/gluetun:latest";
         autoStart = true;
@@ -164,8 +162,6 @@
           TZ = "America/Denver";
         };
     };
-    }
-
     # Surveillance Stack (server only)
     frigate = {
         image = "ghcr.io/blakeblackshear/frigate:stable";
@@ -209,8 +205,9 @@
           "/etc/localtime:/etc/localtime:ro"
         ];
         ports = [ "8123:8123" ];
-      };
-  ];
+    };
+   
+  };
 
   # 💼 BUSINESS INTELLIGENCE SERVICES
 

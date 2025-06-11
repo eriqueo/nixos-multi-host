@@ -53,7 +53,7 @@
       dockerCompat = true;               # Enables `docker` CLI compatibility
       defaultNetwork.settings.dns_enabled = true;
     };
-    virtualisation.docker.enable = true;  # Enable Docker service if needed
+   # virtualisation.docker.enable = true;  # Enable Docker service if needed
     virtualisation.oci-containers.backend = "podman";  # Use Podman as OCI backend
 
 

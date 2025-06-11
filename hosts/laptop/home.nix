@@ -19,8 +19,8 @@ in
   home.packages = with pkgs; [ 
     waybar wofi mako grim slurp wl-clipboard
 	pavucontrol brightnessctl
-    kitty imv kdePackages.kdeconnect-kde engrampa zathura
-    firefox brave  
+    kitty imv kdePackages.kdeconnect-kde zathura
+    firefox brave  networkmanager
     vscode obsidian libreoffice
     protonmail-bridge
     vlc qbittorrent discord telegram-desktop thunderbird
