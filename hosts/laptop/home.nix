@@ -1,8 +1,6 @@
 { config, pkgs, lib, osConfig, ... }:
+
 {
-  # Remove all the let theme = { ... }; stuff
-  
-  # Replace with this one config:
   stylix = {
     enable = true;
     base16Scheme = "${pkgs.base16-schemes}/share/themes/nord.yaml";
@@ -18,13 +16,7 @@
     };
   };
 
-  # Now remove all manual theme references from:
-  # - programs.kitty.settings (remove color configs)
-  # - programs.waybar.style (remove manual colors)
-  # Stylix handles it all automatically!
-}
 
-{
   home.username = "eric";
   home.homeDirectory = "/home/eric";
   home.stateVersion = "23.05";
