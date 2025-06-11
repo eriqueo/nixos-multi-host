@@ -51,8 +51,8 @@ in
 			gaps_in = 5;
 			gaps_out = 10;
 			border_size = 2;
-				"col.active_border" = "#5e81ac";     # Simple hex color
-				"col.inactive_border" = "#434c5e";   # Remove the extra # at end
+				"col.active_border" = "rgba(5e81acee)";    # Fixed: rgba format
+			    "col.inactive_border" = "rgba(434c5eaa)";  # Fixed: rgba format
 			layout = "dwindle";
 		};
 		decoration.rounding = 8;

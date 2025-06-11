@@ -51,7 +51,7 @@
       enable = true;
       shellAliases = {
         # File management with modern tools
-        "ls" = "eza";
+        "ls" = "eza --tree --level=2";
         "ll" = "eza -l --git --icons";
         "la" = "eza -la --git --icons";
         "lt" = "eza --tree --level=2";
@@ -65,7 +65,7 @@
         "df" = "df -h";
         "du" = "du -h";
         "free" = "free -h";
-        "htop" = "htop --tree";
+        "htop" = "btop --tree";
         "grep" = "rg";
         "open" = "xdg-open";
         
@@ -78,7 +78,12 @@
         "gpl" = "git pull";
         
         # NixOS system management
-        "nixconfig" = "sudo micro /etc/nixos/configuration.nix";
+        "nixcon" = "sudo micro /etc/nixos/configuration.nix";
+        "nixflake" = "sudo micro /etc/nixos/flake.nix";
+        "nixlaphome" = "sudo micro /etc/nixos/hosts/laptop/home.nix";
+        "nixlapcon" = "sudo micro /etc/nixos/hosts/laptop/default.nix";
+        "nixserverhome" = "sudo micro /etc/nixos/hosts/server/home.nix";
+        "nixservercon" = "sudo micro /etc/nixos/hosts/server/default.nix";
         "nixsearch" = "nix search nixpkgs";
         "nixclean" = "nix-collect-garbage -d";
         "nixgen" = "sudo nix-env --list-generations --profile /nix/var/nix/profiles/system";
