@@ -17,8 +17,8 @@
         modules = [
           ./hosts/server/default.nix
           ./modules.nix
-          stylix.nixosModules.stylix
           home-manager.nixosModules.home-manager
+          stylix.nixosModules.stylix
           {
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
@@ -31,8 +31,8 @@
         system = "x86_64-linux";
         modules = [
           ./hosts/laptop/default.nix
-          stylix.nixosModules.stylix
           home-manager.nixosModules.home-manager
+          stylix.nixosModules.stylix
           {
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
