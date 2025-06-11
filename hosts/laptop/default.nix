@@ -41,5 +41,8 @@
     };
   };
 
-  # You can add more server-specific services here as needed
+networking.networkmanager.enable = true;
+
+hardware.bluetooth.enable = true;
+services.blueman.enable = true;
 }
