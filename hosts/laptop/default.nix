@@ -47,7 +47,7 @@
 
   # User groups
   users.users.eric.extraGroups = [ "networkmanager" "video" "audio" ];
-  users.users.eric.initialPassword = "changeme123";
+  #users.users.eric.initialPassword = "changeme123";
 
   # SINGLE environment.systemPackages block
   environment.systemPackages = with pkgs; [
