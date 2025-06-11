@@ -53,6 +53,6 @@
   environment.systemPackages = with pkgs; [
     greetd.tuigreet
     nerd-fonts.caskaydia-cove
-    kitty thunar gvfs tumbler firefox
+    kitty xfce.thunar gvfs xfce.tumbler firefox
   ];
 }
