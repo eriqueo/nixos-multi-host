@@ -96,7 +96,11 @@ in
 		    bind = $mod CTRL ALT, 8, workspace, 8
 		  '';
 		settings = {
-		exec-once = [ "waybar" ];
+		exec-once = [
+		 "swaynotificationcenter"
+		 "hypridle"
+		 "hyprpaper"
+		 ];
 		monitor = [ "eDP-1, 2560x1600@165, 1920x0, 1.6" ];
 		input.kb_layout = "us";
 		input.touchpad.natural_scroll = true;
@@ -146,7 +150,7 @@ in
 				          "7" = "Misc";   # Games
 				          "8" = "AI";   # System
 				        };
-				        persistent-workspaces = {
+				        persistent_workspaces = {
 				          "*" = 8;
 				        };
 				      };
