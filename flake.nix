@@ -29,7 +29,7 @@
         system = "x86_64-linux";
         modules = [
           ./hosts/laptop/default.nix
-          ./modules.nix
+         
           home-manager.nixosModules.home-manager
           {
             home-manager.useGlobalPkgs = true;
