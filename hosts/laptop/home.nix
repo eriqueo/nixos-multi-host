@@ -1,34 +1,28 @@
 { config, pkgs, lib, osConfig, ... }:
-let
-nordic-blue = {
-    bg = "#2e3440";
-    bg-alt = "#3b4252";
-    bg-darker = "#1a1d23";
-    fg = "#eceff4";
-    fg-alt = "#d8dee9";
-    fg-dim = "#4c566a";
-    accent = "#5e81ac";
-    accent-bright = "#81a1c1";
-    accent-dim = "#4c7398";
-    red = "#bf616a";
-    orange = "#d08770";
-    yellow = "#ebcb8b";
-    green = "#a3be8c";
-    purple = "#b48ead";
-    border = "#434c5e";
-    selection = "#4c566a";
-    urgent = "#bf616a";
-  };
-  fonts = {
-    mono = "CaskaydiaCove Nerd Font";
-    sans = "Inter";
-    size = {
-      normal = "13";
-      large = "15";
+{
+  # Remove all the let theme = { ... }; stuff
+  
+  # Replace with this one config:
+  stylix = {
+    enable = true;
+    base16Scheme = "${pkgs.base16-schemes}/share/themes/nord.yaml";
+    
+    fonts = {
+      monospace = {
+        package = pkgs.nerd-fonts.caskaydia-cove;
+        name = "CaskaydiaCove Nerd Font";
+      };
+      sizes = {
+        terminal = 13;
+      };
     };
   };
-  theme = nordic-blue;
-in
+
+  # Now remove all manual theme references from:
+  # - programs.kitty.settings (remove color configs)
+  # - programs.waybar.style (remove manual colors)
+  # Stylix handles it all automatically!
+}
 
 {
   home.username = "eric";
@@ -206,24 +200,6 @@ in
 				    };
 				  };
 	
-		style = ''
-		* {
-			font-family: "${fonts.mono}", monospace;
-			font-size: ${fonts.size.normal}px;
-		}
-		window#waybar {
-			background-color: ${theme.bg};
-			color: ${theme.fg};
-		}
-		#workspaces button.active {
-			background-color: ${theme.accent};
-			color: ${theme.bg};
-		}
-		#battery.critical:not(.charging) {
-			background: ${theme.urgent};
-			color: ${theme.fg};
-		}
-		'';
 	};
 
 	services.hyprpaper = {
