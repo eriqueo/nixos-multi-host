@@ -10,7 +10,7 @@
     stylix.url = "github:danth/stylix";
   };
 
-  outputs = { self, nixpkgs, home-manager, ... }: {
+  outputs = inputs@{ self, nixpkgs, home-manager, stylix, ... }: {
     nixosConfigurations = {
       homeserver = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
