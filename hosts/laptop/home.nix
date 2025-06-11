@@ -20,14 +20,13 @@ in
     waybar wofi mako grim slurp wl-clipboard
 	pavucontrol brightnessctl
     kitty imv kdePackages.kdeconnect-kde zathura
-    firefox brave  networkmanager
+    firefox brave networkmanager
     vscode obsidian libreoffice
     protonmail-bridge
-    vlc qbittorrent discord telegram-desktop thunderbird
+    vlc qbittorrent thunderbird
     gimp inkscape blender
     blueman timeshift udiskie redshift
     hyprshot hyprpaper hyprlock hypridle
-
     ffmpeg-full
     ollama
   ];
@@ -63,19 +62,20 @@ in
 	programs.waybar = {
 		enable = true;
 		settings = {
-		mainBar = {
-			layer = "top";
-			position = "top";
-			height = 34;
-			modules-left = [ "hyprland/workspaces" ];
-			modules-center = [ "clock" ];
-			modules-right = [ "pulseaudio" "battery" "tray" ];
-			clock.format = "{:%H:%M}";
-			pulseaudio.format = "{volume}% {icon}";
-			battery.format = "{capacity}% {icon}";
-			tray.spacing = 10;
+			mainBar = {
+				layer = "top";
+				position = "top";
+				height = 34;
+				modules-left = [ "hyprland/workspaces" ];
+				modules-center = [ "clock" ];
+				modules-right = [ "pulseaudio" "battery" "tray" ];
+				clock.format = "{:%H:%M}";
+				pulseaudio.format = "{volume}% {icon}";
+				battery.format = "{capacity}% {icon}";
+				tray.spacing = 10;
+			};
 		};
-		};
+	};
 		style = ''
 		* {
 			font-family: "${fonts.mono}", monospace;
@@ -94,6 +94,17 @@ in
 			color: ${theme.fg};
 		}
 		'';
+	};
+
+	services.hyprpaper = {
+	  enable = true;
+	  settings = {
+	    ipc = "on";
+	    splash = false;
+	    
+	    preload = [ "~/Pictures/wallpaper.jpg" ];  # Put your wallpaper here
+	    wallpaper = [ "eDP-1,~/Pictures/wallpaper.jpg" ];
+	  };
 	};
 	
 	programs.firefox = {

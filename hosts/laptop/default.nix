@@ -15,10 +15,16 @@
   # Login manager
   services.greetd = {
     enable = true;
-    settings.default_session = {
-      command = "${pkgs.greetd.tuigreet}/bin/tuigreet --time --cmd Hyprland";
-      user = "greeter";
-    };
+    settings = {
+    	default_session = {
+      		command = "${pkgs.greetd.tuigreet}/bin/tuigreet --time --cmd Hyprland";
+     		user = "greeter";
+    	};
+    	initial_session = {
+    		command = "Hyprland";
+    		user = "eric"
+    	};
+    };	
   };
 
   # Audio - USE PIPEWIRE (not PulseAudio for modern systems)
