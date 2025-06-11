@@ -8,6 +8,19 @@
 
   networking.hostName = "heartwood-laptop";
 
+  stylix = {
+      enable = true;
+      base16Scheme = "${pkgs.base16-schemes}/share/themes/nord.yaml";
+      fonts = {
+        monospace = {
+          package = pkgs.nerd-fonts.caskaydia-cove;
+          name = "CaskaydiaCove Nerd Font";
+        };
+        sizes = {
+          terminal = 13;
+        };
+      };
+    };
   # Desktop environment
   programs.hyprland.enable = true;
   programs.hyprland.xwayland.enable = true;
