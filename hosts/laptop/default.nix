@@ -2,47 +2,57 @@
 
 {
   imports = [
+    ./hardware-configuration.nix
     ../../configuration.nix
-    ../../hardware-configuration.nix
-    ../../modules.nix
   ];
 
-  # Set the hostname for this server
-  networking.hostName = "homeserver";
+  networking.hostName = "heartwood-laptop";
 
-  # Server-specific packages
-  environment.systemPackages = with pkgs; [
-    podman-compose
-    iotop
-    lsof
-    strace
-    ffmpeg-full
-    # Add any other server-specific packages here
-  ];
+  # Desktop environment
+  programs.hyprland.enable = true;
+  programs.hyprland.xwayland.enable = true;
 
-  # Add server-specific groups for your user (if needed)
-  users.users.eric.extraGroups = [ "docker" "podman" ];
-
-  # Configure the firewall for server ports
-  networking.firewall = {
+  # Login manager
+  services.greetd = {
     enable = true;
-    allowedTCPPorts = [
-      22 2283 4533 5000 7878 8080 8096 8123 8686 8989 9696
-    ];
-    allowedUDPPorts = [
-      7359 8555
-    ];
-    interfaces = {
-      "tailscale0" = {
-        allowedTCPPorts = [
-          5432 6379 8000 8501 11434 1883
-        ];
-      };
+    settings.default_session = {
+      command = "${pkgs.greetd.tuigreet}/bin/tuigreet --time --cmd Hyprland";
+      user = "greeter";
     };
   };
 
-networking.networkmanager.enable = true;
+  # Audio - USE PIPEWIRE (not PulseAudio for modern systems)
+  security.rtkit.enable = true;
+  services.pipewire = {
+    enable = true;
+    alsa.enable = true;
+    pulse.enable = true;
+  };
 
-hardware.bluetooth.enable = true;
-services.blueman.enable = true;
+  # Graphics
+  hardware.opengl.enable = true;
+  xdg.portal.enable = true;
+  xdg.portal.wlr.enable = true;
+
+  # Networking and hardware
+  networking.networkmanager.enable = true;
+  hardware.bluetooth.enable = true;
+  services.blueman.enable = true;
+
+  # Laptop services
+  services.tlp.enable = true;
+  services.printing.enable = true;
+  services.flatpak.enable = true;
+  services.fwupd.enable = true;
+
+  # User groups
+  users.users.eric.extraGroups = [ "networkmanager" "video" "audio" ];
+  users.users.eric.initialPassword = "changeme123";
+
+  # SINGLE environment.systemPackages block
+  environment.systemPackages = with pkgs; [
+    greetd.tuigreet
+    (nerdfonts.override { fonts = [ "CascadiaCode" ]; })
+    kitty thunar gvfs tumbler firefox
+  ];
 }
