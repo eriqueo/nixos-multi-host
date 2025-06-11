@@ -35,13 +35,10 @@ in
   home.homeDirectory = "/home/eric";
   home.stateVersion = "23.05";
   home.packages = with pkgs; [ 
-    waybar wofi mako grim slurp wl-clipboard
-	pavucontrol brightnessctl
-    kitty imv kdePackages.kdeconnect-kde zathura
-    firefox brave networkmanager
+    wofi mako
+	kitty imv kdePackages.kdeconnect-kde zathura
     vscode obsidian libreoffice
-    protonmail-bridge
-    vlc qbittorrent thunderbird
+    vlc qbittorrent 
     gimp inkscape blender
     blueman timeshift udiskie redshift
     hyprshot hyprpaper hyprlock hypridle

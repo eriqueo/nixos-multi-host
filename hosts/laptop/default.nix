@@ -59,7 +59,7 @@
   environment.systemPackages = with pkgs; [
     greetd.tuigreet
     nerd-fonts.caskaydia-cove
-    kitty xfce.thunar gvfs xfce.tumbler firefox
+    xfce.thunar gvfs xfce.tumbler
     electron-mail
     # protonmail-desktop
     # protonmail-bridge
@@ -74,16 +74,7 @@
       swaynotificationcenter  # Notifications
       cliphist               # Clipboard manager
       wl-clipboard          # Wayland clipboard
-      
-      # Missing idle/lock/wallpaper
-      hypridle              # Idle management
-      hyprlock              # Screen locking
-      hyprpaper             # Wallpaper
-      
-      # Missing for screenshots
-      hyprshot              # Screenshots
-      grim slurp            # Screenshot tools
-      
+           
       # Missing utilities
       acpi                  # Battery info
       lm_sensors           # Temperature sensors

@@ -49,6 +49,8 @@
     services.tailscale.enable = true;
     programs.zsh = {
       enable = true;
+      autosuggestion.enable = true;  # This enables history-based suggestions
+      syntaxHighlighting.enable = true;
       shellAliases = {
         # File management with modern tools
         "ls" = "eza --tree --level=2";
