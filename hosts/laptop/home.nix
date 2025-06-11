@@ -75,7 +75,7 @@ in
 				tray.spacing = 10;
 			};
 		};
-	};
+	
 		style = ''
 		* {
 			font-family: "${fonts.mono}", monospace;
