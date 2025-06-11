@@ -60,5 +60,30 @@
     greetd.tuigreet
     nerd-fonts.caskaydia-cove
     kitty xfce.thunar gvfs xfce.tumbler firefox
+    electronmail
+      
+      # Missing Waybar dependencies
+      pavucontrol        # For audio control
+      brightnessctl      # For brightness control (laptop)
+      networkmanager     # For network module
+      wirelesstools      # For wifi info
+      
+      # Missing notification/clipboard
+      swaynotificationcenter  # Notifications
+      cliphist               # Clipboard manager
+      wl-clipboard          # Wayland clipboard
+      
+      # Missing idle/lock/wallpaper
+      hypridle              # Idle management
+      hyprlock              # Screen locking
+      hyprpaper             # Wallpaper
+      
+      # Missing for screenshots
+      hyprshot              # Screenshots
+      grim slurp            # Screenshot tools
+      
+      # Missing utilities
+      acpi                  # Battery info
+      lm_sensors           # Temperature sensors
   ];
 }
