@@ -100,6 +100,16 @@ in
 		monitor = [ "eDP-1, 2560x1600@165, 1920x0, 1.6" ];
 		input.kb_layout = "us";
 		input.touchpad.natural_scroll = true;
+		workspace = [
+		    "1, name:Web"
+		    "2, name:Email" 
+		    "3, name:JT"
+		    "4, name:Notes"
+		    "5, name:Code"
+		    "6, name:Media"
+		    "7, name:Misc"
+		    "8, name:AI"
+		  ];
 		general = {
 			gaps_in = 5;
 			gaps_out = 10;
