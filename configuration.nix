@@ -90,7 +90,7 @@
       };
       
       # Universal shell functions
-      initExtra = ''
+      interactiveShellInit = ''
         # ADHD-friendly productivity functions
         mkcd() { mkdir -p "$1" && cd "$1" }
         
