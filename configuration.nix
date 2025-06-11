@@ -49,7 +49,7 @@
     services.tailscale.enable = true;
     programs.zsh = {
       enable = true;
-      autosuggestions.enable = true; \ # This enables history-based suggestions
+      autosuggestions.enable = true;  # This enables history-based suggestions
       syntaxHighlighting.enable = true;
       shellAliases = {
         # File management with modern tools
