@@ -18,7 +18,7 @@
           ./hosts/server/default.nix
           ./modules.nix
           home-manager.nixosModules.home-manager
-          stylix.nixosModules.stylix
+          inputs.stylix.nixosModules.stylix
           {
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
@@ -32,7 +32,7 @@
         modules = [
           ./hosts/laptop/default.nix
           home-manager.nixosModules.home-manager
-          stylix.nixosModules.stylix
+          inputs.stylix.nixosModules.stylix
           {
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
