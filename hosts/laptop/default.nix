@@ -30,7 +30,7 @@
   };
 
   # Graphics
-  hardware.opengl.enable = true;
+  hardware.graphics.enable = true;
   xdg.portal.enable = true;
   xdg.portal.wlr.enable = true;
 
@@ -52,7 +52,7 @@
   # SINGLE environment.systemPackages block
   environment.systemPackages = with pkgs; [
     greetd.tuigreet
-    (nerdfonts.override { fonts = [ "CascadiaCode" ]; })
+    nerd-fonts.caskaydia-cove
     kitty thunar gvfs tumbler firefox
   ];
 }
