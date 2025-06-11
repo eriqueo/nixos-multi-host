@@ -22,7 +22,7 @@
     	};
     	initial_session = {
     		command = "Hyprland";
-    		user = "eric"
+    		user = "eric";
     	};
     };	
   };
