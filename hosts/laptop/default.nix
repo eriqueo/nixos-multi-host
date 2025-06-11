@@ -60,7 +60,9 @@
     greetd.tuigreet
     nerd-fonts.caskaydia-cove
     kitty xfce.thunar gvfs xfce.tumbler firefox
-    electronmail
+    electron-mail
+    # protonmail-desktop
+    # protonmail-bridge
       
       # Missing Waybar dependencies
       pavucontrol        # For audio control
