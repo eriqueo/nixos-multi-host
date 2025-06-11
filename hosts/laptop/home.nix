@@ -75,7 +75,7 @@ in
 		    bind = $mod, F, fullscreen
 		    bind = $mod, Space, exec, wofi --show drun
 		    bind = $mod, B, exec, librewolf
-		    bind = $mod, E, exec, electronmail
+		    bind = $mod, E, exec, electron-mail
 		    
 		    # Screenshots
 		    bind = , Print, exec, hyprshot -m region -o ~/Pictures/Screenshots
@@ -118,19 +118,27 @@ in
 		 "swaynotificationcenter"
 		 "hypridle"
 		 "hyprpaper"
+		 "wl-paste --type image --watch cliphist store"
+		 "wl-paste --type text --watch cliphist store"
+	     # Separate entries for each delayed launch
+	     "sleep 2 && hyprctl dispatch exec '[workspace 1:Web silent] librewolf'"
+	     "sleep 3 && hyprctl dispatch exec '[workspace 2:Email silent] electron-mail'"
+		 "sleep 4 && hyprctl dispatch exec '[workspace 3:JT silent] librewolf --new-window https://jobtread.com'"
+		 "sleep 5 && hyprctl dispatch exec '[workspace 4:Notes silent] obsidian'"
+		 "sleep 6 && hyprctl dispatch exec '[workspace 6:Code silent] code'"
 		 ];
 		monitor = [ "eDP-1, 2560x1600@165, 1920x0, 1.6" ];
 		input.kb_layout = "us";
 		input.touchpad.natural_scroll = true;
 		workspace = [
-		    "1, name:Web"
-		    "2, name:Email" 
-		    "3, name:JT"
-		    "4, name:Notes"
-		    "5, name:Code"
-		    "6, name:Media"
-		    "7, name:Misc"
-		    "8, name:AI"
+		    "1:Web, default:true"
+		    "2:Email, default:true" 
+		    "3:JT, default:true"
+		    "4:Notes, default:true"
+		    "5:Code, default:true"
+		    "6:Media, default:true"
+		    "7:Misc, default:true"
+		    "8:AI, default:true"
 		  ];
 		general = {
 			gaps_in = 5;
