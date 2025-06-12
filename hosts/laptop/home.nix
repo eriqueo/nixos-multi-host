@@ -20,18 +20,6 @@
   ];
 	wayland.windowManager.hyprland = {
 		  enable = true;
-		  plugins = with pkgs.hyprlandPlugins; [
-		      hyprexpo
-		    ];
-		    settings = {
-		      plugin = {
-		        hyprexpo = {
-		          columns = 3;
-		          gap_size = 5;
-		          bg_col = "rgb(111111)";
-		          workspace_method = "center current"; # [center/first] [workspace] e.g. first 1 or center m+1
-		        };
-		      };
 		  
 		  extraConfig = ''
 		    # Mouse settings
@@ -93,7 +81,7 @@
 		    bind = $mod CTRL, R, movetoworkspace, 8
 		    
 		    # Switch to workspaces (SUPER + CTRL + ALT + numbers)
-            bind = $mod CTRL ALT, up, hyprexpo:expo, toggle  
+             
 		    bind = $mod CTRL ALT, 1, workspace, 1
 		    bind = $mod CTRL ALT, 2, workspace, 2
 		    bind = $mod CTRL ALT, 3, workspace, 3
