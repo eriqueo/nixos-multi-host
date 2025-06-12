@@ -139,7 +139,7 @@
 		decoration.rounding = 8;
 		};
 	};
-
+    };
 	programs.waybar = {
 		enable = true;
 		systemd.enable = true;
