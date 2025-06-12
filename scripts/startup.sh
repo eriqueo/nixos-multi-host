@@ -14,28 +14,27 @@ wl-paste --type image --watch cliphist store &
 sleep 2
 
 # Restart Waybar (optional if managed by systemd)
-pkill waybar
-sleep 1
+#pkill waybar
+#sleep 1
 waybar &
 sleep 2
 
-# Silent app launches - window rules handle workspace assignment
-hyprctl dispatch exec 'librewolf'
+# Silent app launches on specific workspaces
+hyprctl dispatch exec '[workspace 1 silent] librewolf'
 sleep 1
-hyprctl dispatch exec 'electron-mail'
+hyprctl dispatch exec '[workspace 2 silent] electron-mail'
 sleep 1
-hyprctl dispatch exec 'chromium --ozone-platform=wayland --enable-features=UseOzonePlatform --app=https://jobtread.com'
+hyprctl dispatch exec '[workspace 3 silent] chromium --ozone-platform=wayland --enable-features=UseOzonePlatform --app=https://jobtread.com'
 sleep 1
-hyprctl dispatch exec 'obsidian'
+hyprctl dispatch exec '[workspace 4 silent] obsidian'
 sleep 1
-hyprctl dispatch exec 'kitty'
+hyprctl dispatch exec '[workspace 5 silent] kitty'
 sleep 1
-hyprctl dispatch exec 'code'
+hyprctl dispatch exec '[workspace 6 silent] code'
 sleep 1
-hyprctl dispatch exec 'qbittorrent'
+hyprctl dispatch exec '[workspace 7 silent] qbittorrent'
 sleep 1
-hyprctl dispatch exec 'chromium --ozone-platform=wayland --enable-features=UseOzonePlatform --app=https://claude.ai'
+hyprctl dispatch exec '[workspace 8 silent] chromium --ozone-platform=wayland --enable-features=UseOzonePlatform --app=https://claude.ai'
 sleep 1
-
 
 echo "Startup complete"

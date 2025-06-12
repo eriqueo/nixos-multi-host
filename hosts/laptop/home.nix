@@ -39,16 +39,6 @@
 			      "7:Misc, persistent:true"
 			      "8:AI, persistent:true"
 			  ];
-			windowrulev2 = [
-			  "workspace 1 silent, class:^(librewolf)$,floating:0"
-			  "workspace 2 silent, class:^(electron-mail)$,floating:0"
-			  "workspace 3 silent, class:^(chromium)$,title:.*jobtread.*,floating:0"
-			  "workspace 4 silent, class:^(obsidian)$,floating:0"
-			  "workspace 5 silent, class:^(kitty)$,floating:0"
-			  "workspace 6 silent, class:^(code)$,floating:0"
-			  "workspace 7 silent, class:^(qbittorrent)$,floating:0"
-			  "workspace 8 silent, class:^(chromium)$,title:.*claude.*,floating:0"
-			];
 			general = {
 				gaps_in = 5;
 				gaps_out = 10;
@@ -74,16 +64,6 @@
 				        disable-scroll = true;
 				        all-outputs = true;
 				        format = "{name}";
-				       persistent_workspaces = {
-				          "1" = [];
-				          "2" = [];
-				          "3" = [];
-				          "4" = [];
-				          "5" = [];
-				          "6" = [];
-				          "7" = [];
-				          "8" = [];
-				        };
 				        format-icons = {
 				          "1" = "Web";
 				          "2" = "Email";
