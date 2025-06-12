@@ -30,7 +30,6 @@
 				touchpad = {natural_scroll = true;};
 			  };		
 			workspace = [
-			  workspace = [
 			      "1:Web, persistent:true"
 			      "2:Email, persistent:true"
 			      "3:JT, persistent:true"
@@ -39,7 +38,6 @@
 			      "6:Media, persistent:true"
 			      "7:Misc, persistent:true"
 			      "8:AI, persistent:true"
-			    ];
 			  ];
 			windowrulev2 = [
 			  "workspace 1 silent, class:^(librewolf)$,floating:0"
@@ -76,8 +74,15 @@
 				        disable-scroll = true;
 				        all-outputs = true;
 				        format = "{name}";
-				        persistent_workspaces = {
-				          "*" = 8;
+				       persistent_workspaces = {
+				          "1" = [];
+				          "2" = [];
+				          "3" = [];
+				          "4" = [];
+				          "5" = [];
+				          "6" = [];
+				          "7" = [];
+				          "8" = [];
 				        };
 				        format-icons = {
 				          "1" = "Web";
