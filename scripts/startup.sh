@@ -24,15 +24,23 @@ waybar &
 # Wait for waybar to start
 sleep 2
 
-# Launch apps into their workspaces (remove the space in workspace names)
-hyprctl dispatch exec '[workspace 1:Web silent] librewolf'
+hyprctl dispatch workspace 1
+hyprctl dispatch exec 'librewolf'
 sleep 1
-hyprctl dispatch exec '[workspace 2:Email silent] electron-mail'
-sleep 1  
-hyprctl dispatch exec '[workspace 3:JT silent] librewolf --new-window https://jobtread.com'
+
+hyprctl dispatch workspace 2  
+hyprctl dispatch exec 'electron-mail'
 sleep 1
-hyprctl dispatch exec '[workspace 4:Notes silent] obsidian'
+
+hyprctl dispatch workspace 3
+hyprctl dispatch exec 'librewolf --new-window https://jobtread.com'
 sleep 1
-hyprctl dispatch exec '[workspace 6:Code silent] code'  # Changed to 6 to match your config
+
+hyprctl dispatch workspace 4
+hyprctl dispatch exec 'obsidian'
+sleep 1
+
+hyprctl dispatch workspace 6  # You had Code on workspace 6
+hyprctl dispatch exec 'code'
 
 echo "Startup script completed"
