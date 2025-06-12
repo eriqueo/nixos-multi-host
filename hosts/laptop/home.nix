@@ -172,9 +172,9 @@
 				      tray = { 
 				        spacing = 10; 
 				      };
-				    };
-				  };
-	
+				 };
+			};
+		};
 	};
 
 	services.hyprpaper = {
@@ -218,7 +218,8 @@
 		};
 	};
 	};
-stylix.targets.firefox.profileNames = [ "default" ];
+	stylix.targets.firefox.profileNames = [ "eric" ];
+
 	programs.chromium = {
 	enable = true;
 	package = pkgs.ungoogled-chromium;
@@ -227,5 +228,5 @@ stylix.targets.firefox.profileNames = [ "default" ];
 
 
   # Enable Home Manager self-management
-  programs.home-manager.enable = true;
+  	programs.home-manager.enable = true;
 }
