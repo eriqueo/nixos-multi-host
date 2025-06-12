@@ -22,32 +22,30 @@
 		enable = true;
 		extraConfig = ../../scripts/bindings.sh;
 		settings = {
-		exec-once = [
-		 "/etc/nixos/scripts/startup.sh"
-		 ];
-		monitor = [ "eDP-1, 2560x1600@165, 1920x0, 1.6" ];
-		input {
-			.kb_layout = "us";
-			follow_mouse = 1;
-			touchpad {natural_scroll = true};
-		};		
-		workspace = [
-		    "1:Web, default:true"
-		    "2:Email, default:true" 
-		    "3:JT, default:true"
-		    "4:Notes, default:true"
-		    "5:Code, default:true"
-		    "6:Media, default:true"
-		    "7:Misc, default:true"
-		    "8:AI, default:true"
-		  ];
-		general = {
-			gaps_in = 5;
-			gaps_out = 10;
-			border_size = 2;
-			layout = "dwindle";
-		};
-		decoration.rounding = 8;
+			exec-once = [ "/etc/nixos/scripts/startup.sh" ];
+	    	monitor = [ "eDP-1, 2560x1600@165, 1920x0, 1.6" ];
+			input =  {
+				.kb_layout = "us";
+				follow_mouse = 1;
+				touchpad {natural_scroll = true};
+			  };		
+			workspace = [
+			    "1:Web, default:true"
+			    "2:Email, default:true" 
+			    "3:JT, default:true"
+			    "4:Notes, default:true"
+			    "5:Code, default:true"
+			    "6:Media, default:true"
+			    "7:Misc, default:true"
+			    "8:AI, default:true"
+			  ];
+			general = {
+				gaps_in = 5;
+				gaps_out = 10;
+				border_size = 2;
+				layout = "dwindle";
+			  };
+			decoration.rounding = 8;
 		};
 	};
     
