@@ -25,7 +25,7 @@
 			exec-once = [ "/etc/nixos/scripts/startup.sh" ];
 	    	monitor = [ "eDP-1, 2560x1600@165, 1920x0, 1.6" ];
 			input =  {
-				.kb_layout = "us";
+				kb_layout = "us";
 				follow_mouse = 1;
 				touchpad {natural_scroll = true};
 			  };		
