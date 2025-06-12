@@ -90,6 +90,7 @@
         "nixlapcon" = "sudo micro /etc/nixos/hosts/laptop/config.nix";
         "nixserverhome" = "sudo micro /etc/nixos/hosts/server/home.nix";
         "nixservercon" = "sudo micro /etc/nixos/hosts/server/config.nix";
+        "nixsecrets" = "sudo micro /etc/nixos/modules/secrets/secrets.nix";
         "nixsearch" = "nix search nixpkgs";
         "nixclean" = "nix-collect-garbage -d";
         "nixgen" = "sudo nix-env --list-generations --profile /nix/var/nix/profiles/system";
