@@ -1,15 +1,17 @@
 #!/bin/sh
 
-# Startup script to launch applications on specific Hyprland workspaces with delays
+# Wait for Hyprland to be ready
+until hyprctl monitors > /dev/null 2>&1; do
+  sleep 0.5
+done
 
-hyprctl dispatch exec '[workspace 1 silent] librewolf' &
+# Launch apps into specific workspaces with delay
+hyprctl dispatch exec '[workspace 1 silent] librewolf'
 sleep 2
-hyprctl dispatch exec '[workspace 2 silent] electron-mail' &
+hyprctl dispatch exec '[workspace 2 silent] electron-mail'
 sleep 2
-hyprctl dispatch exec '[workspace 3 silent] librewolf --new-window https://jobtread.com' &
+hyprctl dispatch exec '[workspace 3 silent] librewolf --new-window https://jobtread.com'
 sleep 2
-hyprctl dispatch exec '[workspace 4 silent] obsidian' &
+hyprctl dispatch exec '[workspace 4 silent] obsidian'
 sleep 2
-hyprctl dispatch exec '[workspace 5 silent] code' &
-sleep 2
-# Add more apps as needed, following the pattern above
+hyprctl dispatch exec '[workspace 5 silent] code'
