@@ -30,14 +30,16 @@
 				touchpad = {natural_scroll = true;};
 			  };		
 			workspace = [
-			    "1:Web, default:true"
-			    "2:Email, default:true" 
-			    "3:JT, default:true"
-			    "4:Notes, default:true"
-			    "5:Code, default:true"
-			    "6:Media, default:true"
-			    "7:Misc, default:true"
-			    "8:AI, default:true"
+			  workspace = [
+			      "1:Web, persistent:true"
+			      "2:Email, persistent:true"
+			      "3:JT, persistent:true"
+			      "4:Notes, persistent:true"
+			      "5:Code, persistent:true"
+			      "6:Media, persistent:true"
+			      "7:Misc, persistent:true"
+			      "8:AI, persistent:true"
+			    ];
 			  ];
 			windowrulev2 = [
 			  "workspace 1 silent, class:^(librewolf)$,floating:0"
