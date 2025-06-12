@@ -83,6 +83,7 @@
 		  '';
 		settings = {
 		exec-once = [
+		 "waybar"
 		 "swaynotificationcenter"
 		 "hypridle"
 		 "hyprpaper"
