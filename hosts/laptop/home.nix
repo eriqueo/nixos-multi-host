@@ -61,30 +61,12 @@
 				modules-center = [ "clock" ];
 				modules-right = [ "pulseaudio" "battery" "tray" ];
 				"hyprland/workspaces" = {
-				        disable-scroll = true;
-				        all-outputs = true;
-				        format = "{name}";
-				        format_icons = {
-				           "1:Web" = "Web";
-				           "2:Email" = "Email";
-				           "3:JT" = "JT";
-				           "4:Notes" = "Notes";
-				           "5:Code" = "Code";
-				           "6:Media" = "Media";
-				           "7:Misc" = "Misc";
-				           "8:AI" = "AI";
-				         };
-				        persistent_workspaces = {
-				           "1:Web" = [];
-				           "2:Email" = [];
-				           "3:JT" = [];
-				           "4:Notes" = [];
-				           "5:Code" = [];
-				           "6:Media" = [];
-				           "7:Misc" = [];
-				           "8:AI" = [];
-				         };
-				        }; 
+				  format = "{name}";
+				  format_icons = {
+				    active = "●";
+				    default = "○";
+				  };
+				};
 				      clock = {
 				        format = "{:%H:%M}";
 				        format-alt = "{:%Y-%m-%d}";
