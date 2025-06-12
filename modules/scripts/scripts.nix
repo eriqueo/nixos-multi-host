@@ -1,26 +1,24 @@
 # /etc/nixos/modules/scripts/scripts.nix
 
-{ lib, pkgs, config, ... }:
+{ config, pkgs, lib, … }:
 
 let
-  # Wrap startup.sh as a profile‐binary named "hypr-startup"
-  hyprStartup = pkgs.writeScriptBin "hypr-startup" (builtins.readFile ./startup.sh);
-
-  # Wrap bindings.sh as a profile‐binary named "hypr-bindings"
+  # wrap your .sh files into profile binaries
+  hyprStartup  = pkgs.writeScriptBin "hypr-startup" (builtins.readFile ./startup.sh);
   hyprBindings = pkgs.writeScriptBin "hypr-bindings" (builtins.readFile ./bindings.sh);
 in {
-  # Expose them under config.packages.hyprlandScripts
+  # All module configuration MUST live under `config`
   config = {
+    # expose them for other modules to reference
     packages.hyprlandScripts = {
       startup  = hyprStartup;
       bindings = hyprBindings;
     };
+
+    # install into the system profile
+    environment.systemPackages = lib.mkForce [
+      hyprStartup
+      hyprBindings
+    ];
   };
-
-  # Also install them into your system profile so they’re in $PATH
-  environment.systemPackages = lib.mkForce [
-    hyprStartup
-    hyprBindings
-  ];
 }
-
