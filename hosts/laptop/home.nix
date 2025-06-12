@@ -20,7 +20,7 @@
   ];
 	wayland.windowManager.hyprland = {
 		enable = true;
-		extraConfig = ../scripts/bindings.sh
+		extraConfig = ../../scripts/bindings.sh;
 		settings = {
 		exec-once = [
 		 "/etc/nixos/scripts/startup.sh"
@@ -31,7 +31,7 @@
 			follow_mouse = 1;
 			touchpad {natural_scroll = true};
 		};		
-		workspace = {
+		workspace = [
 		    "1:Web, default:true"
 		    "2:Email, default:true" 
 		    "3:JT, default:true"
@@ -40,7 +40,7 @@
 		    "6:Media, default:true"
 		    "7:Misc, default:true"
 		    "8:AI, default:true"
-		  };
+		  ];
 		general = {
 			gaps_in = 5;
 			gaps_out = 10;
