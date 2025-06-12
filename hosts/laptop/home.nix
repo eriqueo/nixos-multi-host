@@ -80,6 +80,8 @@
 		    bind = $mod CTRL, R, movetoworkspace, 8
 		    
 		    # Switch to workspaces (SUPER + CTRL + ALT + numbers)
+            bind = $mod CTRL ALT, up, overview:toggle
+
 		    bind = $mod CTRL ALT, 1, workspace, 1
 		    bind = $mod CTRL ALT, 2, workspace, 2
 		    bind = $mod CTRL ALT, 3, workspace, 3

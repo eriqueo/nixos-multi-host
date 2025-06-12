@@ -19,7 +19,7 @@ sleep 2
 # Restart Waybar explicitly (after background services)
 #pkill waybar
 #sleep 1
-#waybar &
+waybar &
 
 # Wait for waybar to start
 #sleep 2
