@@ -17,12 +17,12 @@ wl-paste --type image --watch cliphist store &
 sleep 2
 
 # Restart Waybar explicitly (after background services)
-pkill waybar
-sleep 1
-waybar &
+#pkill waybar
+#sleep 1
+#waybar &
 
 # Wait for waybar to start
-sleep 2
+#sleep 2
 
 hyprctl dispatch workspace 1
 hyprctl dispatch exec 'librewolf'
@@ -40,7 +40,19 @@ hyprctl dispatch workspace 4
 hyprctl dispatch exec 'obsidian'
 sleep 1
 
+hyprctl dispatch workspace 5
+hyprctl dispatch exec 'kitty'
+sleep 1
+
 hyprctl dispatch workspace 6  # You had Code on workspace 6
 hyprctl dispatch exec 'code'
+
+hyprctl dispatch workspace 7
+hyprctl dispatch exec 'vlc'
+sleep 1
+
+hyprctl dispatch workspace 8
+hyprctl dispatch exec 'imv'
+sleep 1
 
 echo "Startup script completed"

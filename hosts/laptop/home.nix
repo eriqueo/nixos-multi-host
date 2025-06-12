@@ -80,6 +80,16 @@
 		    bind = $mod CTRL ALT, 6, workspace, 6
 		    bind = $mod CTRL ALT, 7, workspace, 7
 		    bind = $mod CTRL ALT, 8, workspace, 8
+		    bind = $mod CTRL ALT, W, workspace, 1
+		    bind = $mod CTRL ALT, E, workspace, 2
+		    bind = $mod CTRL ALT, J, workspace, 3
+		    bind = $mod CTRL ALT, O, workspace, 4
+		    bind = $mod CTRL ALT, K, workspace, 5
+		    bind = $mod CTRL ALT, C, workspace, 6
+		    bind = $mod CTRL ALT, M, workspace, 7
+		    bind = $mod CTRL ALT, R, workspace, 8
+		    bind = $mod CTRL ALT, left, workspace, e-1
+		    bind = $mod CTRL ALT, right, workspace, e+1
 		  '';
 		settings = {
 		exec-once = [
