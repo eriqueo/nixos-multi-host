@@ -142,7 +142,7 @@
 				"hyprland/workspaces" = {
 				        disable-scroll = true;
 				        all-outputs = true;
-				        format = "{icon}";
+				        format = "{name}";
 				        persistent_workspaces = {
 				          "*" = 8;
 				        };
