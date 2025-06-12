@@ -32,10 +32,6 @@
 		          workspace_method = "center current"; # [center/first] [workspace] e.g. first 1 or center m+1
 		        };
 		      };
-		      bind = [
-		        "$mainMod, grave, hyprexpo:expo, toggle" # can be: toggle, off/disable or on/enable
-		      ];
-		   
 		  
 		  extraConfig = ''
 		    # Mouse settings
