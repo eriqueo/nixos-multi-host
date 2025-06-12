@@ -23,6 +23,10 @@
       diffutils less which
       python3Packages.pip   
     ];
+	environment.etc."nixos-scripts" = {
+	  source = ./scripts;
+	  mode = "0755";
+	};
     users.users.eric = {
       isNormalUser = true;
       home = "/home/eric";

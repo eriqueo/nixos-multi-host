@@ -84,17 +84,6 @@
 		settings = {
 		exec-once = [
 		 "/etc/nixos/scripts/startup.sh"
-		 "swaynotificationcenter"
-		 "hypridle"
-		 "hyprpaper"
-		 "wl-paste --type image --watch cliphist store"
-		 "wl-paste --type text --watch cliphist store"
-	     # Separate entries for each delayed launch
-	    # "sleep 2 && hyprctl dispatch exec '[workspace 1:Web silent] librewolf'"
-	    # "sleep 3 && hyprctl dispatch exec '[workspace 2:Email silent] electron-mail'"
-		# "sleep 4 && hyprctl dispatch exec '[workspace 3:JT silent] librewolf --new-window https://jobtread.com'"
-		# "sleep 5 && hyprctl dispatch exec '[workspace 4:Notes silent] obsidian'"
-		# "sleep 6 && hyprctl dispatch exec '[workspace 6:Code silent] code'"
 		 ];
 		monitor = [ "eDP-1, 2560x1600@165, 1920x0, 1.6" ];
 		input.kb_layout = "us";
