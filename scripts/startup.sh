@@ -19,29 +19,23 @@ sleep 1
 waybar &
 sleep 2
 
-# Silent app launches per workspace
-hyprctl dispatch exec '[workspace 1:Web silent] librewolf'
+# Silent app launches - window rules handle workspace assignment
+hyprctl dispatch exec '[silent] librewolf'
+sleep 1
+hyprctl dispatch exec '[silent] electron-mail'
+sleep 1
+hyprctl dispatch exec '[silent] chromium --ozone-platform=wayland --enable-features=UseOzonePlatform --app=https://jobtread.com'
+sleep 1
+hyprctl dispatch exec '[silent] obsidian'
+sleep 1
+hyprctl dispatch exec '[silent] kitty'
+sleep 1
+hyprctl dispatch exec '[silent] code'
+sleep 1
+hyprctl dispatch exec '[silent] qbittorrent'
+sleep 1
+hyprctl dispatch exec '[silent] chromium --ozone-platform=wayland --enable-features=UseOzonePlatform --app=https://claude.ai'
 sleep 1
 
-hyprctl dispatch exec '[workspace 2:Email silent] electron-mail'
-sleep 1
 
-hyprctl dispatch exec '[workspace 3:JT silent] chromium --ozone-platform=wayland --enable-features=UseOzonePlatform --app=https://jobtread.com'
-sleep 1
-
-hyprctl dispatch exec '[workspace 4:Notes silent] obsidian'
-sleep 1
-
-hyprctl dispatch exec '[workspace 5:Terminal silent] kitty'
-sleep 1
-
-hyprctl dispatch exec '[workspace 6:Code silent] code'
-sleep 1
-
-hyprctl dispatch exec '[workspace 7:Misc silent] qbittorrent'
-sleep 1
-
-hyprctl dispatch exec '[workspace 8:AI silent] chromium --ozone-platform=wayland --enable-features=UseOzonePlatform --app=https://claude.ai'
-sleep 1
-
-echo "Silent startup complete"
+echo "Startup complete"
