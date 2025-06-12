@@ -24,7 +24,17 @@
   # Desktop environment
   programs.hyprland.enable = true;
   programs.hyprland.xwayland.enable = true;
-
+  fonts.fontconfig = {
+    enable = true;
+    antialias = true;
+    hinting.enable = true;
+    subpixelRendering = "rgb";
+  };
+  services.upower.enable = true;  # Battery status for desktop environments
+  services.logind = {
+    lidSwitch = "suspend";        # Suspend on lid close
+    lidSwitchExternalPower = "lock"; # Just lock when on AC power
+  };
   # Login manager
   services.greetd = {
     enable = true;
@@ -55,7 +65,22 @@
 
   # Networking and hardware
   networking.networkmanager.enable = true;
-  hardware.bluetooth.enable = true;
+  hardware.bluetooth = {
+    enable = true;
+    powerOnBoot = true;
+    settings = {
+      General = {
+        Enable = "Source,Sink,Media,Socket";
+        Experimental = true;
+        AutoConnect = true;
+        ReconnectAttempts = 7;
+        ReconnectIntervals = "1,2,4,8,16,32,64";
+      };
+      Policy = {
+        AutoEnable = true;
+      };
+    };
+  };
   services.blueman.enable = true;
 
   # Laptop services
@@ -65,7 +90,7 @@
   services.fwupd.enable = true;
 
   # User groups
-  users.users.eric.extraGroups = [ "networkmanager" "video" "audio" ];
+  users.users.eric.extraGroups = [ "networkmanager" "video" "audio" "wheel" "storage" ];
   #users.users.eric.initialPassword = "changeme123";
 
   # SINGLE environment.systemPackages block
