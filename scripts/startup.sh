@@ -14,7 +14,7 @@ wl-paste --type image --watch cliphist store &
 sleep 2
 
 # Restart Waybar (optional if managed by systemd)
-#pkill waybar
+pkill waybar
 #sleep 1
 waybar &
 sleep 2

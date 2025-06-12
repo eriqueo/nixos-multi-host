@@ -64,16 +64,7 @@
 				        disable-scroll = true;
 				        all-outputs = true;
 				        format = "{name}";
-				        format-icons = {
-				          "1" = "Web";
-				          "2" = "Email";
-				          "3" = "JT";
-				          "4" = "Notes";
-				          "5" = "Code";
-				          "6" = "Media";
-				          "7" = "Misc";
-				          "8" = "AI";
-				      };
+				       
 				      
 				      clock = {
 				        format = "{:%H:%M}";
