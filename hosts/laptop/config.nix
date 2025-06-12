@@ -1,127 +1,89 @@
-{ config, pkgs, ... }:
+# /etc/nixos/hosts/laptop/config.nix
+
+{ config, pkgs, lib, ... }:
+
+#==============================================================================
+#  Host-specific NixOS configuration for “heartwood-laptop”
+#==============================================================================
 
 {
+  #---------------------------------------------------------------------------
+  #  1. IMPORTS: bring in shared globals, hardware, and feature modules
+  #---------------------------------------------------------------------------
   imports = [
-    ./hardware-configuration.nix
+    # Global settings (users, networking, core packages, timeZone, etc.)
     ../../configuration.nix
-    ../../modules/scripts.nix     # exposes config.packages.hyprlandScripts.{startup,bindings}
-    ../../modules/ui/hyprland.nix # or inline below
+
+    # Machine-specific hardware settings (bootloader, fileSystems, swap)
+    ./hardware-configuration.nix
+
+    # Core system services (Docker, SSH, Samba, etc.)
+    ../../modules/services.nix
+
+    # Wrap your shell scripts into the Nix store & expose them
+    ../../modules/scripts.nix
+
+    # Deploy your secret files under /etc/secrets
+    ../../modules/secrets.nix
+
+    # UI stack modules: Hyprland, Waybar, Stylix
+    ../../modules/ui/hyprland.nix
+    ../../modules/ui/waybar.nix
+    ../../modules/ui/stylix.nix
   ];
 
+  #---------------------------------------------------------------------------
+  #  2. BASIC SYSTEM OPTIONS
+  #---------------------------------------------------------------------------
+
+  # Host name (used in /etc/hostname, networking)
   networking.hostName = "heartwood-laptop";
 
-  stylix = {
-      enable = true;
-      base16Scheme = "${pkgs.base16-schemes}/share/themes/nord.yaml";
-      fonts = {
-        monospace = {
-          package = pkgs.nerd-fonts.caskaydia-cove;
-          name = "CaskaydiaCove Nerd Font";
-        };
-        sizes = {
-          terminal = 13;
-        };
-      };
-    };
-  # Desktop environment
-  services.xserver = {
-    enable     = true;
-    windowManager.hyprland = {
-      enable            = true;
-      systemdIntegration = true;  # optional, for better session hooks
+  # Time zone for the system clock & containers
+  time.timeZone = "America/Denver";
 
-      # Autostart your startup.sh
-      settings.execOnce = [
-        config.packages.hyprlandScripts.startup
-      ];
+  # Default shell for root (optional)
+  users.users.root.shell = pkgs.zsh;
 
+  #---------------------------------------------------------------------------
+  #  3. XSERVER & DISPLAY SETTINGS
+  #---------------------------------------------------------------------------
 
-      
-  services.upower.enable = true;  # Battery status for desktop environments
-  services.logind = {
-    lidSwitch = "suspend";        # Suspend on lid close
-    lidSwitchExternalPower = "lock"; # Just lock when on AC power
-  };
-  # Login manager
-  services.greetd = {
-    enable = true;
-    settings = {
-    	default_session = {
-      		command = "${pkgs.greetd.tuigreet}/bin/tuigreet --time --cmd Hyprland";
-     		user = "greeter";
-    	};
-    	initial_session = {
-    		command = "Hyprland";
-    		user = "eric";
-    	};
-    };	
+  # Enable X11/Wayland server (needed for Hyprland)
+  services.xserver.enable = true;
+
+  services.xserver.displayManager = {
+    # No login manager; assume auto-login via getty or custom script
+    # Uncomment and adjust if you prefer lightdm, gdm, etc.
+    # displayManager.lightdm.enable = true;
+    # displayManager.defaultSession = "hyprland";
   };
 
-  # Audio - USE PIPEWIRE (not PulseAudio for modern systems)
-  security.rtkit.enable = true;
-  services.pipewire = {
-    enable = true;
-    alsa.enable = true;
-    pulse.enable = true;
-  };
+  #---------------------------------------------------------------------------
+  #  4. SYSTEM PACKAGES
+  #---------------------------------------------------------------------------
 
-  # Graphics
-  hardware.graphics.enable = true;
-  xdg.portal.enable = true;
-  xdg.portal.wlr.enable = true;
-
-  # Networking and hardware
-  networking.networkmanager.enable = true;
-  hardware.bluetooth = {
-    enable = true;
-    powerOnBoot = true;
-    settings = {
-      General = {
-        Enable = "Source,Sink,Media,Socket";
-        Experimental = true;
-        AutoConnect = true;
-        ReconnectAttempts = 7;
-        ReconnectIntervals = "1,2,4,8,16,32,64";
-      };
-      Policy = {
-        AutoEnable = true;
-      };
-    };
-  };
-  services.blueman.enable = true;
-
-  # Laptop services
-  services.tlp.enable = true;
-  services.printing.enable = true;
-  services.flatpak.enable = true;
-  services.fwupd.enable = true;
-
-  # User groups
-  users.users.eric.extraGroups = [ "networkmanager" "video" "audio" "wheel" "storage" ];
-  #users.users.eric.initialPassword = "changeme123";
-
-  # SINGLE environment.systemPackages block
   environment.systemPackages = with pkgs; [
-    greetd.tuigreet
-    nerd-fonts.caskaydia-cove
-    xfce.thunar gvfs xfce.tumbler
-    electron-mail
-    # protonmail-desktop
-    # protonmail-bridge
-      
-      # Missing Waybar dependencies
-      pavucontrol        # For audio control
-      brightnessctl      # For brightness control (laptop)
-      networkmanager     # For network module
-      wirelesstools      # For wifi info
-      
-      # Missing notification/clipboard
-      swaynotificationcenter  # Notifications
-      cliphist               # Clipboard manager
-      wl-clipboard          # Wayland clipboard
-           
-      # Missing utilities
-      acpi                  # Battery info
-      lm_sensors           # Temperature sensors
+    # Essential CLI tools
+    vim         # Editor
+    btop        # Process viewer
+    ncdu        # Disk usage analyzer
+    zoxide      # Smart directory jumper
+    eza         # ls replacement
+    # …add any host-specific packages here…
   ];
+
+  #---------------------------------------------------------------------------
+  #  5. OPTIONAL TWEAKS & HOST OVERRIDES
+  #---------------------------------------------------------------------------
+
+  # Example: custom keyboard layout
+  # services.xserver.layout = "us";
+  # services.xserver.xkbOptions = "ctrl:nocaps";
+
+  # Example: enable swap on a swapfile
+  # swapDevices = [ { device = "/swapfile"; size = 4096; } ];
+
+  # …any other per-host options…
+
 }
