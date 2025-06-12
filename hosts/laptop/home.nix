@@ -40,14 +40,14 @@
 			    "8:AI, default:true"
 			  ];
 			windowrulev2 = [
-			  "workspace 1, class:^(librewolf)$,floating:0"
-			  "workspace 2, class:^(electron-mail)$,floating:0"
-			  "workspace 3, class:^(chromium)$,title:.*jobtread.*,floating:0"
-			  "workspace 4, class:^(obsidian)$,floating:0"
-			  "workspace 5, class:^(kitty)$,floating:0"
-			  "workspace 6, class:^(code)$,floating:0"
-			  "workspace 7, class:^(qbittorrent)$,floating:0"
-			  "workspace 8, class:^(chromium)$,title:.*claude.*,floating:0"
+			  "workspace 1 silent, class:^(librewolf)$,floating:0"
+			  "workspace 2 silent, class:^(electron-mail)$,floating:0"
+			  "workspace 3 silent, class:^(chromium)$,title:.*jobtread.*,floating:0"
+			  "workspace 4 silent, class:^(obsidian)$,floating:0"
+			  "workspace 5 silent, class:^(kitty)$,floating:0"
+			  "workspace 6 silent, class:^(code)$,floating:0"
+			  "workspace 7 silent, class:^(qbittorrent)$,floating:0"
+			  "workspace 8 silent, class:^(chromium)$,title:.*claude.*,floating:0"
 			];
 			general = {
 				gaps_in = 5;

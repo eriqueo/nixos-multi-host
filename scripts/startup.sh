@@ -20,21 +20,21 @@ waybar &
 sleep 2
 
 # Silent app launches - window rules handle workspace assignment
-hyprctl dispatch exec '[silent] librewolf'
+hyprctl dispatch exec 'librewolf'
 sleep 1
-hyprctl dispatch exec '[silent] electron-mail'
+hyprctl dispatch exec 'electron-mail'
 sleep 1
-hyprctl dispatch exec '[silent] chromium --ozone-platform=wayland --enable-features=UseOzonePlatform --app=https://jobtread.com'
+hyprctl dispatch exec 'chromium --ozone-platform=wayland --enable-features=UseOzonePlatform --app=https://jobtread.com'
 sleep 1
-hyprctl dispatch exec '[silent] obsidian'
+hyprctl dispatch exec 'obsidian'
 sleep 1
-hyprctl dispatch exec '[silent] kitty'
+hyprctl dispatch exec 'kitty'
 sleep 1
-hyprctl dispatch exec '[silent] code'
+hyprctl dispatch exec 'code'
 sleep 1
-hyprctl dispatch exec '[silent] qbittorrent'
+hyprctl dispatch exec 'qbittorrent'
 sleep 1
-hyprctl dispatch exec '[silent] chromium --ozone-platform=wayland --enable-features=UseOzonePlatform --app=https://claude.ai'
+hyprctl dispatch exec 'chromium --ozone-platform=wayland --enable-features=UseOzonePlatform --app=https://claude.ai'
 sleep 1
 
 
