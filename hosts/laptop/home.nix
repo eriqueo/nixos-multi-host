@@ -83,7 +83,7 @@
 		  '';
 		settings = {
 		exec-once = [
-		 "waybar"
+		 
 		 "swaynotificationcenter"
 		 "hypridle"
 		 "hyprpaper"
@@ -132,7 +132,8 @@
 	};
 
 	programs.waybar = {
-		enable = false;
+		enable = true;
+		systemd.enable = true;
 		settings = {
 			mainBar = {
 				layer = "top";
