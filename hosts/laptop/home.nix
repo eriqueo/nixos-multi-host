@@ -88,13 +88,25 @@
 		 "hyprpaper"
 		 "wl-paste --type image --watch cliphist store"
 		 "wl-paste --type text --watch cliphist store"
+		 "librewolf"
+		 "electron-mail"
+		 "librewolf --new-window https://jobtread.com"
+		 "obsidian"
+		 "code"
 	     # Separate entries for each delayed launch
-	     "sleep 2 && hyprctl dispatch exec '[workspace 1:Web silent] librewolf'"
-	     "sleep 3 && hyprctl dispatch exec '[workspace 2:Email silent] electron-mail'"
-		 "sleep 4 && hyprctl dispatch exec '[workspace 3:JT silent] librewolf --new-window https://jobtread.com'"
-		 "sleep 5 && hyprctl dispatch exec '[workspace 4:Notes silent] obsidian'"
-		 "sleep 6 && hyprctl dispatch exec '[workspace 6:Code silent] code'"
+	    # "sleep 2 && hyprctl dispatch exec '[workspace 1:Web silent] librewolf'"
+	    # "sleep 3 && hyprctl dispatch exec '[workspace 2:Email silent] electron-mail'"
+		# "sleep 4 && hyprctl dispatch exec '[workspace 3:JT silent] librewolf --new-window https://jobtread.com'"
+		# "sleep 5 && hyprctl dispatch exec '[workspace 4:Notes silent] obsidian'"
+		# "sleep 6 && hyprctl dispatch exec '[workspace 6:Code silent] code'"
 		 ];
+		 windowrulev2 = [
+		     "workspace 1, class:^(librewolf|firefox)$, title:^((?!JobTread).)*$"
+		     "workspace 2, class:^(electron-mail|ElectronMail)$"
+		     "workspace 3, class:^(librewolf|firefox)$, title:.*JobTread.*"
+		     "workspace 4, class:^(obsidian|Obsidian)$"
+		     "workspace 6, class:^(code|Code|vscode)$"
+		   ];
 		monitor = [ "eDP-1, 2560x1600@165, 1920x0, 1.6" ];
 		input.kb_layout = "us";
 		input.touchpad.natural_scroll = true;
