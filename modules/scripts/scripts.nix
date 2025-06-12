@@ -1,6 +1,6 @@
 # /etc/nixos/modules/scripts/scripts.nix
 
-{ config, pkgs, lib, … }:
+{ config, pkgs, lib, ... }:
 
 let
   # wrap your .sh files into profile binaries
