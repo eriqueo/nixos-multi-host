@@ -132,8 +132,7 @@
 	};
 
 	programs.waybar = {
-		enable = true;
-		systemd.enable = true;
+		enable = false;
 		settings = {
 			mainBar = {
 				layer = "top";
