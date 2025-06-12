@@ -20,7 +20,7 @@
   ];
 	wayland.windowManager.hyprland = {
 		enable = true;
-		extraConfig = ../../scripts/bindings.sh;
+		extraConfig = builtins.readFile ../../scripts/bindings.sh;
 		settings = {
 			exec-once = [ "/etc/nixos/scripts/startup.sh" ];
 	    	monitor = [ "eDP-1, 2560x1600@165, 1920x0, 1.6" ];
