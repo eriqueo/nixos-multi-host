@@ -83,17 +83,12 @@
 		  '';
 		settings = {
 		exec-once = [
-		 
+		 "/etc/nixos/scripts/startup.sh"
 		 "swaynotificationcenter"
 		 "hypridle"
 		 "hyprpaper"
 		 "wl-paste --type image --watch cliphist store"
 		 "wl-paste --type text --watch cliphist store"
-		 "librewolf"
-		 "electron-mail"
-		 "librewolf --new-window https://jobtread.com"
-		 "obsidian"
-		 "code"
 	     # Separate entries for each delayed launch
 	    # "sleep 2 && hyprctl dispatch exec '[workspace 1:Web silent] librewolf'"
 	    # "sleep 3 && hyprctl dispatch exec '[workspace 2:Email silent] electron-mail'"
@@ -101,16 +96,6 @@
 		# "sleep 5 && hyprctl dispatch exec '[workspace 4:Notes silent] obsidian'"
 		# "sleep 6 && hyprctl dispatch exec '[workspace 6:Code silent] code'"
 		 ];
-		 windowrulev2 = [
-		     "workspace 1 silent, class:^(librewolf|firefox)$, title:^((?!JobTread).)*$"
-		     "workspace 2 silent, class:^(electron-mail|ElectronMail)$"
-		     "workspace 3 silent, class:^(librewolf|firefox)$, title:.*JobTread.*"
-		     "workspace 4 silent, class:^(obsidian|Obsidian)$"
-		     "workspace 5 silent, class:^(kitty)$"
-		     "workspace 6 silent, class:^(vlc|VLC)$"
-		     "workspace 7 silent, class:^(code|Code|vscode)$"
-		     "workspace 8 silent, class:^(thunar)$"
-		   ];
 		monitor = [ "eDP-1, 2560x1600@165, 1920x0, 1.6" ];
 		input.kb_layout = "us";
 		input.touchpad.natural_scroll = true;
@@ -148,10 +133,19 @@
 				"hyprland/workspaces" = {
 				        disable-scroll = true;
 				        all-outputs = true;
-				        format = "{name}";
+				        format = "{icon}";
 				        persistent_workspaces = {
 				          "*" = 8;
 				        };
+				        format-icons = {
+				          "1" = "Web";
+				          "2" = "Email";
+				          "3" = "JT";
+				          "4" = "Notes";
+				          "5" = "Code";
+				          "6" = "Media";
+				          "7" = "Misc";
+				          "8" = "AI";
 				      };
 				      
 				      clock = {
