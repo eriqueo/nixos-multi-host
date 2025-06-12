@@ -15,7 +15,7 @@
     ../../configuration.nix
     ./hardware-configuration.nix
     ../../modules/services.nix
-    ../../modules/scripts.nix
+    ../../modules/scripts/scripts.nix
     ../../modules/secrets.nix
     ../../modules/ui/hyprland.nix
     ../../modules/ui/waybar.nix
