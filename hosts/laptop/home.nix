@@ -102,11 +102,14 @@
 		# "sleep 6 && hyprctl dispatch exec '[workspace 6:Code silent] code'"
 		 ];
 		 windowrulev2 = [
-		     "workspace 1, class:^(librewolf|firefox)$, title:^((?!JobTread).)*$"
-		     "workspace 2, class:^(electron-mail|ElectronMail)$"
-		     "workspace 3, class:^(librewolf|firefox)$, title:.*JobTread.*"
-		     "workspace 4, class:^(obsidian|Obsidian)$"
-		     "workspace 6, class:^(code|Code|vscode)$"
+		     "workspace 1 silent, class:^(librewolf|firefox)$, title:^((?!JobTread).)*$"
+		     "workspace 2 silent, class:^(electron-mail|ElectronMail)$"
+		     "workspace 3 silent, class:^(librewolf|firefox)$, title:.*JobTread.*"
+		     "workspace 4 silent, class:^(obsidian|Obsidian)$"
+		     "workspace 5 silent, class:^(kitty)$"
+		     "workspace 6 silent, class:^(vlc|VLC)$"
+		     "workspace 7 silent, class:^(code|Code|vscode)$"
+		     "workspace 8 silent, class:^(thunar)$"
 		   ];
 		monitor = [ "eDP-1, 2560x1600@165, 1920x0, 1.6" ];
 		input.kb_layout = "us";
@@ -146,15 +149,6 @@
 				        disable-scroll = true;
 				        all-outputs = true;
 				        format = "{name}";
-				        format-icons = {
-				          "1" = "Web";  # Web
-				          "2" = "Email";   # Terminal  
-				          "3" = "JT";  # Music
-				          "4" = "Notes";   # Chat
-				          "5" = "Code";   # Files
-				          "6" = "Media";   # Code
-				          "7" = "Misc";   # Games
-				          "8" = "AI";   # System
 				        };
 				        persistent_workspaces = {
 				          "*" = 8;
