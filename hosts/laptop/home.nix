@@ -15,7 +15,7 @@
     gimp inkscape blender
     blueman timeshift udiskie redshift
     hyprshot hyprpaper hyprlock hypridle
-    ffmpeg-full
+    ffmpeg-full protonvpn-gui protonmail-desktop
     ollama
   ];
 	wayland.windowManager.hyprland = {

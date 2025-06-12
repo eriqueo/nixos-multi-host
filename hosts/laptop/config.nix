@@ -4,6 +4,8 @@
   imports = [
     ./hardware-configuration.nix
     ../../configuration.nix
+    ../../modules/scripts.nix     # exposes config.packages.hyprlandScripts.{startup,bindings}
+    ../../modules/ui/hyprland.nix # or inline below
   ];
 
   networking.hostName = "heartwood-laptop";
@@ -22,8 +24,19 @@
       };
     };
   # Desktop environment
-  programs.hyprland.enable = true;
-  programs.hyprland.xwayland.enable = true;
+  services.xserver = {
+    enable     = true;
+    windowManager.hyprland = {
+      enable            = true;
+      systemdIntegration = true;  # optional, for better session hooks
+
+      # Autostart your startup.sh
+      settings.execOnce = [
+        config.packages.hyprlandScripts.startup
+      ];
+
+
+      
   services.upower.enable = true;  # Battery status for desktop environments
   services.logind = {
     lidSwitch = "suspend";        # Suspend on lid close
