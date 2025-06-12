@@ -70,6 +70,14 @@
 		    bind = $mod CTRL, 6, movetoworkspace, 6
 		    bind = $mod CTRL, 7, movetoworkspace, 7
 		    bind = $mod CTRL, 8, movetoworkspace, 8
+		    bind = $mod CTRL, W, movetoworkspace, 1
+		    bind = $mod CTRL, E, movetoworkspace, 2
+		    bind = $mod CTRL, J, movetoworkspace, 3
+		    bind = $mod CTRL, O, movetoworkspace, 4
+		    bind = $mod CTRL, K, movetoworkspace, 5
+		    bind = $mod CTRL, C, movetoworkspace, 6
+		    bind = $mod CTRL, M, movetoworkspace, 7
+		    bind = $mod CTRL, R, movetoworkspace, 8
 		    
 		    # Switch to workspaces (SUPER + CTRL + ALT + numbers)
 		    bind = $mod CTRL ALT, 1, workspace, 1

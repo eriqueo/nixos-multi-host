@@ -104,24 +104,7 @@
       interactiveShellInit = ''
         # ADHD-friendly productivity functions
         mkcd() { mkdir -p "$1" && cd "$1" }
-        
-        # Enhanced file extraction
-        extract() {
-          if [[ -f "$1" ]]; then
-            case "$1" in
-              *.tar.gz)  tar -xzf "$1" ;;
-              *.tar.xz)  tar -xJf "$1" ;;
-              *.tar.bz2) tar -xjf "$1" ;;
-              *.zip)     unzip "$1" ;;
-              *.rar)     unrar x "$1" ;;
-              *.pdf)     echo "PDF file: $1 (use pdf processing tools)" ;;
-              *)         echo "'$1' cannot be extracted" ;;
-            esac
-          else
-            echo "'$1' is not a valid file"
-          fi
-        }
-        
+                
         # Quick search and replace
         sr() {
           (( $# != 3 )) && { echo "Usage: sr <search> <replace> <file>"; return 1; }

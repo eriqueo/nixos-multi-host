@@ -33,7 +33,7 @@ hyprctl dispatch exec 'electron-mail'
 sleep 1
 
 hyprctl dispatch workspace 3
-hyprctl dispatch exec 'librewolf --new-window https://jobtread.com'
+hyprctl dispatch exec 'chromium --ozone-platform=wayland --enable-features=UseOzonePlatform --app=https://jobtread.com'
 sleep 1
 
 hyprctl dispatch workspace 4
@@ -44,15 +44,15 @@ hyprctl dispatch workspace 5
 hyprctl dispatch exec 'kitty'
 sleep 1
 
-hyprctl dispatch workspace 6  # You had Code on workspace 6
+hyprctl dispatch workspace 6 
 hyprctl dispatch exec 'code'
 
 hyprctl dispatch workspace 7
-hyprctl dispatch exec 'vlc'
+hyprctl dispatch exec 'qbittorrent'
 sleep 1
 
 hyprctl dispatch workspace 8
-hyprctl dispatch exec 'imv'
-sleep 1
+hyprctl dispatch exec 'chromium --ozone-platform=wayland --enable-features=UseOzonePlatform --app=https://claude.ai'
+
 
 echo "Startup script completed"
