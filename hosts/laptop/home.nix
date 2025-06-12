@@ -191,6 +191,19 @@
 	programs.firefox = {
 	enable = true;
 	package = pkgs.librewolf;
+	profiles = {
+	    default = {
+	      id = 0;
+	      name = "eric";
+	      isDefault = true;
+	      settings = {
+	        # Example settings, add or remove as you wish
+	        "browser.startup.homepage" = "https://iheartwoodcraft.com";
+	        "browser.search.defaultenginename" = "DuckDuckGo";
+	        "signon.rememberSignons" = false;
+	      };
+	    };
+	  };
 	policies = {
 		DisableTelemetry = true;
 		Preferences = {
@@ -205,7 +218,7 @@
 		};
 	};
 	};
-
+stylix.targets.firefox.profileNames = [ "default" ];
 	programs.chromium = {
 	enable = true;
 	package = pkgs.ungoogled-chromium;
