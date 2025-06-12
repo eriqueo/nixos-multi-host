@@ -148,9 +148,7 @@
 				"hyprland/workspaces" = {
 				        disable-scroll = true;
 				        all-outputs = true;
-				        format = {
-				        	"{name}";
-				        };
+				        format = "{name}";
 				        persistent_workspaces = {
 				          "*" = 8;
 				        };
