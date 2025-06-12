@@ -29,16 +29,16 @@
 				follow_mouse = 1;
 				touchpad = {natural_scroll = true;};
 			  };		
-			workspace = [
-			      "1:Web, persistent:true"
-			      "2:Email, persistent:true"
-			      "3:JT, persistent:true"
-			      "4:Notes, persistent:true"
-			      "5:Code, persistent:true"
-			      "6:Media, persistent:true"
-			      "7:Misc, persistent:true"
-			      "8:AI, persistent:true"
-			  ];
+			#workspace = [
+			#      "1:Web, persistent:true"
+			 #     "2:Email, persistent:true"
+			  #    "3:JT, persistent:true"
+			   #   "4:Notes, persistent:true"
+			    #  "5:Code, persistent:true"
+			     # "6:Media, persistent:true"
+			     # "7:Misc, persistent:true"
+			     # "8:AI, persistent:true"
+			#  ];
 			general = {
 				gaps_in = 5;
 				gaps_out = 10;
@@ -51,7 +51,7 @@
     
 	programs.waybar = {
 		enable = true;
-		systemd.enable = true;
+		systemd.enable = false;
 		settings = {
 			mainBar = {
 				layer = "top";
@@ -64,8 +64,27 @@
 				        disable-scroll = true;
 				        all-outputs = true;
 				        format = "{name}";
-				       
-				      
+				       format_icons = {
+				         "1:Web" = "Web";
+				         "2:Email" = "Email";
+				         "3:JT" = "JT";
+				         "4:Notes" = "Notes";
+				         "5:Code" = "Code";
+				         "6:Media" = "Media";
+				         "7:Misc" = "Misc";
+				         "8:AI" = "AI";
+				         "default" = "";  # Hide anything that doesn't match
+				       };
+				      persistent_workspaces = {
+				        "1" = [];
+				        "2" = [];
+				        "3" = [];
+				        "4" = [];
+				        "5" = [];
+				        "6" = [];
+				        "7" = [];
+				        "8" = [];
+				      };
 				      clock = {
 				        format = "{:%H:%M}";
 				        format-alt = "{:%Y-%m-%d}";
