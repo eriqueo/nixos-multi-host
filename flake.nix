@@ -15,7 +15,7 @@
       homeserver = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         modules = [
-          ./hosts/server/default.nix
+          ./hosts/server/config.nix
           ./modules.nix
           home-manager.nixosModules.home-manager
           inputs.stylix.nixosModules.stylix
@@ -30,7 +30,7 @@
       "heartwood-laptop" = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         modules = [
-          ./hosts/laptop/default.nix
+          ./hosts/laptop/config.nix
           home-manager.nixosModules.home-manager
           inputs.stylix.nixosModules.stylix
           {

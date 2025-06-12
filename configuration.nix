@@ -87,9 +87,9 @@
         "nixcon" = "sudo micro /etc/nixos/configuration.nix";
         "nixflake" = "sudo micro /etc/nixos/flake.nix";
         "nixlaphome" = "sudo micro /etc/nixos/hosts/laptop/home.nix";
-        "nixlapcon" = "sudo micro /etc/nixos/hosts/laptop/default.nix";
+        "nixlapcon" = "sudo micro /etc/nixos/hosts/laptop/config.nix";
         "nixserverhome" = "sudo micro /etc/nixos/hosts/server/home.nix";
-        "nixservercon" = "sudo micro /etc/nixos/hosts/server/default.nix";
+        "nixservercon" = "sudo micro /etc/nixos/hosts/server/config.nix";
         "nixsearch" = "nix search nixpkgs";
         "nixclean" = "nix-collect-garbage -d";
         "nixgen" = "sudo nix-env --list-generations --profile /nix/var/nix/profiles/system";
