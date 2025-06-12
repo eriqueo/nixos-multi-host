@@ -24,12 +24,6 @@
   # Desktop environment
   programs.hyprland.enable = true;
   programs.hyprland.xwayland.enable = true;
-  fonts.fontconfig = {
-    enable = true;
-    antialias = true;
-    hinting.enable = true;
-    subpixelRendering = "rgb";
-  };
   services.upower.enable = true;  # Battery status for desktop environments
   services.logind = {
     lidSwitch = "suspend";        # Suspend on lid close
