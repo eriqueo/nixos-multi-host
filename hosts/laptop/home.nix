@@ -6,6 +6,9 @@
 { config, pkgs, lib, ... }:
 
 {
+  imports = [
+  	../../modules/ui/waybar.nix
+  ];	
   # identity & state
   home.username    = "eric";
   home.homeDirectory = "/home/eric";
