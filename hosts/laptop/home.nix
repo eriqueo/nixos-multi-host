@@ -192,9 +192,9 @@
 	enable = true;
 	package = pkgs.librewolf;
 	profiles = {
-	    eric = {
+	    default = {
 	      id = 0;
-	      name = "eric";
+	      name = "default";
 	      isDefault = true;
 	      settings = {
 	        # Example settings, add or remove as you wish
