@@ -112,7 +112,7 @@
 				 };
 			};
 		};
-	};
+	
 
 	services.hyprpaper = {
 	  enable = true;
