@@ -1,5 +1,4 @@
 { config, pkgs, lib, ... }:
-
 let
   base16 = "${pkgs.base16-schemes}/share/themes/nord.yaml";
 in {
@@ -10,16 +9,26 @@ in {
       fonts = {
         monospace = {
           package = pkgs.nerd-fonts.caskaydia-cove;
-          size    = 12;
+          name    = "CaskaydiaCove Nerd Font";
         };
-        sans = {
+        sansSerif = {
           package = pkgs.fira;
-          size    = 11;
+          name    = "Fira Sans";
+        };
+        serif = {
+          package = pkgs.fira;
+          name    = "Fira Sans";
         };
         emoji = {
           package = pkgs.twemoji-color-font;
-          size    = 13;
+          name    = "Twitter Color Emoji";
         };
+      };
+      fonts.sizes = {
+        applications = 11;
+        terminal     = 12;
+        desktop      = 11;
+        popups       = 11;
       };
     };
   };
