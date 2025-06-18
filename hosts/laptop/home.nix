@@ -1,5 +1,5 @@
 { config, pkgs, lib, osConfig, ... }:
-────────────────────────────────────
+#────────────────────────────────────
 # File: hosts/laptop/home.nix
 # Home-Manager config for user “eric” on your laptop
 # ───────────────────────────────────────────────────────────────
