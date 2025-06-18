@@ -99,7 +99,7 @@
   	nssmdns4 = true;
   	openFirewall = true;
   	};
-  }   
+     
     
   ####################################################################
   # 8. SYSTEM PACKAGES (LAPTOP-ONLY)
