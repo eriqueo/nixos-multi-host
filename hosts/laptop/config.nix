@@ -38,16 +38,21 @@
   ####################################################################
   # 4. DISPLAY & LOGIN (HYPRLAND SESSION)
   ####################################################################
-  services.greetd.enable = true;
-  services.greetd.defaultSession = {
-    user    = "greeter";
-    command = "${pkgs.greetd.tuigreet}/bin/tuigreet --time --cmd Hyprland";
-  };
-  services.greetd.initialSession = {
-    user    = "eric";
-    command = "Hyprland";
-  };
-
+  services.greetd = {
+  	enable = true;
+  	settings = {
+  		default_session = {
+  			user    = "greeter";
+  			command = "${pkgs.greetd.tuigreet}/bin/tuigreet --time --cmd Hyprland";
+  		};
+  		initial_session = {
+  			user    = "eric";
+  	        command = "Hyprland";
+  		};
+  	  };	
+  	};
+  	 
+ 
   services.xserver.enable = true;
   services.xserver.displayManager = { };
   # Hyprland itself is enabled/configured in modules/ui/hyprland.nix
