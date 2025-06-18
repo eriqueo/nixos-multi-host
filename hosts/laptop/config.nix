@@ -84,6 +84,23 @@
     };
   };
 
+  services.printing = {
+  	enable = true;
+	drivers = with pkgs;[
+		gutenprint 
+		hplip
+		brlaser
+		brgenml1lpr
+		cnijfilter2
+	 ];
+	};
+  services.avahi = {
+  	enable = true;
+  	nssmdns4 = true;
+  	openFirewall = true;
+  	};
+  }   
+    
   ####################################################################
   # 8. SYSTEM PACKAGES (LAPTOP-ONLY)
   ####################################################################
@@ -116,6 +133,8 @@
     wl-clipboard
 
     # Hardware utils
+    system-config-printer
+    cups
     acpi
     lm_sensors
   ];
