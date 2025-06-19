@@ -364,6 +364,7 @@
      button:focus {
        background-color: rgba(136, 192, 208, 0.2);
        outline: none;
-     }''
+     }
+     '';
   };
 }
