@@ -22,6 +22,8 @@
   # STANDARDIZED DIRECTORY STRUCTURE
   # ========================================
   home.file = {
+    ".config/hypr/hyprland.conf".source = "/etc/hypr/hyprland.conf";
+
     # Documents structure
     "Documents/00-templates/.keep".text = "Templates and forms directory";
     "Documents/01-vaults/.keep".text = "Obsidian vaults directory";  
