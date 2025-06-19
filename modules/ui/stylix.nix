@@ -6,6 +6,7 @@ in {
     stylix = {
       enable       = true;
       base16Scheme = base16;
+      image = /home/eric/Pictures/00-meta/wallpaper.jpg;
       fonts = {
         monospace = {
           package = pkgs.nerd-fonts.caskaydia-cove;

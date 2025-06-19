@@ -157,11 +157,13 @@ in
     bind = $mod, Space, exec, wofi --show drun
     bind = $mod, B, exec, librewolf
     bind = $mod, E, exec, electron-mail
+    bind = $mod, T, exec, thunar
+    bind = $mod, O, exec, obsidian
     bind = $mod SHIFT, M, exec, ${monitorToggle}/bin/monitor-toggle
 
     # Screenshots
     bind = , Print, exec, hyprshot -m region -o ~/Pictures/01-screenshots
-    bind = SHIFT, Print, exec, hyprshot -m region -c
+    bind = SHIFT, Print, exec, hyprshot -m region --clipboard-only
     
     # Focus movement (SUPER + arrows)
     bind = $mod, left, movefocus, l
