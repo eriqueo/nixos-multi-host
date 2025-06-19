@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
 
 # Wait until Hyprland is ready
 until hyprctl monitors > /dev/null 2>&1; do
@@ -16,7 +17,7 @@ sleep 2
 # Start waybar
 pkill waybar
 sleep 1
-waybar >/dev/null 2>&1 &
+waybar -c ~/.config/waybar/config.json -s ~/.config/waybar/style.css >/dev/null 2>&1 &
 sleep 2
 
 # Create workspaces by switching to them
