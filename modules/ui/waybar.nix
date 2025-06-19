@@ -299,7 +299,6 @@
 
       #mpd {
         color: #d08770;
-        max-width: 300px;
       }
 
       #mpd.disconnected {
@@ -387,10 +386,6 @@
 
       /* Media query for smaller screens */
       @media (max-width: 1366px) {
-        #mpd {
-          max-width: 200px;
-        }
-        
         #memory,
         #cpu,
         #temperature {
