@@ -24,7 +24,7 @@
       python3Packages.pip   
     ];
 	environment.etc."nixos-scripts" = {
-	  source = ./scripts;
+	  source = ./modules/scripts;
 	  mode = "0755";
 	};
     users.users.eric = {
