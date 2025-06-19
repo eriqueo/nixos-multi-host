@@ -125,24 +125,24 @@ in
     bind = $mod CTRL, R, movetoworkspace, 8
 	    
 	# Monitor-aware workspace switching (SUPER + CTRL + ALT + numbers)  
-	bind = $mod CTRL ALT, 1, focusworkspaceoncurrentmonitor, 1
-	bind = $mod CTRL ALT, 2, focusworkspaceoncurrentmonitor, 2
-	bind = $mod CTRL ALT, 3, focusworkspaceoncurrentmonitor, 3
-	bind = $mod CTRL ALT, 4, focusworkspaceoncurrentmonitor, 4
-	bind = $mod CTRL ALT, 5, focusworkspaceoncurrentmonitor, 5
-	bind = $mod CTRL ALT, 6, focusworkspaceoncurrentmonitor, 6
-	bind = $mod CTRL ALT, 7, focusworkspaceoncurrentmonitor, 7
-	bind = $mod CTRL ALT, 8, focusworkspaceoncurrentmonitor, 8
-	bind = $mod CTRL ALT, W, focusworkspaceoncurrentmonitor, 1
-	bind = $mod CTRL ALT, E, focusworkspaceoncurrentmonitor, 2
-	bind = $mod CTRL ALT, J, focusworkspaceoncurrentmonitor, 3
-	bind = $mod CTRL ALT, O, focusworkspaceoncurrentmonitor, 4
-	bind = $mod CTRL ALT, K, focusworkspaceoncurrentmonitor, 5
-	bind = $mod CTRL ALT, C, focusworkspaceoncurrentmonitor, 6
-	bind = $mod CTRL ALT, M, focusworkspaceoncurrentmonitor, 7
-	bind = $mod CTRL ALT, R, focusworkspaceoncurrentmonitor, 8
-    bind = $mod CTRL ALT, left, focusworkspaceoncurrentmonitor, e-1
-    bind = $mod CTRL ALT, right, focusworkspaceoncurrentmonitor, e+1
+	bind = $mod CTRL ALT, 1, workspace, 1
+	bind = $mod CTRL ALT, 2, workspace, 2
+	bind = $mod CTRL ALT, 3, workspace, 3
+	bind = $mod CTRL ALT, 4, workspace, 4
+	bind = $mod CTRL ALT, 5, workspace, 5
+	bind = $mod CTRL ALT, 6, workspace, 6
+	bind = $mod CTRL ALT, 7, workspace, 7
+	bind = $mod CTRL ALT, 8, workspace, 8
+	bind = $mod CTRL ALT, W, workspace, 1
+	bind = $mod CTRL ALT, E, workspace, 2
+	bind = $mod CTRL ALT, J, workspace, 3
+	bind = $mod CTRL ALT, O, workspace, 4
+	bind = $mod CTRL ALT, K, workspace, 5
+	bind = $mod CTRL ALT, C, workspace, 6
+	bind = $mod CTRL ALT, M, workspace, 7
+	bind = $mod CTRL ALT, R, workspace, 8
+    bind = $mod CTRL ALT, left, workspace, e-1
+    bind = $mod CTRL ALT, right, workspace, e+1
   '';
 
   # Install the startup script into system packages
