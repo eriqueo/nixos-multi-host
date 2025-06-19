@@ -4,50 +4,79 @@
 
 let
   # Inlined startup script (replaces startup.sh)
-  hyprStartup = pkgs.writeScriptBin "hypr-startup" ''
-     #!/usr/bin/env bash
-     # Wait until Hyprland is ready
-     until hyprctl monitors > /dev/null 2>&1; do
-       sleep 0.2
-     done
-     
-     # Background services (only ones that are configured)
-     wl-paste --type text --watch cliphist store &
-     wl-paste --type image --watch cliphist store &
-     sleep 2
-     
-     # Start waybar (home-manager handles config files)
-     pkill waybar
-     sleep 1
-     waybar >/dev/null 2>&1 &
-     sleep 2
-     
-     # Create workspaces by switching to them
-     for i in {1..8}; do
-       hyprctl dispatch workspace $i
-     done
-     
-     # Launch apps - they'll land on current workspace
-     hyprctl dispatch workspace 1 && hyprctl dispatch exec 'librewolf' &
-     sleep 1
-     hyprctl dispatch workspace 2 && hyprctl dispatch exec 'electron-mail' &
-     sleep 1
-     hyprctl dispatch workspace 3 && hyprctl dispatch exec 'chromium --app=https://jobtread.com' &
-     sleep 1
-     hyprctl dispatch workspace 4 && hyprctl dispatch exec 'obsidian' &
-     sleep 1
-     hyprctl dispatch workspace 5 && hyprctl dispatch exec 'kitty' &
-     sleep 1
-     hyprctl dispatch workspace 6 && hyprctl dispatch exec 'code' &
-     sleep 1
-     hyprctl dispatch workspace 7 && hyprctl dispatch exec 'qbittorrent' &
-     sleep 1
-     hyprctl dispatch workspace 8 && hyprctl dispatch exec 'chromium --app=https://claude.ai' &
-     
-     # Go back to workspace 1
-     hyprctl dispatch workspace 1
-     echo "Startup complete"
-   '';
+  # Monitor toggle script
+  monitorToggle = pkgs.writeScriptBin "monitor-toggle" ''
+    #!/usr/bin/env bash
+    
+    # Get list of connected monitors
+    MONITORS=$(hyprctl monitors -j | jq -r '.[].name')
+    LAPTOP=$(echo "$MONITORS" | grep -E "(eDP|LVDS)" | head -1)
+    EXTERNAL=$(echo "$MONITORS" | grep -v -E "(eDP|LVDS)" | head -1)
+    
+    if [[ -z "$EXTERNAL" ]]; then
+        echo "No external monitor detected"
+        exit 1
+    fi
+    
+    # Get current positions
+    LAPTOP_POS=$(hyprctl monitors -j | jq -r ".[] | select(.name==\"$LAPTOP\") | .x")
+    EXTERNAL_POS=$(hyprctl monitors -j | jq -r ".[] | select(.name==\"$EXTERNAL\") | .x")
+    
+    # Get monitor specs
+    LAPTOP_SPEC=$(hyprctl monitors -j | jq -r ".[] | select(.name==\"$LAPTOP\") | \"\(.width)x\(.height)@\(.refreshRate)\"")
+    EXTERNAL_SPEC=$(hyprctl monitors -j | jq -r ".[] | select(.name==\"$EXTERNAL\") | \"\(.width)x\(.height)@\(.refreshRate)\"")
+    LAPTOP_WIDTH=$(echo "$LAPTOP_SPEC" | cut -d'x' -f1)
+    EXTERNAL_WIDTH=$(echo "$EXTERNAL_SPEC" | cut -d'x' -f1)
+    
+    if [[ $LAPTOP_POS -eq 0 ]]; then
+        # Laptop is on left, move external to left
+        echo "Moving external monitor to left"
+        hyprctl keyword monitor "$EXTERNAL,$EXTERNAL_SPEC,0x0,1"
+        hyprctl keyword monitor "$LAPTOP,$LAPTOP_SPEC,${EXTERNAL_WIDTH}x0,1"
+    else
+        # Laptop is on right, move external to right  
+        echo "Moving external monitor to right"
+        hyprctl keyword monitor "$LAPTOP,$LAPTOP_SPEC,0x0,1"
+        hyprctl keyword monitor "$EXTERNAL,$EXTERNAL_SPEC,${LAPTOP_WIDTH}x0,1"
+    fi
+  '';
+hyprStartup = pkgs.writeScriptBin "hypr-startup" ''
+  #!/usr/bin/env bash
+  # Wait until Hyprland is ready
+  until hyprctl monitors > /dev/null 2>&1; do
+    sleep 0.2
+  done
+  
+  # Background services (only ones that are configured)
+  wl-paste --type text --watch cliphist store &
+  wl-paste --type image --watch cliphist store &
+  sleep 2
+  
+  # Start waybar (home-manager handles config files)
+  pkill waybar
+  sleep 1
+  waybar >/dev/null 2>&1 &
+  sleep 2
+  
+  # Launch apps directly to specific workspaces (no switching)
+  hyprctl dispatch exec '[workspace 1 silent] librewolf' &
+  sleep 1
+  hyprctl dispatch exec '[workspace 2 silent] electron-mail' &
+  sleep 1
+  hyprctl dispatch exec '[workspace 3 silent] chromium --app=https://jobtread.com' &
+  sleep 1
+  hyprctl dispatch exec '[workspace 4 silent] obsidian' &
+  sleep 1
+  hyprctl dispatch exec '[workspace 5 silent] kitty' &
+  sleep 1
+  hyprctl dispatch exec '[workspace 6 silent] code' &
+  sleep 1
+  hyprctl dispatch exec '[workspace 7 silent] qbittorrent' &
+  
+  # Stay on workspace 1
+  hyprctl dispatch workspace 1
+  echo "Startup complete"
+'';
 in
 {
   # Enable Hyprland the modern way
@@ -87,6 +116,8 @@ in
     bind = $mod, Space, exec, wofi --show drun
     bind = $mod, B, exec, librewolf
     bind = $mod, E, exec, electron-mail
+    bind = $mod SHIFT, M, exec, monitor-toggle
+
     
     # Screenshots - FIXED paths
     bind = , Print, exec, hyprshot -m region -o ~/Pictures/01-screenshots
@@ -148,6 +179,7 @@ in
   # Install the startup script into system packages
   environment.systemPackages = [
     hyprStartup
+    monitorToggle
   ];
   system.activationScripts.hyprlandConfig = ''
     mkdir -p /home/eric/.config/hypr
