@@ -1,80 +1,89 @@
-
 {
   "layer": "top",
   "position": "top",
-  "height": 30,
+  "height": 34,
   "spacing": 4,
   "modules-left": [
-    "wlr/taskbar",
-    "hyprland/mode",
-    "hyprland/scratchpad",
-    "custom/media"
+    "hyprland/workspaces",
+    "hyprland/window"
   ],
   "modules-center": [
-    "hyprland/window"
+    "clock"
   ],
   "modules-right": [
     "mpd",
     "pulseaudio",
     "network",
-    "tray",
-    "power-profiles-daemon",
     "memory",
-    "temperature",
     "cpu",
+    "temperature",
     "battery",
-    "clock",
+    "tray",
     "custom/power"
   ],
-  "wlr/taskbar": {
+  "hyprland/workspaces": {
+    "disable-scroll": true,
+    "all-outputs": false,
+    "warp-on-scroll": false,
     "format": "{icon}",
-    "icon-size": 24,
-    "tooltip": false
+    "format-icons": {
+      "1": "󰈹",
+      "2": "󰭹", 
+      "3": "󰏘",
+      "4": "󰎞",
+      "5": "󰕧",
+      "6": "󰊢",
+      "7": "󰋩",
+      "8": "󰚌",
+      "active": "",
+      "default": ""
+    },
+    "persistent-workspaces": {
+      "DP-1": ["1", "2", "3", "4", "5", "6", "7", "8"],
+      "eDP-1": ["1", "2", "3", "4", "5", "6", "7", "8"]
+    }
+  },
+  "hyprland/window": {
+    "format": "{title}",
+    "max-length": 50,
+    "separate-outputs": true
   },
   "mpd": {
-    "format": "{stateIcon} {consumeIcon}{randomIcon}{repeatIcon}{singleIcon}{artist} - {album} - {title} ({elapsedTime:%M:%S}/{totalTime:%M:%S}) ⸨{songPosition}|{queueLength}⸩ {volume}% ",
-    "format-disconnected": "Disconnected ",
-    "format-stopped": "{consumeIcon}{randomIcon}{repeatIcon}{singleIcon}Stopped ",
+    "format": "{stateIcon} {artist} - {title}",
+    "format-disconnected": "󰝛",
+    "format-stopped": "󰓛",
     "unknown-tag": "N/A",
     "interval": 5,
-    "consume-icons": {
-      "on": " "
-    },
-    "random-icons": {
-      "off": "<span color=\"#f53c3c\"></span> ",
-      "on": " "
-    },
-    "repeat-icons": {
-      "on": " "
-    },
-    "single-icons": {
-      "on": "1 "
-    },
     "state-icons": {
       "paused": "",
       "playing": ""
     },
-    "tooltip-format": "MPD (connected)",
-    "tooltip-format-disconnected": "MPD (disconnected)"
+    "tooltip-format": "MPD: {artist} - {title}",
+    "tooltip-format-disconnected": "MPD disconnected"
   },
   "tray": {
     "spacing": 10
   },
   "clock": {
     "tooltip-format": "<big>{:%Y %B}</big>\n<tt><small>{calendar}</small></tt>",
+    "format": "{:%H:%M}",
     "format-alt": "{:%Y-%m-%d}"
   },
   "memory": {
-    "format": "{}% "
+    "interval": 30,
+    "format": "󰍛 {used:0.1f}G",
+    "max-length": 10
   },
   "cpu": {
-    "format": "{usage}% ",
+    "interval": 10,
+    "format": "󰻠 {usage}%",
     "tooltip": false
   },
   "temperature": {
+    "thermal-zone": 2,
     "critical-threshold": 80,
-    "format": "{temperatureC}°C",
-    "format-icons": ["", "", ""]
+    "format": " {temperatureC}°C",
+    "format-critical": " {temperatureC}°C"
   },
   "battery": {
     "states": {
@@ -82,70 +91,30 @@
       "warning": 30,
       "critical": 15
     },
-    "format": "{capacity}% {icon}",
-    "format-full": "{capacity}% {icon}",
-    "format-charging": "{capacity}% ",
-    "format-plugged": "{capacity}% ",
-    "format-alt": "{time} {icon}",
-    "format-icons": ["", "", "", "", ""]
-  },
-  "power-profiles-daemon": {
-    "format": "{icon}",
-    "tooltip-format": "Power profile: {profile}\nDriver: {driver}",
-    "tooltip": true,
-    "format-icons": {
-      "default": "",
-      "performance": "",
-      "balanced": "",
-      "power-saver": ""
-    }
+    "format": "{icon} {capacity}%",
+    "format-charging": "󰂄 {capacity}%",
+    "format-plugged": "󰂄 {capacity}%",
+    "format-icons": ["󰂃", "󰁺", "󰁻", "󰁼", "󰁽", "󰁾", "󰁿", "󰂀", "󰂁", "󰂂", "󰁹"]
   },
   "network": {
-    "format-wifi": "{essid} ({signalStrength}%) ",
-    "format-ethernet": "{ipaddr}/{cidr} ",
-    "tooltip-format": "{ifname} via {gwaddr} ",
-    "format-linked": "{ifname} (No IP) ",
-    "format-disconnected": "Disconnected ⚠",
-    "format-alt": "{ifname}: {ipaddr}/{cidr}"
+    "format-wifi": "󰤨 {essid}",
+    "format-ethernet": "󰈀",
+    "format-linked": "󰈀 No IP",
+    "format-disconnected": "󰤭",
+    "tooltip-format": "{ifname} via {gwaddr}"
   },
   "pulseaudio": {
-    "format": "{volume}% {icon} {format_source}",
-    "format-bluetooth": "{volume}% {icon} {format_source}",
-    "format-bluetooth-muted": " {icon} {format_source}",
-    "format-muted": " {format_source}",
-    "format-source": "{volume}% ",
-    "format-source-muted": "",
+    "scroll-step": 1,
+    "format": "{icon} {volume}%",
+    "format-muted": "󰝟",
     "format-icons": {
-      "headphone": "",
-      "hands-free": "",
-      "headset": "",
-      "phone": "",
-      "portable": "",
-      "car": "",
-      "default": ["", "", ""]
+      "default": ["󰕿", "󰖀", "󰕾"]
     },
     "on-click": "pavucontrol"
   },
-  "custom/media": {
-    "format": "{icon} {text}",
-    "return-type": "json",
-    "max-length": 40,
-    "format-icons": {
-      "spotify": "",
-      "default": "🎜"
-    },
-    "escape": true,
-    "exec": "$HOME/.config/waybar/modules/mediaplayer.py 2> /dev/null"
-  },
   "custom/power": {
-    "format": "⏻",
+    "format": "󰐥",
     "tooltip": false,
-    "menu": "on-click",
-    "menu-file": "$HOME/.config/waybar/modules/power_menu.xml",
-    "menu-actions": {
-      "shutdown": "shutdown -h now",
-      "reboot": "reboot",
-      "suspend": "systemctl suspend"
-    }
+    "on-click": "wlogout || systemctl poweroff"
   }
 }
