@@ -5,41 +5,41 @@
 let
   # Inlined startup script (replaces startup.sh)
   # Monitor toggle script
-  monitorToggle = pkgs.writeScriptBin "monitor-toggle" ''
-    #!/usr/bin/env bash
-    
-    # Get list of connected monitors
-    MONITORS=$(hyprctl monitors -j | jq -r '.[].name')
-    LAPTOP=$(echo "$MONITORS" | grep -E "(eDP|LVDS)" | head -1)
-    EXTERNAL=$(echo "$MONITORS" | grep -v -E "(eDP|LVDS)" | head -1)
-    
-    if [[ -z "$EXTERNAL" ]]; then
-        echo "No external monitor detected"
-        exit 1
-    fi
-    
-    # Get current positions
-    LAPTOP_POS=$(hyprctl monitors -j | jq -r ".[] | select(.name==\"$LAPTOP\") | .x")
-    EXTERNAL_POS=$(hyprctl monitors -j | jq -r ".[] | select(.name==\"$EXTERNAL\") | .x")
-    
-    # Get monitor specs
-    LAPTOP_SPEC=$(hyprctl monitors -j | jq -r ".[] | select(.name==\"$LAPTOP\") | \"\(.width)x\(.height)@\(.refreshRate)\"")
-    EXTERNAL_SPEC=$(hyprctl monitors -j | jq -r ".[] | select(.name==\"$EXTERNAL\") | \"\(.width)x\(.height)@\(.refreshRate)\"")
-    LAPTOP_WIDTH=$(echo "$LAPTOP_SPEC" | cut -d'x' -f1)
-    EXTERNAL_WIDTH=$(echo "$EXTERNAL_SPEC" | cut -d'x' -f1)
-    
-    if [[ $LAPTOP_POS -eq 0 ]]; then
-        # Laptop is on left, move external to left
-        echo "Moving external monitor to left"
-        hyprctl keyword monitor "$EXTERNAL,$EXTERNAL_SPEC,0x0,1"
-        hyprctl keyword monitor "$LAPTOP,$LAPTOP_SPEC,${EXTERNAL_WIDTH}x0,1"
-    else
-        # Laptop is on right, move external to right  
-        echo "Moving external monitor to right"
-        hyprctl keyword monitor "$LAPTOP,$LAPTOP_SPEC,0x0,1"
-        hyprctl keyword monitor "$EXTERNAL,$EXTERNAL_SPEC,${LAPTOP_WIDTH}x0,1"
-    fi
-  '';
+monitorToggle = pkgs.writeScriptBin "monitor-toggle" ''
+  #!/usr/bin/env bash
+  
+  # Get list of connected monitors
+  MONITORS=$(hyprctl monitors -j | jq -r '.[].name')
+  LAPTOP=$(echo "$MONITORS" | grep -E "(eDP|LVDS)" | head -1)
+  EXTERNAL=$(echo "$MONITORS" | grep -v -E "(eDP|LVDS)" | head -1)
+  
+  if [[ -z "$EXTERNAL" ]]; then
+      echo "No external monitor detected"
+      exit 1
+  fi
+  
+  # Get current positions
+  LAPTOP_POS=$(hyprctl monitors -j | jq -r ".[] | select(.name==\"$LAPTOP\") | .x")
+  EXTERNAL_POS=$(hyprctl monitors -j | jq -r ".[] | select(.name==\"$EXTERNAL\") | .x")
+  
+  # Get monitor specs
+  LAPTOP_SPEC=$(hyprctl monitors -j | jq -r ".[] | select(.name==\"$LAPTOP\") | \"\(.width)x\(.height)@\(.refreshRate)\"")
+  EXTERNAL_SPEC=$(hyprctl monitors -j | jq -r ".[] | select(.name==\"$EXTERNAL\") | \"\(.width)x\(.height)@\(.refreshRate)\"")
+  LAPTOP_WIDTH=$(echo "$LAPTOP_SPEC" | cut -d'x' -f1)
+  EXTERNAL_WIDTH=$(echo "$EXTERNAL_SPEC" | cut -d'x' -f1)
+  
+  if [[ $LAPTOP_POS -eq 0 ]]; then
+      # Laptop is on left, move external to left
+      echo "Moving external monitor to left"
+      hyprctl keyword monitor "$EXTERNAL,$EXTERNAL_SPEC,0x0,1"
+      hyprctl keyword monitor "$LAPTOP,$LAPTOP_SPEC,''${EXTERNAL_WIDTH}x0,1"
+  else
+      # Laptop is on right, move external to right  
+      echo "Moving external monitor to right"
+      hyprctl keyword monitor "$LAPTOP,$LAPTOP_SPEC,0x0,1"
+      hyprctl keyword monitor "$EXTERNAL,$EXTERNAL_SPEC,''${LAPTOP_WIDTH}x0,1"
+  fi
+'';
 hyprStartup = pkgs.writeScriptBin "hypr-startup" ''
   #!/usr/bin/env bash
   # Wait until Hyprland is ready
@@ -69,7 +69,7 @@ hyprStartup = pkgs.writeScriptBin "hypr-startup" ''
   sleep 1
   hyprctl dispatch exec '[workspace 5 silent] kitty' &
   sleep 1
-  hyprctl dispatch exec '[workspace 6 silent] code' &
+  hyprctl dispatch exec '[workspace 6 silent] codium' &
   sleep 1
   hyprctl dispatch exec '[workspace 7 silent] qbittorrent' &
   
