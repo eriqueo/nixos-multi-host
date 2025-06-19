@@ -37,7 +37,7 @@
 
       "hyprland/workspaces" = {
         disable-scroll = true;
-        all-outputs = false;
+        all-outputs = true;
         warp-on-scroll = false;
         format = "{icon}";
         format-icons = {
@@ -52,10 +52,20 @@
           active = "";
           default = "";
         };
-        persistent-workspaces = {
-          "DP-1" = ["1" "2" "3" "4" "5" "6" "7" "8"];
-          "eDP-1" = ["1" "2" "3" "4" "5" "6" "7" "8"];
-        };
+       # persistent-workspaces = {
+        #  "DP-1" = ["1" "2" "3" "4" "5" "6" "7" "8"];
+         # "eDP-1" = ["1" "2" "3" "4" "5" "6" "7" "8"];
+       # };
+		persistent-workspaces = {
+		  "1" = [];
+		  "2" = [];
+		  "3" = [];
+		  "4" = [];
+		  "5" = [];
+		  "6" = [];
+		  "7" = [];
+		  "8" = [];
+		};
       };
 
       "hyprland/window" = {
