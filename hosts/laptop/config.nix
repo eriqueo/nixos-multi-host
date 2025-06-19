@@ -3,22 +3,15 @@
 {
   ####################################################################
   # 1. IMPORTS
-  #
-  # – ../../configuration.nix: timeZone, default users, any global pkgs
-  # – ./hardware-configuration.nix: this laptop’s disks & bootloader
-  # – ../../modules/services.nix: Podman containers & back-end daemons
-  # – ../../modules/scripts.nix: hypr-startup & hypr-bindings
-  # – ../../modules/secrets.nix: /etc/secrets/*
-  # – ../../modules/ui/…: Hyprland, Waybar, Stylix modules
-  ####################################################################
+   ####################################################################
   imports = [
-    ../../configuration.nix
-    ./hardware-configuration.nix
-   # ../../modules/services.nix
-    #../../modules/scripts/scripts.nix
-    ../../modules/secrets/secrets.nix
-    ../../modules/ui/hyprland.nix
-    ../../modules/ui/stylix.nix
+    ../../configuration.nix             #timeZone, default users, any global pkgs
+    ./hardware-configuration.nix        #this laptop’s disks & bootloader
+   # ../../modules/services.nix         #Podman containers & back-end daemons
+    #../../modules/scripts/scripts.nix  #hypr-startup & hypr-bindings
+    ../../modules/secrets/secrets.nix   #/etc/secrets/*
+    ../../modules/ui/hyprland.nix       #Hyprland, Waybar, 
+    ../../modules/ui/stylix.nix         #Stylix modules
   ];
 
   ####################################################################
@@ -120,7 +113,7 @@
     xfce.thunar
     gvfs
     xfce.tumbler
-
+    jq
     # Email
     electron-mail
     # protonmail-desktop
