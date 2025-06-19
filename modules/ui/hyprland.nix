@@ -149,4 +149,10 @@ in
   environment.systemPackages = [
     hyprStartup
   ];
+  system.activationScripts.hyprlandConfig = ''
+    mkdir -p /home/eric/.config/hypr
+    chown eric:users /home/eric/.config/hypr
+    ln -sf /etc/hypr/hyprland.conf /home/eric/.config/hypr/hyprland.conf
+    chown -h eric:users /home/eric/.config/hypr/hyprland.conf
+  '';
 }
