@@ -130,6 +130,7 @@ in
         "$mod, B, exec, librewolf"
         "$mod, E, exec, electron-mail"
         "$mod SHIFT, M, exec, monitor-toggle"
+        "$mod, TAB, overview:toggle"
 
         # Screenshots
         ", Print, exec, hyprshot -m region -o ~/Pictures/01-screenshots"
