@@ -68,22 +68,144 @@
   };
 
   # SHELL CONFIGURATION
-  programs.zsh = {
-    enable = true;
-    shellAliases = {
-      # Quick directory navigation
-      "cdactive" = "cd ~/Documents/02-active";
-      "cdbusiness" = "cd ~/Documents/03-business";
-      "cdinbox" = "cd ~/Documents/99-inbox";
-      "cdvaults" = "cd ~/Documents/01-vaults";
+  # In hosts/laptop/home.nix
+programs.zsh = {
+  enable = true;
+  autosuggestions.enable = true;
+  syntaxHighlighting.enable = true;
+  
+  shellAliases = {
+    # File management with modern tools
+    "ls" = "eza --tree --level=1";
+    "ll" = "eza -l --git --icons";
+    "la" = "eza -la --git --icons";
+    "lt" = "eza --tree --level=2";
+    
+    # Navigation shortcuts
+    ".." = "cd ..";
+    "..." = "cd ../..";
+    "...." = "cd ../../..";
+    
+    # Quick directory navigation (laptop-specific)
+    "cdactive" = "cd ~/Documents/02-active";
+    "cdbusiness" = "cd ~/Documents/03-business";
+    "cdinbox" = "cd ~/Documents/99-inbox";
+    "cdvaults" = "cd ~/Documents/01-vaults";
+    "screenshots" = "cd ~/Pictures/01-screenshots";
+    "receipts" = "cd ~/Pictures/02-receipts";
+    "projects" = "cd ~/Pictures/03-projects";
+    
+    # System utilities
+    "df" = "df -h";
+    "du" = "du -h";
+    "free" = "free -h";
+    "htop" = "btop --tree";
+    "open" = "xdg-open";
+    
+    # Git workflow shortcuts
+    "gs" = "git status -sb";
+    "ga" = "git add .";
+    "gc" = "git commit -m";
+    "gp" = "git push";
+    "gl" = "git log --oneline --graph --decorate --all";
+    "gpl" = "git pull";
+    
+    # NixOS system management
+    "nixflake" = "sudo micro /etc/nixos/flake.nix";
+    "nixlaphome" = "sudo micro /etc/nixos/hosts/laptop/home.nix";
+    "nixlapcon" = "sudo micro /etc/nixos/hosts/laptop/config.nix";
+    "nixserverhome" = "sudo micro /etc/nixos/hosts/server/home.nix";
+    "nixservercon" = "sudo micro /etc/nixos/hosts/server/config.nix";
+    "nixsecrets" = "sudo micro /etc/nixos/modules/secrets/secrets.nix";
+    "nixsearch" = "nix search nixpkgs";
+    "nixclean" = "nix-collect-garbage -d";
+    "nixgen" = "sudo nix-env --list-generations --profile /nix/var/nix/profiles/system";
+    
+    # Development and productivity
+    "speedtest" = "speedtest-cli";
+    "myip" = "curl -s ifconfig.me";
+    "reload" = "source ~/.zshrc";
+    
+    # Host-specific rebuild
+    "rebuild" = "sudo nixos-rebuild switch --flake /etc/nixos#heartwood-laptop";
+  };
+  
+  # Shell functions
+  initExtra = ''
+    # ADHD-friendly productivity functions
+    mkcd() { mkdir -p "$1" && cd "$1" }
+            
+    # Quick search and replace
+    sr() {
+      (( $# != 3 )) && { echo "Usage: sr <search> <replace> <file>"; return 1; }
+      sed -i "s/$1/$2/g" "$3"
+    }
+    
+    # Fuzzy directory navigation
+    fd() {
+      local dir
+      dir=$(find . -type d 2>/dev/null | fzf --preview 'ls -la {}') && cd "$dir"
+    }
+    
+    # Git branch switching with fuzzy search
+    fgb() {
+      local branch
+      branch=$(git branch -a | fzf --preview 'git log --oneline --graph --color=always {1}') && git checkout "''${branch##* }"
+    }
+    
+    # Hostname-aware grebuild function
+    grebuild() {
+        local commit_msg="$1"
+        [[ -z "$commit_msg" ]] && { echo "Usage: grebuild 'commit message'"; return 1; }
+        
+        cd /etc/nixos || return 1
+        sudo git add .
+        sudo git commit -m "$commit_msg"
+        sudo git push
+        
+        case $(hostname) in
+          "heartwood-laptop")
+            sudo nixos-rebuild switch --flake .#heartwood-laptop
+            ;;
+          "homeserver")
+            sudo nixos-rebuild switch --flake .#homeserver  
+            ;;
+          *)
+            echo "Unknown hostname: $(hostname)"
+            return 1
+            ;;
+        esac
+      }
       
-      # Picture directories
-      "screenshots" = "cd ~/Pictures/01-screenshots";
-      "receipts" = "cd ~/Pictures/02-receipts";
-      "projects" = "cd ~/Pictures/03-projects";
+      # Test-only version
+      gtest() {
+        local commit_msg="$1"
+        [[ -z "$commit_msg" ]] && { echo "Usage: gtest 'commit message'"; return 1; }
+        
+        cd /etc/nixos || return 1
+        sudo git add .
+        sudo git commit -m "$commit_msg"
+        
+        case $(hostname) in
+          "heartwood-laptop")
+            sudo nixos-rebuild test --flake .#heartwood-laptop
+            ;;
+          "homeserver")
+            sudo nixos-rebuild test --flake .#homeserver
+            ;;
+        esac
+      }
       
-      # System shortcuts
-      "rebuild" = "sudo nixos-rebuild switch --flake /etc/nixos#heartwood-laptop";
-    };
+      # Quick system status check
+      status() {
+        echo "🖥️  System Status Overview"
+        echo "=========================="
+        echo "💾 Memory: $(free -h | awk 'NR==2{printf "%.1f%%", $3*100/$2 }')"
+        echo "💽 Disk: $(df -h / | awk 'NR==2{print $5}')"
+        echo "🔥 Load: $(uptime | awk -F'load average:' '{print $2}')"
+      }
+    '';
+
+    
   };
 }

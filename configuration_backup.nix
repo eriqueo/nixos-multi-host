@@ -24,7 +24,7 @@
       python3Packages.pip   
     ];
 	
-    
+  
     nix.settings = {
       experimental-features = [ "nix-command" "flakes" ];
       auto-optimise-store = true;

@@ -5,14 +5,33 @@
 
 {
   imports = [
-    ../../configuration.nix
+  
     ./hardware-configuration.nix  
     ../../modules/secrets/secrets.nix
     # REMOVED: UI modules are now in Home Manager
   ];
 
   networking.hostName = "heartwood-laptop";
+  boot.loader.systemd-boot.enable = true;
+  boot.loader.efi.canTouchEfiVariables = true;
+  time.timeZone = "America/Denver";
+  i18n.defaultLocale = "en_US.UTF-8";
 
+  nix.settings = {
+    experimental-features = [ "nix-command" "flakes" ];
+    auto-optimise-store = true;
+  };
+  nixpkgs.config.allowUnfree = true;
+
+  services.openssh = {
+    enable = true;
+    settings = {
+      PasswordAuthentication = false;
+      KbdInteractiveAuthentication = false;
+    };
+  };
+services.tailscale.enable = true;
+system.stateVersion = "23.05";
   # Enable Hyprland at system level
   programs.hyprland = {
     enable = true;
@@ -70,16 +89,70 @@
     nssmdns4 = true;
     openFirewall = true;
   };
-
+virtualisation.podman = {
+  enable = true;
+  dockerCompat = true;
+  defaultNetwork.settings.dns_enabled = true;
+};
+virtualisation.oci-containers.backend = "podman";
   # ESSENTIAL SYSTEM PACKAGES (laptop-only)
   environment.systemPackages = with pkgs; [
-    greetd.tuigreet
-    jq                    # For monitor scripts
-    system-config-printer
-    cups
-    acpi                  # Battery info
-    lm_sensors           # Laptop sensors
-    nerd-fonts.caskaydia-cove
-    hyprsome
+
+  # Login Manager
+  greetd.tuigreet
+
+  # Wayland Workspace Manager
+  hyprsome
+
+  # Printing Support
+  cups
+  system-config-printer
+
+  # Power & Sensor Tools
+  acpi
+  lm_sensors
+
+  # Fonts
+  nerd-fonts.caskaydia-cove
+
+  # Editors
+  neovim
+  micro
+
+  # Network Tools
+  wget
+  curl
+
+  # File Tools
+  unzip
+  zip
+  p7zip
+  rsync
+
+  # Navigation & Info
+  tree
+  btop
+  neofetch
+
+  # Terminal UX Enhancements
+  bat
+  eza
+  fzf
+  ripgrep
+  tmux
+
+  # GNU Utilities
+  diffutils
+  less
+  which
+
+  # Data Manipulation
+  jq
+  yq
+  pandoc
+    python3 nodejs gh speedtest-cli nmap wireguard-tools
+  sshfs rclone xclip usbutils pciutils dmidecode powertop
+  python3Packages.pip
+
   ];
 }
