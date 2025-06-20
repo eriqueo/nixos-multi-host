@@ -27,7 +27,7 @@
   stylix = {
     enable = true;
     base16Scheme = "${pkgs.base16-schemes}/share/themes/nord.yaml";
-    image = /etc/nixos/modules/home-manager/assets/wallpapers/nord-mountains.jpg;
+    image = ./assets/wallpapers/nord-mountains.jpg;
     
     fonts = {
       monospace = {
