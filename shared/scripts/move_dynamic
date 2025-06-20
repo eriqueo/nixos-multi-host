@@ -1,0 +1,70 @@
+#!/bin/bash
+# move_job_dynamic.sh
+# Usage: move_job_dynamic.sh <source_folder> [destination_folder]
+#
+# If the destination folder is not provided, a file dialog will ask for it.
+# The script then moves the source folder into the destination,
+# renaming it by assigning the next available numeric prefix.
+
+# Check for source folder argument.
+if [ -z "$1" ]; then
+    echo "Usage: $0 <source_folder> [destination_folder]"
+    exit 1
+fi
+
+SOURCE_PATH="$1"
+
+# If destination is not provided, ask via kdialog.
+if [ -z "$2" ]; then
+    DESTINATION_PATH=$(kdialog --getexistingdirectory "$HOME" "Select destination folder")
+    if [ -z "$DESTINATION_PATH" ]; then
+        echo "No destination folder selected. Exiting."
+        exit 1
+    fi
+else
+    DESTINATION_PATH="$2"
+fi
+
+# Get just the folder name from the source path.
+JOB_FOLDER="$(basename "$SOURCE_PATH")"
+
+# Ensure the destination folder exists.
+mkdir -p "$DESTINATION_PATH"
+
+# Change directory to the destination.
+cd "$DESTINATION_PATH" || { echo "Failed to change directory to $DESTINATION_PATH"; exit 1; }
+
+# Gather existing numeric prefixes from folders in the destination.
+existing_numbers=()
+for d in */; do
+  # Remove trailing slash and extract prefix before the underscore.
+  prefix="${d%/}"
+  prefix="${prefix%%_*}"
+  if [[ "$prefix" =~ ^[0-9]+$ ]]; then
+    existing_numbers+=("$prefix")
+  fi
+done
+
+# Determine the new numeric prefix.
+if [ ${#existing_numbers[@]} -eq 0 ]; then
+  new_number="01"
+else
+  IFS=$'\n' sorted=($(sort -n <<<"${existing_numbers[*]}"))
+  highest="${sorted[-1]}"
+  new_number=$(printf "%02d" $((10#$highest + 1)))
+fi
+
+# Remove any existing numeric prefix from the JOB_FOLDER.
+if [[ "$JOB_FOLDER" =~ ^[0-9]{2}_ ]]; then
+    suffix="${JOB_FOLDER#*_}"
+else
+    suffix="$JOB_FOLDER"
+fi
+
+# Build the new folder name.
+new_folder_name="${new_number}_${suffix}"
+
+# Move and rename the folder.
+mv "$SOURCE_PATH" "${DESTINATION_PATH}/${new_folder_name}"
+
+echo "Moved '$JOB_FOLDER' to '${new_folder_name}' in $DESTINATION_PATH"

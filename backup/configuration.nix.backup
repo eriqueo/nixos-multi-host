@@ -1,0 +1,379 @@
+# Edit this configuration file to define what should be installed on
+# your system. Help is available in the configuration.nix(5) man page
+# and in the NixOS manual (accessible by running 'nixos-help').
+# https://search.nixos.org/options and in the NixOS manual
+
+{ config, lib, pkgs, ... }:
+
+{
+  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+
+  imports =
+    [ # Include the results of the hardware scan.
+      ./hardware-configuration.nix
+    ];
+  # Storage Mounts
+  # Media Storage Mount
+  fileSystems."/mnt/media" = {
+    device = "/dev/disk/by-label/media";
+    fsType = "ext4";
+  };
+
+  # Use the systemd-boot EFI boot loader.
+  boot.loader.systemd-boot.enable = true;
+  boot.loader.efi.canTouchEfiVariables = true;
+
+  networking.hostName = "homeserver"; # Define your hostname.
+  # Pick only one of the below networking options.
+  # networking.wireless.enable = true;  # Enables wireless support via wpa_supplicant.
+  networking.networkmanager.enable = true;  # Easiest to use and most distros use this by default.
+
+  # Set your time zone.
+  time.timeZone = "America/Denver";
+
+  # Configure network proxy if necessary
+  # networking.proxy.default = "http://user:password@proxy:port/";
+  # networking.proxy.noProxy = "127.0.0.1,localhost,internal.domain";
+  #caddy check 
+  # Select internationalisation properties.
+  # i18n.defaultLocale = "en_US.UTF-8";
+  # console = {
+  #   font = "Lat2-Terminus16";
+  #   keyMap = "us";
+  #   useXkbConfig = true; # use xkbOptions in tty.
+  # };
+
+  # Enable the X11 windowing system.
+  # services.xserver.enable = true;
+
+  # Configure keymap in X11
+  # services.xserver.layout = "us";
+  # services.xserver.xkbOptions = "eurosym:e,caps:escape";
+
+  # Enable CUPS to print documents.
+  # services.printing.enable = true;
+
+  # Enable sound.
+  # hardware.pulseaudio.enable = true;
+  # OR
+  # services.pipewire = {
+  #   enable = true;
+  #   pulse.enable = true;
+  # };
+
+  # Enable touchpad support (enabled default in most desktopManager).
+  # services.xserver.libinput.enable = true;
+
+  # Define a user account. Don't forget to set a password with 'passwd'.
+  users.users.eric = {
+    isNormalUser = true;
+    extraGroups = [ "wheel" "networkmanager" ];
+    shell = pkgs.zsh; # Enable 'sudo' for the user.
+    packages = with pkgs; [
+    ];
+  };
+
+	programs.zsh.enable = true;
+
+  # List packages installed in system profile. To search, run:
+	environment.systemPackages = with pkgs; [
+	 wget                    # Download files from web
+	 curl                    # Transfer data from/to servers
+	 git                     # Version control system
+	 htop                    # Interactive process viewer
+	 neofetch               # System information display
+	 kitty
+	 micro                  # Modern terminal text editor
+	 ssh-to-age             # SSH key to age key converter
+	 sops                   # Secrets management tool
+	 age                    # File encryption tool
+	 tree                   # Directory structure display
+	 picard                 # Music organization
+	 xfce. thunar                 # File manager
+	 xorg.xauth             # Required for X11 forwarding
+
+	 # Optional: useful GUI utilities
+	 file-roller            # Archive manager (zip/tar files)
+	 evince                 # PDF viewer
+	 feh                    # Image viewer (lightweight)
+	];
+  # Some programs need SUID wrappers, can be configured further or are
+  # started in user sessions.
+  # programs.mtr.enable = true;
+  # programs.gnupg.agent = {
+  #   enable = true;
+  #   enableSSHSupport = true;
+  # };
+
+  # List services that you want to enable:
+  # Enable X11 forwarding
+  services.openssh.settings.X11Forwarding = true;
+  
+  # Enable the OpenSSH daemon.
+  services.openssh.enable = true;
+  # Enable basic X11 services (minimal)
+  services.xserver.enable = true;
+  # Tailscale
+  services.tailscale.enable = true;
+
+  # VPN Download Stack - CORRECTED PATHS AND NETWORKING
+  virtualisation.oci-containers = {
+    backend = "podman";
+    containers = {
+      gluetun = {
+        image = "qmcgaw/gluetun";
+        autoStart = true;
+        extraOptions = [
+          "--cap-add=NET_ADMIN"
+          "--device=/dev/net/tun:/dev/net/tun"
+          "--network=media-network"
+        ];
+        environmentFiles = [ "/opt/downloads/.env" ];
+        ports = [ 
+          "8080:8080"  # qBittorrent
+          "8081:8081"  # SABnzbd
+        ];
+        volumes = [ "/opt/downloads/gluetun:/gluetun" ];
+      };
+
+      sabnzbd = {
+        image = "lscr.io/linuxserver/sabnzbd:latest";
+        autoStart = true;
+        dependsOn = [ "gluetun" ];
+        extraOptions = [ 
+          "--network=container:gluetun"
+        ];
+        environment = {
+          PUID = "1000";
+          PGID = "100";
+          TZ = "America/Denver";
+        };
+        volumes = [
+          "/opt/downloads/sabnzbd:/config"
+          "/mnt/media/downloads:/downloads"
+          "/mnt/media/incomplete:/incomplete-downloads"
+        ];
+      };
+
+      qbittorrent = {
+        image = "lscr.io/linuxserver/qbittorrent";
+        autoStart = true;
+        dependsOn = [ "gluetun" ];
+        extraOptions = [ 
+          "--network=container:gluetun"
+        ];
+        environment = {
+          PUID = "1000";
+          PGID = "1000";
+          TZ = "America/Denver";
+          WEBUI_PORT = "8080";
+        };
+        volumes = [
+          "/opt/downloads/qbittorrent:/config"
+          "/mnt/media:/media"
+          "/mnt/media/downloads:/downloads"
+        ];
+      };
+
+      navidrome = {
+        image = "deluan/navidrome";
+        autoStart = true;
+        extraOptions = [ "--network=media-network" ];
+        environment = {
+          ND_MUSICFOLDER = "/music";
+          ND_DATAFOLDER = "/data";
+          ND_LOGLEVEL = "info";
+          ND_SESSIONTIMEOUT = "24h";
+        };
+        ports = [ "4533:4533" ];
+        volumes = [
+          "/opt/downloads/navidrome:/data"
+          "/mnt/media/music:/music:ro"
+        ];
+      };
+
+      sonarr = {
+        image = "lscr.io/linuxserver/sonarr:latest";
+        autoStart = true;
+        extraOptions = [ "--network=media-network" ];
+        environment = {
+          PUID = "1000";
+          PGID = "1000";
+          TZ = "America/Denver";
+        };
+        ports = [ "8989:8989" ];
+        volumes = [
+          "/opt/downloads/sonarr:/config"
+          "/mnt/media:/media"
+          "/mnt/media/downloads:/downloads"
+        ];
+      };
+
+      radarr = {
+        image = "lscr.io/linuxserver/radarr:latest";
+        autoStart = true;
+        extraOptions = [ "--network=media-network" ];
+        environment = {
+          PUID = "1000";
+          PGID = "1000";
+          TZ = "America/Denver";
+        };
+        ports = [ "7878:7878" ];
+        volumes = [
+          "/opt/downloads/radarr:/config"
+          "/mnt/media:/media"
+          "/mnt/media/downloads:/downloads"
+        ];
+      };
+
+      prowlarr = {
+        image = "lscr.io/linuxserver/prowlarr:latest";
+        autoStart = true;
+        extraOptions = [ "--network=media-network" ];
+        environment = {
+          PUID = "1000";
+          PGID = "1000";
+          TZ = "America/Denver";
+        };
+        ports = [ "9696:9696" ];
+        volumes = [
+          "/opt/downloads/prowlarr:/config"
+        ];
+      };
+
+      lidarr = {
+        image = "lscr.io/linuxserver/lidarr:latest";
+        autoStart = true;
+        extraOptions = [ "--network=media-network" ];
+        environment = {
+          PUID = "1000";
+          PGID = "1000";
+          TZ = "America/Denver";
+        };
+        ports = [ "8686:8686" ];
+        volumes = [
+          "/opt/downloads/lidarr:/config"
+          "/mnt/media:/media"
+          "/mnt/media/downloads:/downloads"
+        ];
+      };
+
+      immich = {
+        image = "ghcr.io/immich-app/immich-server:release";
+        autoStart = true;
+        extraOptions = [ "--network=media-network" ];
+        environment = {
+          UPLOAD_LOCATION = "/photos";
+          DB_HOSTNAME = "immich-postgres";
+          DB_USERNAME = "postgres";
+          DB_PASSWORD = "postgres";
+          DB_DATABASE_NAME = "immich";
+          REDIS_HOSTNAME = "immich-redis";
+          TZ = "America/Denver";
+        };
+        ports = [ "2283:3001" ];
+        volumes = [
+          "/opt/downloads/immich/upload:/photos"
+          "/etc/localtime:/etc/localtime:ro"
+        ];
+        dependsOn = [ "immich-postgres" "immich-redis" ];
+      };
+
+      immich-postgres = {
+        image = "tensorchord/pgvecto-rs:pg14-v0.2.0";
+        autoStart = true;
+        extraOptions = [ "--network=media-network" ];
+        environment = {
+          POSTGRES_USER = "postgres";
+          POSTGRES_PASSWORD = "postgres";
+          POSTGRES_DB = "immich";
+        };
+        volumes = [
+          "/opt/downloads/immich/database:/var/lib/postgresql/data"
+        ];
+      };
+
+      immich-redis = {
+        image = "redis:6.2-alpine";
+        autoStart = true;
+        extraOptions = [ "--network=media-network" ];
+      };
+    };
+  };
+
+  # Create the media-network for containers
+  systemd.services.init-media-network = {
+    description = "Create media-network";
+    after = [ "network.target" ];
+    wantedBy = [ "multi-user.target" ];
+    serviceConfig.Type = "oneshot";
+    script = let dockercli = "${pkgs.podman}/bin/podman"; in ''
+      # Put a true at the end to prevent getting non-zero return code, which will
+      # crash the whole service.
+      check=$(${dockercli} network ls | grep "media-network" || true)
+      if [ -z "$check" ]; then
+        ${dockercli} network create media-network
+      else
+        echo "media-network already exists in podman"
+      fi
+    '';
+  };
+  systemd.services.receipt-api = {
+      description = "Receipt Upload API";
+      after = [ "network.target" ];
+      wantedBy = [ "multi-user.target" ];
+      serviceConfig = {
+        Type = "simple";
+        User = "eric";
+        Group = "users";
+        WorkingDirectory = "/opt/business/api";
+        ExecStart = "${pkgs.python311.withPackages(ps: [ ps.fastapi ps.uvicorn ps.python-multipart ])}/bin/python receipt_upload.py";
+        Restart = "always";
+        RestartSec = "10";
+      };
+    };
+  # Jellyfin Native Service
+  services.jellyfin = {
+    enable = true;
+    openFirewall = false;  # We'll manage firewall manually
+  };
+
+  # Open firewall ports or configure your firewall
+  networking.firewall = {
+    enable = true;
+    allowedTCPPorts = [
+      22    # SSH
+      8080  # qBittorrent (via Gluetun)
+      7878  # Radarr
+      8989  # Sonarr
+      8686  # Lidarr
+      9696  # Prowlarr
+      4533  # Navidrome
+      8096  # Jellyfin
+      2283  # Immich
+      8081  # SABnzbd
+      8888  # Reciept API
+    ];
+    allowedUDPPorts = [
+      7359  # Jellyfin
+    ];
+
+    # Block all other external access
+    extraCommands = ''
+      # Allow Tailscale network
+      iptables -A INPUT -i tailscale0 -j ACCEPT
+
+      # Allow local network for Samba (optional)
+      iptables -A INPUT -s 192.168.1.0/24 -j ACCEPT
+     '';
+  };
+
+  # This value determines the NixOS release from which the default
+  # settings for stateful data, like file locations and database versions
+  # on your system were taken. It's perfectly fine and recommended to leave
+  # this value at the release version of the first install of this system.
+  # Before changing this value read the documentation for this option
+  # (e.g. man configuration.nix or on https://nixos.org/nixos/options.html).
+  system.stateVersion = "24.05"; # Did you read the comment?
+
+}

@@ -18,7 +18,6 @@
     ./modules/adhd-tools.nix
     ./modules/obsidian-sync.nix
     ./modules/hardware-tools.nix
-    ../../shared/secrets.nix 
   ];
 
   ####################################################################

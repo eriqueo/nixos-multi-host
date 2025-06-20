@@ -1,0 +1,262 @@
+* {
+  font-family: "JetBrainsMono Nerd Font", FontAwesome, Roboto, Helvetica, Arial, sans-serif;
+  font-size: 12px;
+  border: none;
+  border-radius: 0;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+}
+
+window#waybar {
+  background: rgba(36, 39, 58, 0.9);
+  color: #e5e9f0;
+  border-bottom: 2px solid #5e81ac;
+  transition-property: background-color;
+  transition-duration: 0.5s;
+}
+
+window#waybar.hidden {
+  opacity: 0.2;
+}
+
+/* Workspaces - FIXED for proper display and highlighting */
+#workspaces {
+  margin: 0 4px;
+  background: transparent;
+}
+
+#workspaces button {
+  padding: 4px 8px;
+  background: transparent;
+  color: #81a1c1;
+  border: none;
+  border-bottom: 2px solid transparent;
+  border-radius: 0;
+  transition: all 0.3s ease-in-out;
+  min-width: 24px;
+}
+
+#workspaces button:hover {
+  background: rgba(129, 161, 193, 0.2);
+  border-bottom: 2px solid #81a1c1;
+  box-shadow: none;
+}
+
+#workspaces button.active {
+  background: rgba(136, 192, 208, 0.3);
+  color: #88c0d0;
+  border-bottom: 2px solid #88c0d0;
+  font-weight: bold;
+}
+
+#workspaces button.urgent {
+  background: rgba(191, 97, 106, 0.3);
+  color: #bf616a;
+  border-bottom: 2px solid #bf616a;
+  animation: blink 1s linear infinite alternate;
+}
+
+/* Window title */
+#window {
+  margin: 0 8px;
+  color: #d8dee9;
+  font-weight: normal;
+}
+
+/* Center modules */
+#clock {
+  margin: 0 8px;
+  color: #e5e9f0;
+  font-weight: bold;
+  background: rgba(76, 86, 106, 0.4);
+  padding: 0 12px;
+  border-radius: 8px;
+}
+
+/* Right modules - consistent styling */
+#memory,
+#cpu,
+#temperature,
+#battery,
+#network,
+#pulseaudio,
+#mpd,
+#tray,
+#custom-power {
+  margin: 0 2px;
+  padding: 0 8px;
+  background: rgba(76, 86, 106, 0.4);
+  border-radius: 8px;
+  font-weight: 500;
+}
+
+/* Individual module colors */
+#memory {
+  color: #a3be8c;
+}
+
+#cpu {
+  color: #ebcb8b;
+}
+
+#temperature {
+  color: #81a1c1;
+}
+
+#temperature.critical {
+  color: #bf616a;
+  background: rgba(191, 97, 106, 0.3);
+  animation: blink 1s linear infinite alternate;
+}
+
+#battery {
+  color: #88c0d0;
+}
+
+#battery.charging {
+  color: #a3be8c;
+  background: rgba(163, 190, 140, 0.2);
+}
+
+#battery.warning:not(.charging) {
+  color: #ebcb8b;
+  background: rgba(235, 203, 139, 0.2);
+  animation: blink 1s linear infinite alternate;
+}
+
+#battery.critical:not(.charging) {
+  color: #bf616a;
+  background: rgba(191, 97, 106, 0.3);
+  animation: blink 1s linear infinite alternate;
+}
+
+#network {
+  color: #5e81ac;
+}
+
+#network.disconnected {
+  color: #bf616a;
+  background: rgba(191, 97, 106, 0.2);
+}
+
+#pulseaudio {
+  color: #b48ead;
+}
+
+#pulseaudio.muted {
+  color: #4c566a;
+  background: rgba(76, 86, 106, 0.6);
+}
+
+#mpd {
+  color: #d08770;
+  max-width: 300px;
+}
+
+#mpd.disconnected {
+  color: #4c566a;
+}
+
+#mpd.stopped {
+  color: #4c566a;
+}
+
+#mpd.paused {
+  color: #d08770;
+  font-style: italic;
+}
+
+#custom-power {
+  color: #bf616a;
+  margin-right: 8px;
+  font-size: 14px;
+}
+
+#custom-power:hover {
+  background: rgba(191, 97, 106, 0.3);
+  color: #ffffff;
+}
+
+#tray {
+  background: transparent;
+  margin-right: 4px;
+}
+
+#tray > .passive {
+  -gtk-icon-effect: dim;
+}
+
+#tray > .needs-attention {
+  -gtk-icon-effect: highlight;
+  background-color: #bf616a;
+  border-radius: 8px;
+}
+
+/* Keyboard state indicators */
+#keyboard-state {
+  background: #97e1ad;
+  color: #000000;
+  padding: 0 0px;
+  margin: 0 5px;
+  min-width: 16px;
+  border-radius: 4px;
+}
+
+#keyboard-state > label {
+  padding: 0 5px;
+}
+
+#keyboard-state > label.locked {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+/* Animations */
+@keyframes blink {
+  to {
+    background-color: #bf616a;
+    color: #2e3440;
+  }
+}
+
+/* Tooltip styling */
+tooltip {
+  background: rgba(46, 52, 64, 0.95);
+  border: 1px solid #4c566a;
+  border-radius: 8px;
+  padding: 8px;
+}
+
+tooltip label {
+  color: #e5e9f0;
+}
+
+/* Focus and hover effects */
+button:focus {
+  background-color: rgba(136, 192, 208, 0.2);
+  outline: none;
+}
+
+/* Media query for smaller screens */
+@media (max-width: 1366px) {
+  #mpd {
+    max-width: 200px;
+  }
+  
+  #memory,
+  #cpu,
+  #temperature {
+    font-size: 11px;
+  }
+}
+
+/* High DPI adjustments */
+@media (min-resolution: 192dpi) {
+  * {
+    font-size: 13px;
+  }
+  
+  window#waybar {
+    border-bottom: 3px solid #5e81ac;
+  }
+}

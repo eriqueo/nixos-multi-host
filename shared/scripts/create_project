@@ -1,0 +1,138 @@
+#!/bin/bash
+# Usage: ./create_project.sh ProjectName
+# This script creates a new project folder under ~/coding/projects with:
+# - A virtual environment (venv)
+# - A symlink to a shared "common" folder
+# - main.py, README.md, requirements.txt, pyproject.toml for Poetry
+# - Automatically installs dependencies inside venv
+
+# Check if a project name was provided.
+if [ -z "$1" ]; then
+  echo "Usage: $0 ProjectName"
+  exit 1
+fi
+
+PROJECT_NAME="$1"
+BASE_DIR=~/coding/projects/"$PROJECT_NAME"
+
+echo "Creating project folder: $BASE_DIR"
+
+# Create the project directory.
+mkdir -p "$BASE_DIR"
+
+# Create a symlink to the shared common folder.
+# (Assumes you already have a ~/coding/projects/common folder with your apis.env and helper.py.)
+if [ -d ~/coding/projects/common ]; then
+    ln -s ~/coding/projects/common "$BASE_DIR/common"
+    echo "Linked common helper folder to $BASE_DIR/common"
+else
+    echo "Warning: ~/coding/projects/common does not exist. Create it for shared helper scripts."
+fi
+
+# Create and activate virtual environment inside the project
+echo "Creating virtual environment..."
+python -m venv "$BASE_DIR/venv"
+
+# Activate virtual environment
+source "$BASE_DIR/venv/bin/activate"
+
+# Create main.py with a basic template.
+cat << 'EOF' > "$BASE_DIR/main.py"
+#!/usr/bin/env python
+"""
+Main entry point for the project.
+This script uses a shared helper to load API keys from a common apis.env file.
+"""
+
+# Adjust the import if needed. This works because we created a symlink "common" in the project folder.
+from common.helper import get_secret
+
+def main():
+    try:
+        # Attempt to load the YOUTUBE_API_KEY from the shared apis.env
+        api_key = get_secret("YOUTUBE_API_KEY")
+        print("Successfully loaded YOUTUBE_API_KEY:", api_key)
+    except Exception as e:
+        print("Error loading API key:", e)
+
+if __name__ == "__main__":
+    main()
+EOF
+
+# Make main.py executable.
+chmod +x "$BASE_DIR/main.py"
+
+# Create README.md with basic instructions.
+cat << EOF > "$BASE_DIR/README.md"
+# $PROJECT_NAME
+
+This project was created using a custom template.
+
+## Setup
+
+1. **Virtual Environment (venv):**
+
+   The virtual environment is automatically created.
+   To activate it manually:
+   \`\`\`bash
+   source venv/bin/activate
+   \`\`\`
+
+2. **Dependencies:**
+
+   Install required packages:
+   \`\`\`bash
+   pip install -r requirements.txt
+   \`\`\`
+   Or, if you're using Poetry:
+   \`\`\`bash
+   poetry install
+   \`\`\`
+
+3. **Run the Project:**
+
+   To run the main script:
+   \`\`\`bash
+   python main.py
+   \`\`\`
+EOF
+
+# Create a base-level requirements.txt with core dependencies.
+cat << EOF > "$BASE_DIR/requirements.txt"
+# requirements.txt
+#
+# Core Dependencies
+python-dotenv==1.0.0
+requests==2.28.1
+# Uncomment the lines below if your project uses these APIs:
+# google-api-python-client==2.88.0
+# youtube-transcript-api==0.4.3
+EOF
+
+# Create a minimal pyproject.toml for Poetry.
+cat << EOF > "$BASE_DIR/pyproject.toml"
+[tool.poetry]
+name = "$PROJECT_NAME"
+version = "0.1.0"
+description = "Description for $PROJECT_NAME."
+authors = ["Your Name <your.email@example.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+EOF
+
+# Optionally, create an empty poetry.lock (Poetry will update this when installing dependencies).
+touch "$BASE_DIR/poetry.lock"
+
+# Ensure the virtual environment is activated and install dependencies
+echo "Activating virtual environment and installing dependencies..."
+source "$BASE_DIR/venv/bin/activate"
+pip install -r "$BASE_DIR/requirements.txt"
+
+echo "Project '$PROJECT_NAME' created at: $BASE_DIR"

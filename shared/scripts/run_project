@@ -1,0 +1,40 @@
+#!/bin/bash
+
+# Ensure a project name is provided
+if [ -z "$1" ]; then
+    echo "Usage: runproj <project_name>"
+    exit 1
+fi
+
+PROJECT_DIR=~/coding/projects/"$1"
+
+# Check if the project directory exists
+if [ ! -d "$PROJECT_DIR" ]; then
+    echo "Project '$1' does not exist."
+    exit 1
+fi
+
+cd "$PROJECT_DIR"
+
+# Check if venv exists, if not, create it
+if [ ! -d "venv" ]; then
+    echo "Creating virtual environment..."
+    python -m venv venv
+fi
+
+# Activate the virtual environment
+source venv/bin/activate
+
+# Install dependencies if requirements.txt exists
+if [ -f "requirements.txt" ]; then
+    echo "Installing dependencies (suppressing already installed messages)..."
+    pip install -r requirements.txt --quiet
+
+fi
+
+# Run main.py
+echo "Running main.py..."
+python main.py
+
+# Deactivate the virtual environment (optional)
+deactivate

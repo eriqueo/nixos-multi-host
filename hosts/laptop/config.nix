@@ -9,7 +9,7 @@
   ####################################################################
   imports = [
     ./hardware-configuration.nix  
-    ../../modules/secrets/secrets.nix
+    ../../shared/secrets.nix
     # REMOVED: UI modules are now in Home Manager
   ];
 

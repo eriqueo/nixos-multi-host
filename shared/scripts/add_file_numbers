@@ -1,0 +1,32 @@
+#!/bin/bash
+# add_file_numbers.sh
+# Prepend a 01_, 02_, etc. prefix to files or folders in the current directory.
+
+i=1
+for item in *; do
+    # Skip the script itself or anything that shouldn't be renamed
+    [[ "$item" == "add_file_numbers.sh" ]] && continue
+    
+    # If you only want to rename directories (not files), then do:
+    # [[ -d "$item" ]] || continue
+    
+    # If you only want to rename files (not directories), then do:
+    # [[ -f "$item" ]] || continue
+
+    # Remove trailing slash if 'item' is a directory
+    old_name="${item%/}"
+
+    # Create a two-digit prefix 01_, 02_, etc.
+    prefix=$(printf "%02d_" "$i")
+    
+    # Build the new name
+    new_name="${prefix}${old_name}"
+    
+    # Rename if it’s different
+    if [[ "$old_name" != "$new_name" ]]; then
+        echo "Renaming '$old_name' -> '$new_name'"
+        mv "$old_name" "$new_name"
+    fi
+
+    ((i++))
+done
