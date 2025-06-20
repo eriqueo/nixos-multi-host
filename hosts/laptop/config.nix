@@ -80,5 +80,6 @@
     acpi                  # Battery info
     lm_sensors           # Laptop sensors
     nerd-fonts.caskaydia-cove
+    hyprsome
   ];
 }
