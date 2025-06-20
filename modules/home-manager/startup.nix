@@ -22,19 +22,21 @@ let
     sleep 2
     
     # Launch apps directly to specific workspaces (silent mode)
-    hyprctl dispatch exec '[workspace 1 silent] librewolf' &
+ hyprctl dispatch exec '[workspace 1 silent] librewolf' &      # External
     sleep 1
-    hyprctl dispatch exec '[workspace 2 silent] electron-mail' &
+    hyprctl dispatch exec '[workspace 2 silent] electron-mail' &  # External  
     sleep 1
-    hyprctl dispatch exec '[workspace 3 silent] chromium --app=https://jobtread.com' &
+    hyprctl dispatch exec '[workspace 3 silent] chromium --app=https://jobtread.com' &  # External
     sleep 1
-    hyprctl dispatch exec '[workspace 4 silent] obsidian' &
+    
+    # Laptop monitor workspaces (11-18)
+    hyprctl dispatch exec '[workspace 11 silent] obsidian' &      # Laptop
     sleep 1
-    hyprctl dispatch exec '[workspace 5 silent] kitty' &
+    hyprctl dispatch exec '[workspace 12 silent] kitty' &         # Laptop
     sleep 1
-    hyprctl dispatch exec '[workspace 6 silent] codium' &
+    hyprctl dispatch exec '[workspace 13 silent] codium' &        # Laptop
     sleep 1
-    hyprctl dispatch exec '[workspace 7 silent] qbittorrent' &
+    hyprctl dispatch exec '[workspace 14 silent] qbittorrent' &   # Laptop
     
     # Stay on workspace 1
     hyprctl dispatch workspace 1
