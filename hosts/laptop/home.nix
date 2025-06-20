@@ -4,10 +4,10 @@
 { config, pkgs, lib, osConfig, ... }:
 {
   imports = [
-    ../../modules/home-manager/ui/hyprland.nix
-    ../../modules/home-manager/ui/waybar.nix
-    ../../modules/home-manager/ui/theming.nix
-    ../../modules/home-manager/ui/startup.nix
+    ../../modules/home-manager/hyprland.nix
+    ../../modules/home-manager/waybar.nix
+    ../../modules/home-manager/theming.nix
+    ../../modules/home-manager/startup.nix
     ../../modules/home-manager/apps.nix
   ];
 
