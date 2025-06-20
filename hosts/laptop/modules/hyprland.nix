@@ -136,6 +136,7 @@ in
         windowrulev2 = [
           "tile,class:^(Chromium-browser)$,title:^.*JobTread.*$"
           "workspace 3,class:^(Chromium-browser)$,title:^.*JobTread.*$"
+          "tile,class:^(chromium-.*|Chromium-.*)$"
         ];
       # Variables
       "$mod" = "SUPER";
@@ -151,7 +152,7 @@ in
         "$mod, E, exec, electron-mail"
         "$mod SHIFT, M, exec, monitor-toggle"
         "$mod, TAB, exec, workspace-overview"
-
+        "$mod SHIFT, T, togglefloating"
         # Screenshots
         ", Print, exec, hyprshot -m region -o ~/Pictures/01-screenshots"
         "SHIFT, Print, exec, hyprshot -m region -c"
