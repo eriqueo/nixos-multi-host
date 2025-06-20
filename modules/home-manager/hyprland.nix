@@ -92,7 +92,10 @@ in
           natural_scroll = true;
         };
       };
-
+        windowrulev2 = [
+          "tile,class:^(Chromium-browser)$,title:^.*JobTread.*$"
+          "workspace 3,class:^(Chromium-browser)$,title:^.*JobTread.*$"
+        ];
       # Variables
       "$mod" = "SUPER";
 
