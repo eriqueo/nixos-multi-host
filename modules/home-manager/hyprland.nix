@@ -72,8 +72,8 @@ in
     settings = {
       # Monitor setup
       monitor = [
-        "DP-1,1920x1080@60,0x0,1"
-        "eDP-1,2560x1600@165,1920x0,1"
+        "eDP-1,2560x1600@165,0x0,1"      # Laptop at 0,0 (left)
+        "DP-1,1920x1080@60,2560x0,1"     # External at 2560,0 (right) 
       ];
 
       # Startup applications
