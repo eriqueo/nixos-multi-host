@@ -18,7 +18,7 @@
     python3Packages.pillow  # Image processing
     python3Packages.opencv4  # Advanced image processing
     python3Packages.pytesseract
-    python3Packages.spacy
+    # python3Packages.spacy  # Temporarily disabled due to wandb build issues
     python3Packages.httpx  # For API requests
     python3Packages.asyncpg
     python3Packages.redis

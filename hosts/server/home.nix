@@ -185,7 +185,7 @@
     ####################################################################
     # 7. CUSTOM ZSH FUNCTIONS
     ####################################################################
-    initExtraContent = ''
+    initContent = ''
       # Enhanced NixOS git rebuild function with safety checks
       grebuild() {
         if [[ -z "$1" ]]; then
