@@ -1,7 +1,7 @@
 # -----------------------------------------------------------------------------
 # FILE: hosts/laptop/home.nix (ORCHESTRATOR)
 # -----------------------------------------------------------------------------
-{ config, pkgs, lib, osConfig, ... }:
+{ config, pkgs, lib, osConfig, inputs, ... }:
 {
   imports = [
     ../../modules/home-manager/hyprland.nix
@@ -9,6 +9,7 @@
     ../../modules/home-manager/theming.nix
     ../../modules/home-manager/startup.nix
     ../../modules/home-manager/apps.nix
+    inputs.stylix.homeManagerModules.stylix
   ];
 
   # IDENTITY
