@@ -1,10 +1,7 @@
-# -----------------------------------------------------------------------------
-# FILE: modules/home-manager/ui/theming.nix (WALLPAPER & CURSOR)
-# -----------------------------------------------------------------------------
 { config, pkgs, lib, ... }:
 
 {
-  # Cursor theme configuration
+  # Cursor theme
   home.pointerCursor = {
     name = "Bibata-Modern-Classic";
     package = pkgs.bibata-cursors;
@@ -13,6 +10,7 @@
     x11.enable = true;
   };
 
+  # GTK theming (Nord-style)
   gtk = {
     enable = true;
     
@@ -63,4 +61,3 @@
     noto-fonts-emoji
   ];
 }
-
