@@ -149,10 +149,11 @@ in
         "$mod, F, fullscreen"
         "$mod, Space, exec, wofi --show drun"
         "$mod, B, exec, librewolf"
+        "$mod, O, exec, obsidian"
         "$mod, E, exec, electron-mail"
         "$mod SHIFT, M, exec, monitor-toggle"
         "$mod, TAB, exec, workspace-overview"
-        "$mod SHIFT, T, togglefloating"
+        "$mod, T, stogglefloating"
         # Screenshots
         ", Print, exec, hyprshot -m region -o ~/Pictures/01-screenshots"
         "SHIFT, Print, exec, hyprshot -m region -c"
