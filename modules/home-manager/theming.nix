@@ -13,47 +13,54 @@
     x11.enable = true;
   };
 
-  # GTK theme configuration
   gtk = {
     enable = true;
+    
+    theme = {
+      name = "Nordic";
+      package = pkgs.nordic;
+    };
+    
+    iconTheme = {
+      name = "Papirus-Dark";
+      package = pkgs.papirus-icon-theme;
+    };
+    
     cursorTheme = {
       name = "Bibata-Modern-Classic";
       package = pkgs.bibata-cursors;
       size = 24;
     };
+    
+    font = {
+      name = "Fira Sans";
+      size = 11;
+      package = pkgs.fira;
+    };
+
+    gtk3.extraConfig = {
+      gtk-application-prefer-dark-theme = 1;
+    };
+
+    gtk4.extraConfig = {
+      gtk-application-prefer-dark-theme = 1;
+    };
   };
 
-  # Stylix configuration (if using it for wallpaper)
-  stylix = {
+  # Qt theming to match GTK
+  qt = {
     enable = true;
-    base16Scheme = "${pkgs.base16-schemes}/share/themes/nord.yaml";
-    #image = ./assets/wallpapers/nord-mountains.jpg;
-    
-    fonts = {
-      monospace = {
-        package = pkgs.nerd-fonts.caskaydia-cove;
-        name = "CaskaydiaCove Nerd Font";
-      };
-      sansSerif = {
-        package = pkgs.fira;
-        name = "Fira Sans";
-      };
-      serif = {
-        package = pkgs.fira;
-        name = "Fira Sans";
-      };
-      emoji = {
-        package = pkgs.twemoji-color-font;
-        name = "Twitter Color Emoji";
-      };
-    };
-    
-
-    fonts.sizes = {
-      applications = 11;
-      terminal = 12;
-      desktop = 11;
-      popups = 11;
-    };
+    platformTheme = "gtk";
   };
+
+  # Fonts
+  fonts.fontconfig.enable = true;
+  home.packages = with pkgs; [
+    fira
+    fira-code
+    nerd-fonts.caskaydia-cove
+    noto-fonts
+    noto-fonts-emoji
+  ];
 }
+
