@@ -29,6 +29,8 @@
 
       "heartwood-laptop" = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
+        specialArgs = { inherit inputs; };  # ← Add this line
+
         modules = [
           ./hosts/laptop/config.nix
           home-manager.nixosModules.home-manager
@@ -36,6 +38,7 @@
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
             home-manager.users.eric = import ./hosts/laptop/home.nix;
+            home-manager.extraSpecialArgs = { inherit inputs; };
           }
         ];
       };
