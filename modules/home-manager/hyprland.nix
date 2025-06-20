@@ -5,7 +5,27 @@
 
 let
   wallpaperPath = "/etc/nixos/modules/home-manager/assets/wallpapers/nord-mountains.jpg";
-  
+  workspaceOverview = pkgs.writeScriptBin "workspace-overview" ''
+    #!/usr/bin/env bash
+    
+    # Get all workspaces with their contents
+    WORKSPACES=$(hyprctl workspaces -j | ${pkgs.jq}/bin/jq -r '
+      .[] | 
+      if .windows > 0 then
+        "\(.id): \(.windows) windows - \(.lastwindowtitle // "empty")"
+      else
+        "\(.id): empty"
+      end
+    ' | sort -n)
+    
+    # Use wofi to select workspace
+    SELECTED=$(echo "$WORKSPACES" | ${pkgs.wofi}/bin/wofi --dmenu --prompt "Go to workspace:" --lines 10)
+    
+    if [[ -n "$SELECTED" ]]; then
+      WORKSPACE_ID=$(echo "$SELECTED" | cut -d: -f1)
+      ${pkgs.hyprsome}/bin/hyprsome workspace "$WORKSPACE_ID"
+    fi
+  '';
   # Monitor toggle script
   monitorToggle = pkgs.writeScriptBin "monitor-toggle" ''
     #!/usr/bin/env bash
@@ -51,7 +71,7 @@ in
     hyprshot
     hypridle
     hyprpaper
-    
+    workspaceOverview
     # Clipboard management
     cliphist
     wl-clipboard
@@ -130,7 +150,7 @@ in
         "$mod, B, exec, librewolf"
         "$mod, E, exec, electron-mail"
         "$mod SHIFT, M, exec, monitor-toggle"
-        "$mod, TAB, overview:toggle"
+        "$mod, TAB, exec, workspace-overview"
 
         # Screenshots
         ", Print, exec, hyprshot -m region -o ~/Pictures/01-screenshots"
