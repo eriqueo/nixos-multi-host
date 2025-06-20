@@ -71,7 +71,7 @@
   # In hosts/laptop/home.nix
 programs.zsh = {
   enable = true;
-  autosuggestions.enable = true;
+  enableAutosuggestions.enable = true;
   syntaxHighlighting.enable = true;
   
   shellAliases = {
