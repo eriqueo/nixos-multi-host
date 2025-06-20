@@ -153,7 +153,7 @@ in
         "$mod, E, exec, electron-mail"
         "$mod SHIFT, M, exec, monitor-toggle"
         "$mod, TAB, exec, workspace-overview"
-        "$mod, T, stogglefloating"
+        "$mod, T, togglefloating"
         # Screenshots
         ", Print, exec, hyprshot -m region -o ~/Pictures/01-screenshots"
         "SHIFT, Print, exec, hyprshot -m region -c"
