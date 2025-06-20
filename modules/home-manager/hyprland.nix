@@ -4,7 +4,7 @@
 { config, pkgs, lib, ... }:
 
 let
-  wallpaperPath = "/etc/nixos/modules/home-manager/assets/wallpapers/nord-mountains.jpg;";
+  wallpaperPath = "/etc/nixos/modules/home-manager/assets/wallpapers/nord-mountains.jpg";
   
   # Monitor toggle script
   monitorToggle = pkgs.writeScriptBin "monitor-toggle" ''

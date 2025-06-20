@@ -48,7 +48,7 @@
   # Qt theming to match GTK
   qt = {
     enable = true;
-    platformTheme = "gtk";
+    platformTheme.name = "gtk";
   };
 
   # Fonts
