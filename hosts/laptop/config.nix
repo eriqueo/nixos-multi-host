@@ -17,6 +17,9 @@
   # 2. HOST IDENTITY
   ####################################################################
   networking.hostName = "heartwood-laptop";
+  systemd.tmpfiles.rules = [
+    "Z /etc/nixos - eric users - -"
+  ];
 
   ####################################################################
   # 3. BOOT & SYSTEM
@@ -52,7 +55,7 @@
     syntaxHighlighting.enable = true;
     shellAliases = {
       # File management with modern tools
-      "ls" = "eza --tree --level=2";
+      "ls" = "eza --tree --level=1";
       "ll" = "eza -l --git --icons";
       "la" = "eza -la --git --icons";
       "lt" = "eza --tree --level=2";
