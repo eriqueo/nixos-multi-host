@@ -47,7 +47,7 @@
         name = "Twitter Color Emoji";
       };
     };
-    stylix.targets.firefox.profileNames = [ "3bp09ufp.default" ];
+    
 
     fonts.sizes = {
       applications = 11;
