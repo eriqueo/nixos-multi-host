@@ -24,17 +24,7 @@
       python3Packages.pip   
     ];
 	
-    users.users.eric = {
-      isNormalUser = true;
-      home = "/home/eric";
-      description = "Eric - Heartwood Craft";
-      shell = pkgs.zsh;
-      extraGroups = [ "wheel" "networkmanager" "video" "audio" ];
-      openssh.authorizedKeys.keys = [
-        "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILQFHXbcZCYrqyJoRPJddpEpnEquRJUxtopQkZsZdGhl hwc@laptop"
-      ];
-      initialPassword = "il0wwlm?";
-    };  
+    
     nix.settings = {
       experimental-features = [ "nix-command" "flakes" ];
       auto-optimise-store = true;

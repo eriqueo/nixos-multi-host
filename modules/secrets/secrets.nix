@@ -51,7 +51,17 @@
       mode = "0600";
     };
   };
-
+  users.users.eric = {
+    isNormalUser = true;
+    home = "/home/eric";
+    description = "Eric - Heartwood Craft";
+    shell = pkgs.zsh;
+    extraGroups = [ "wheel" "networkmanager" "video" "audio" ];
+    openssh.authorizedKeys.keys = [
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILQFHXbcZCYrqyJoRPJddpEpnEquRJUxtopQkZsZdGhl hwc@laptop"
+    ];
+    initialPassword = "il0wwlm?";
+  };
   # Script to help with secrets management
   environment.systemPackages = with pkgs; [
     (writeScriptBin "secrets-init" ''
@@ -71,7 +81,7 @@
       echo "Current secrets structure:"
       sudo find /etc/secrets -type f -exec ls -la {} \;
     '')
-    
+
     (writeScriptBin "secrets-backup" ''
       #!/bin/bash
       BACKUP_DIR="/opt/business/backups/secrets"
