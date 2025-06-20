@@ -69,7 +69,7 @@
         "du" = "du -h";
         "free" = "free -h";
         "htop" = "btop --tree";
-        "grep" = "rg";
+        #"grep" = "rg";
         "open" = "xdg-open";
         
         # Git workflow shortcuts

@@ -79,7 +79,7 @@ in
       # Startup applications
       exec-once = [
         "hypr-startup"
-        #"hyprpaper"
+        "hyprpaper"
         "wl-paste --type text --watch cliphist store"
         "wl-paste --type image --watch cliphist store"
       ];
@@ -167,10 +167,10 @@ in
   };
 
   # Hyprpaper configuration
-  #home.file.".config/hypr/hyprpaper.conf".text = ''
-   # preload = ${wallpaperPath}
-    #wallpaper = eDP-1,${wallpaperPath}
-    #wallpaper = DP-1,${wallpaperPath}
-    #splash = false
-  #'';
+  home.file.".config/hypr/hyprpaper.conf".text = ''
+    preload = ${wallpaperPath}
+    wallpaper = eDP-1,${wallpaperPath}
+    wallpaper = DP-1,${wallpaperPath}
+    splash = false
+  '';
 }
