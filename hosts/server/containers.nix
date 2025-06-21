@@ -234,7 +234,7 @@
   };
 
   ####################################################################
-  # 2. CONTAINER NETWORK SETUPsudo podman ps -a | rg "slskd|soularr"
+  # 2. CONTAINER NETWORK SETUP
 
   ####################################################################
   # Create the media-network for containers
