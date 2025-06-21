@@ -4,7 +4,7 @@
 { config, pkgs, lib, ... }:
 
 let
-  wallpaperPath = "/etc/nixos/modules/home-manager/assets/wallpapers/nord-mountains.jpg";
+  wallpaperPath = "/etc/nixos/modules/assets/wallpapers/nord-mountains.jpg";
   workspaceOverview = pkgs.writeScriptBin "workspace-overview" ''
     #!/usr/bin/env bash
     
