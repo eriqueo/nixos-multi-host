@@ -234,7 +234,8 @@
   };
 
   ####################################################################
-  # 2. CONTAINER NETWORK SETUP
+  # 2. CONTAINER NETWORK SETUPsudo podman ps -a | rg "slskd|soularr"
+
   ####################################################################
   # Create the media-network for containers
   systemd.tmpfiles.rules = [
