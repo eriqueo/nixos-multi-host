@@ -162,6 +162,8 @@
       2283  # Immich
       8081  # SABnzbd
       8888  # Receipt API
+      5030    # slskd web interface
+      50300   # Soulseek P2P port
     ];
     allowedUDPPorts = [
       7359  # Jellyfin

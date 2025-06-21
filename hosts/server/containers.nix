@@ -132,6 +132,45 @@
         ];
       };
 
+            # Soulseek daemon (slskd)
+      slskd = {
+        image = "slskd/slskd:latest";
+        autoStart = true;
+        ports = [ 
+          "5030:5030"   # Web interface
+          "50300:50300" # Soulseek port
+        ];
+        volumes = [
+          "/opt/downloads/slskd:/app"
+          "/mnt/media:/data"  # Shared with other media apps
+        ];
+        environment = {
+          PUID = "1000";
+          PGID = "1000";
+          TZ = "America/Denver";
+          SLSKD_REMOTE_CONFIGURATION = "true";
+        };
+        extraOptions = [ "--network=media-network" ];
+      };
+
+      # Soularr bridge script
+      soularr = {
+        image = "mrusse08/soularr:latest";
+        autoStart = true;
+        volumes = [
+          "/opt/downloads/slskd/downloads:/downloads"  # slskd download folder
+          "/opt/downloads/soularr:/data"               # Soularr config
+        ];
+        environment = {
+          PUID = "1000";
+          PGID = "1000";
+          TZ = "America/Denver";
+          SCRIPT_INTERVAL = "300";  # Run every 5 minutes
+        };
+        extraOptions = [ "--network=media-network" ];
+        dependsOn = [ "slskd" ];
+      };
+
       # Music Streaming
       navidrome = {
         image = "deluan/navidrome";
@@ -198,6 +237,13 @@
   # 2. CONTAINER NETWORK SETUP
   ####################################################################
   # Create the media-network for containers
+  systemd.tmpfiles.rules = [
+  # Soulseek/Soularr directories
+  "d /opt/downloads/slskd 0755 eric users -"
+  "d /opt/downloads/slskd/downloads 0755 eric users -" 
+  "d /opt/downloads/soularr 0755 eric users -"
+  "d /mnt/media/music/soulseek 0755 eric users -"
+  ];
   systemd.services.init-media-network = {
     description = "Create media-network";
     after = [ "network.target" ];
