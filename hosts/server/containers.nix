@@ -158,7 +158,7 @@
         image = "mrusse08/soularr:latest";
         autoStart = true;
         volumes = [
-          "/opt/downloads/slskd/downloads:/downloads"  # slskd download folder
+          "/mnt/media/downloads:/downloads"  # slskd download folder
           "/opt/downloads/soularr:/data"               # Soularr config
         ];
         environment = {
