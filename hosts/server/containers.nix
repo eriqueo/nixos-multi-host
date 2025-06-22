@@ -190,46 +190,46 @@
       };
 
       # Photo Management
-      immich = {
-        image = "ghcr.io/immich-app/immich-server:release";
-        autoStart = true;
-        extraOptions = [ "--network=media-network" ];
-        environment = {
-          UPLOAD_LOCATION = "/photos";
-          DB_HOSTNAME = "immich-postgres";
-          DB_USERNAME = "postgres";
-          DB_PASSWORD = "postgres";
-          DB_DATABASE_NAME = "immich";
-          REDIS_HOSTNAME = "immich-redis";
-          TZ = "America/Denver";
-        };
-        ports = [ "2283:3001" ];
-        volumes = [
-          "/opt/downloads/immich/upload:/photos"
-          "/etc/localtime:/etc/localtime:ro"
-        ];
-        dependsOn = [ "immich-postgres" "immich-redis" ];
-      };
+#      immich = {
+#        image = "ghcr.io/immich-app/immich-server:release";
+#        autoStart = true;
+#        extraOptions = [ "--network=media-network" ];
+#        environment = {
+#          UPLOAD_LOCATION = "/photos";
+#          DB_HOSTNAME = "immich-postgres";
+#          DB_USERNAME = "postgres";
+#          DB_PASSWORD = "postgres";
+#          DB_DATABASE_NAME = "immich";
+#          REDIS_HOSTNAME = "immich-redis";
+#          TZ = "America/Denver";
+#        };
+#        ports = [ "2283:3001" ];
+#        volumes = [
+#          "/opt/downloads/immich/upload:/photos"
+#          "/etc/localtime:/etc/localtime:ro"
+#        ];
+#        dependsOn = [ "immich-postgres" "immich-redis" ];
+#      };
 
-      immich-postgres = {
-        image = "tensorchord/pgvecto-rs:pg14-v0.2.0";
-        autoStart = true;
-        extraOptions = [ "--network=media-network" ];
-        environment = {
-          POSTGRES_USER = "postgres";
-          POSTGRES_PASSWORD = "postgres";
-          POSTGRES_DB = "immich";
-        };
-        volumes = [
-          "/opt/downloads/immich/database:/var/lib/postgresql/data"
-        ];
-      };
+#      immich-postgres = {
+#        image = "tensorchord/pgvecto-rs:pg14-v0.2.0";
+#        autoStart = true;
+#        extraOptions = [ "--network=media-network" ];
+#        environment = {
+#          POSTGRES_USER = "postgres";
+#          POSTGRES_PASSWORD = "postgres";
+#          POSTGRES_DB = "immich";
+#        };
+#        volumes = [
+#          "/opt/downloads/immich/database:/var/lib/postgresql/data"
+#        ];
+#      };
 
-      immich-redis = {
-        image = "redis:6.2-alpine";
-        autoStart = true;
-        extraOptions = [ "--network=media-network" ];
-      };
+#      immich-redis = {
+#        image = "redis:6.2-alpine";
+#        autoStart = true;
+#        extraOptions = [ "--network=media-network" ];
+#      };
     };
   };
 
