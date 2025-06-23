@@ -72,7 +72,12 @@ cameras:
       fps: 3
     record: { enabled: true, retain: { days: 7, mode: active_objects } }
     objects:
-      track: [ person, car, truck ]
+      person:
+        required_zones: []
+      car:
+        required_zones: []
+      truck:
+        required_zones: []
     
   cobra_cam_2:
     ffmpeg:
@@ -87,7 +92,12 @@ cameras:
       fps: 3
     record: { enabled: true, retain: { days: 7, mode: active_objects } }
     objects:
-  track: [ person, car, truck ]
+      person:
+        required_zones: []
+      car:
+        required_zones: []
+      truck:
+        required_zones: []
     
   cobra_cam_3:
     ffmpeg:
@@ -112,7 +122,6 @@ cameras:
           - bicycle
           - motorcycle
    
-    
   cobra_cam_4:
     ffmpeg:
       <<: *ffmpeg_defaults
@@ -124,7 +133,20 @@ cameras:
     record: { enabled: true, retain: { days: 7, mode: motion } }
 
 objects:
-  track: [ person, car, truck, bicycle, motorcycle, dog, cat ]
+  person:
+    required_zones: []
+  car:
+    required_zones: []
+  truck:
+    required_zones: []
+  bicycle:
+    required_zones: []
+  motorcycle:
+    required_zones: []
+  dog:
+    required_zones: []
+  cat:
+    required_zones: []
 
 go2rtc:
   streams:
@@ -136,7 +158,6 @@ go2rtc:
 ui:
   live_mode: mse
   timezone: America/Denver
-  
 
 record:
   enabled: true
@@ -148,7 +169,12 @@ record:
       default: 30
       mode: motion
     objects:
-  track: [ person, car, truck ]
+      person:
+        required_zones: []
+      car:
+        required_zones: []
+      truck:
+        required_zones: []
 
 motion:
   threshold: 25
@@ -167,7 +193,7 @@ EOF
       chown eric:users /opt/surveillance/frigate/config/config.yaml
     '';
   };
-  
+
   virtualisation.oci-containers.containers = {
     frigate = {
       image = "ghcr.io/blakeblackshear/frigate:stable";
@@ -199,7 +225,7 @@ EOF
         "8555:8555/udp"
       ];
     };
-    
+
     home-assistant = {
       image = "ghcr.io/home-assistant/home-assistant:stable";
       autoStart = true;
