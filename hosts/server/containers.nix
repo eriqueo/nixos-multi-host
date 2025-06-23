@@ -80,6 +80,9 @@
           "/opt/downloads/sonarr:/config"
           "/mnt/media:/media"
           "/mnt/media/downloads:/downloads"
+          # ADD THESE NEW LINES for RandomNinjaAtk scripts:
+          "/opt/sonarr/custom-services.d:/custom-services.d"
+          "/opt/sonarr/custom-cont-init.d:/custom-cont-init.d"
         ];
       };
 
@@ -97,6 +100,9 @@
           "/opt/downloads/radarr:/config"
           "/mnt/media:/media"
           "/mnt/media/downloads:/downloads"
+          # ADD THESE NEW LINES for RandomNinjaAtk scripts:
+          "/opt/radarr/custom-services.d:/custom-services.d"
+          "/opt/radarr/custom-cont-init.d:/custom-cont-init.d"
         ];
       };
 
@@ -114,6 +120,9 @@
           "/opt/downloads/lidarr:/config"
           "/mnt/media:/media"
           "/mnt/media/downloads:/downloads"
+          # ADD THESE NEW LINES for RandomNinjaAtk scripts:
+          "/opt/lidarr/custom-services.d:/custom-services.d"
+          "/opt/lidarr/custom-cont-init.d:/custom-cont-init.d"
         ];
       };
 

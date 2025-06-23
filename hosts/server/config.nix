@@ -20,6 +20,7 @@
     ./modules/hardware-tools.nix
     ./containers.nix
     ../../shared/secrets.nix 
+    ./modules/arr-scripts.nix  # ADD THIS LINE
   ];
 
   ####################################################################
