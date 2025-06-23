@@ -46,7 +46,7 @@
     vlc
     mpv
     qbittorrent
-    
+    picard  # MusicBrainz Picard
     # FILE MANAGEMENT
     imv
     file-roller
