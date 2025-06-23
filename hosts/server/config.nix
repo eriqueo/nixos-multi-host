@@ -20,6 +20,7 @@
     ./modules/hardware-tools.nix
     ./containers.nix
     ../../shared/secrets.nix 
+    ../../shared/zsh-config.nix  # Add this import
   ];
 
   ####################################################################
@@ -67,7 +68,7 @@
   ####################################################################
   # 7. ZSH CONFIGURATION - SYSTEM LEVEL
   ####################################################################
-  programs.zsh.enable = true;
+  #programs.zsh.enable = true;
 
   ####################################################################
   # 8. SYSTEM PACKAGES

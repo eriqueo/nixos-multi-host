@@ -10,6 +10,7 @@
   imports = [
     ./hardware-configuration.nix  
     ../../shared/secrets.nix
+    ../../shared/zsh-config.nix  # Add this import
     # REMOVED: UI modules are now in Home Manager
   ];
 
@@ -49,132 +50,7 @@
   ####################################################################
   # 6. ZSH CONFIGURATION - SYSTEM LEVEL
   ####################################################################
-  programs.zsh = {
-    enable = true;
-    autosuggestions.enable = true;
-    syntaxHighlighting.enable = true;
-    shellAliases = {
-      # File management with modern tools
-      "ls" = "eza --tree --level=1";
-      "ll" = "eza -l --git --icons";
-      "la" = "eza -la --git --icons";
-      "lt" = "eza --tree --level=2";
-      
-      # Navigation shortcuts
-      ".." = "cd ..";
-      "..." = "cd ../..";
-      "...." = "cd ../../..";
-      
-      # System utilities
-      "df" = "df -h";
-      "du" = "du -h";
-      "free" = "free -h";
-      "htop" = "btop --tree";
-      "grep" = "rg";
-      "open" = "xdg-open";
-      
-      # Git workflow shortcuts
-      "gs" = "git status -sb";
-      "ga" = "git add .";
-      "gc" = "git commit -m";
-      "gp" = "git push";
-      "gl" = "git log --oneline --graph --decorate --all";
-      "gpl" = "git pull";
-      
-      # NixOS system management
-      "nixcon" = "sudo micro /etc/nixos/configuration.nix";
-      "nixflake" = "sudo micro /etc/nixos/flake.nix";
-      "nixlaphome" = "sudo micro /etc/nixos/hosts/laptop/home.nix";
-      "nixlapcon" = "sudo micro /etc/nixos/hosts/laptop/config.nix";
-      "nixserverhome" = "sudo micro /etc/nixos/hosts/server/home.nix";
-      "nixservercon" = "sudo micro /etc/nixos/hosts/server/config.nix";
-      "nixsecrets" = "sudo micro /etc/nixos/modules/secrets/secrets.nix";
-      "nixsearch" = "nix search nixpkgs";
-      "nixclean" = "nix-collect-garbage -d";
-      "nixgen" = "sudo nix-env --list-generations --profile /nix/var/nix/profiles/system";
-      
-      # Development and productivity
-      "speedtest" = "speedtest-cli";
-      "myip" = "curl -s ifconfig.me";
-      "reload" = "source ~/.zshrc";
-    };
-    
-    # Universal shell functions
-    interactiveShellInit = ''
-      # ADHD-friendly productivity functions
-      mkcd() { mkdir -p "$1" && cd "$1" }
-              
-      # Quick search and replace
-      sr() {
-        (( $# != 3 )) && { echo "Usage: sr <search> <replace> <file>"; return 1; }
-        sed -i "s/$1/$2/g" "$3"
-      }
-      
-      # Fuzzy directory navigation
-      fd() {
-        local dir
-        dir=$(find . -type d 2>/dev/null | fzf --preview 'ls -la {}') && cd "$dir"
-      }
-      
-      # Git branch switching with fuzzy search
-      fgb() {
-        local branch
-        branch=$(git branch -a | fzf --preview 'git log --oneline --graph --color=always {1}') && git checkout "''${branch##* }"
-      }
-      
-      # Hostname-aware grebuild function
-      grebuild() {
-          local commit_msg="$1"
-          [[ -z "$commit_msg" ]] && { echo "Usage: grebuild 'commit message'"; return 1; }
-          
-          cd /etc/nixos || return 1
-          sudo git add .
-          sudo git commit -m "$commit_msg"
-          sudo git push
-          
-          case $(hostname) in
-            "heartwood-laptop")
-              sudo nixos-rebuild switch --flake .#heartwood-laptop
-              ;;
-            "homeserver")
-              sudo nixos-rebuild switch --flake .#homeserver  
-              ;;
-            *)
-              echo "Unknown hostname: $(hostname)"
-              return 1
-              ;;
-          esac
-        }
-        
-        # Test-only version
-        gtest() {
-          local commit_msg="$1"
-          [[ -z "$commit_msg" ]] && { echo "Usage: gtest 'commit message'"; return 1; }
-          
-          cd /etc/nixos || return 1
-          sudo git add .
-          sudo git commit -m "$commit_msg"
-          
-          case $(hostname) in
-            "heartwood-laptop")
-              sudo nixos-rebuild test --flake .#heartwood-laptop
-              ;;
-            "homeserver")
-              sudo nixos-rebuild test --flake .#homeserver
-              ;;
-          esac
-        }
-        
-        # Quick system status check
-        status() {
-          echo "🖥️  System Status Overview"
-          echo "=========================="
-          echo "💾 Memory: $(free -h | awk 'NR==2{printf "%.1f%%", $3*100/$2 }')"
-          echo "💽 Disk: $(df -h / | awk 'NR==2{print $5}')"
-          echo "🔥 Load: $(uptime | awk -F'load average:' '{print $2}')"
-        }
-      '';
-  };
+  # now in /shared/zsh-config.nix
 
   ####################################################################
   # 7. LOGIN MANAGER
