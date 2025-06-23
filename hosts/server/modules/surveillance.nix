@@ -65,7 +65,11 @@ cameras:
       inputs:
         - path: rtsp://admin:il0wwlm%3F@192.168.1.101:554/ch01/0
           roles: [ record ]
-    detect:{ enabled: true, width: 1280, height: 720, fps: 3 }
+    detect:
+      enabled: true
+      width: 1280
+      height: 720
+      fps: 3
     record: { enabled: true, retain: { days: 7, mode: objects } }
     objects:
       track: [ person, car, truck ]
@@ -76,7 +80,11 @@ cameras:
       inputs:
         - path: rtsp://admin:il0wwlm%3F@192.168.1.102:554/ch01/0
           roles: [ record ]
-    detect:{ enabled: true, width: 1280, height: 720, fps: 3 }
+    detect:
+      enabled: true
+      width: 1280
+      height: 720
+      fps: 3
     record: { enabled: true, retain: { days: 7, mode: objects } }
     objects: [ person, car, truck ]
     
