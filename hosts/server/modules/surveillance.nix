@@ -4,7 +4,7 @@
     ffmpeg
     mosquitto
   ];
-  
+
   services.mosquitto = {
     enable = true;
     listeners = [{
@@ -15,7 +15,7 @@
       settings.allow_anonymous = true;
     }];
   };
-  
+
   systemd.tmpfiles.rules = [
     "d /opt/surveillance 0755 eric users -"
     "d /opt/surveillance/frigate 0755 eric users -"
@@ -32,10 +32,8 @@
     description = "Generate Frigate configuration";
     wantedBy = [ "podman-frigate.service" ];
     before = [ "podman-frigate.service" ];
-    serviceConfig = {
-      Type = "oneshot";
-      RemainAfterExit = true;
-    };
+    serviceConfig.Type = "oneshot";
+    serviceConfig.RemainAfterExit = true;
     script = ''
       mkdir -p /opt/surveillance/frigate/config
       cat > /opt/surveillance/frigate/config/config.yaml << 'EOF'
@@ -70,15 +68,14 @@ cameras:
       width: 1280
       height: 720
       fps: 3
-    record: { enabled: true, retain: { days: 7, mode: active_objects } }
+    record:
+      enabled: true
+      retain:
+        days: 7
+        mode: active_objects
     objects:
-      person:
-        required_zones: []
-      car:
-        required_zones: []
-      truck:
-        required_zones: []
-    
+      track: [ person, car, truck ]
+
   cobra_cam_2:
     ffmpeg:
       <<: *ffmpeg_defaults
@@ -90,28 +87,36 @@ cameras:
       width: 1280
       height: 720
       fps: 3
-    record: { enabled: true, retain: { days: 7, mode: active_objects } }
+    record:
+      enabled: true
+      retain:
+        days: 7
+        mode: active_objects
     objects:
-      person:
-        required_zones: []
-      car:
-        required_zones: []
-      truck:
-        required_zones: []
-    
+      track: [ person, car, truck ]
+
   cobra_cam_3:
     ffmpeg:
       <<: *ffmpeg_defaults
       inputs:
         - path: rtsp://admin:il0wwlm%3F@192.168.1.103:554/ch01/0
           roles: [ detect, record ]
-    detect: 
+    detect:
       enabled: true
       width: 320
       height: 240
       fps: 3
-    record: { enabled: true, retain: { days: 7, mode: motion } }
-    snapshots: { enabled: true, timestamp: true, bounding_box: true, retain: { default: 14 } }
+    record:
+      enabled: true
+      retain:
+        days: 7
+        mode: motion
+    snapshots:
+      enabled: true
+      timestamp: true
+      bounding_box: true
+      retain:
+        default: 14
     zones:
       sidewalk:
         coordinates: "0.132,0.468,0.996,0.7,0.993,0.998,0.003,0.996,0.007,0.5"
@@ -121,7 +126,7 @@ cameras:
           - truck
           - bicycle
           - motorcycle
-   
+
   cobra_cam_4:
     ffmpeg:
       <<: *ffmpeg_defaults
@@ -130,23 +135,14 @@ cameras:
           roles: [ record ]
     detect:
       enabled: false
-    record: { enabled: true, retain: { days: 7, mode: motion } }
+    record:
+      enabled: true
+      retain:
+        days: 7
+        mode: motion
 
 objects:
-  person:
-    required_zones: []
-  car:
-    required_zones: []
-  truck:
-    required_zones: []
-  bicycle:
-    required_zones: []
-  motorcycle:
-    required_zones: []
-  dog:
-    required_zones: []
-  cat:
-    required_zones: []
+  track: [ person, car, truck, bicycle, motorcycle, dog, cat ]
 
 go2rtc:
   streams:
