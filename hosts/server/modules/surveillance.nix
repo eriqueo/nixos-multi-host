@@ -70,7 +70,7 @@ cameras:
       width: 1280
       height: 720
       fps: 3
-    record: { enabled: true, retain: { days: 7, mode: objects } }
+    record: { enabled: true, retain: { days: 7, mode: active_objects } }
     objects:
       track: [ person, car, truck ]
     
@@ -85,8 +85,9 @@ cameras:
       width: 1280
       height: 720
       fps: 3
-    record: { enabled: true, retain: { days: 7, mode: objects } }
-    objects: [ person, car, truck ]
+    record: { enabled: true, retain: { days: 7, mode: active_objects } }
+    objects:
+  track: [ person, car, truck ]
     
   cobra_cam_3:
     ffmpeg:
@@ -146,7 +147,8 @@ record:
     retain:
       default: 30
       mode: motion
-    objects: [ person, car, truck ]
+    objects:
+  track: [ person, car, truck ]
 
 motion:
   threshold: 25
