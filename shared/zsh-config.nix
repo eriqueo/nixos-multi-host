@@ -37,7 +37,7 @@
       "gpl" = "git pull";
       
       # Git sync aliases
-      "gresync" = "cd /etc/nixos && sudo git fetch origin && sudo git pull origin main && echo '✅ Git sync complete!'";
+      "gresync" = "cd /etc/nixos && sudo git fetch origin && sudo git pull origin master && echo '✅ Git sync complete!'";
       "gstatus" = "cd /etc/nixos && sudo git status";
       "glog" = "cd /etc/nixos && sudo git log --oneline -10";
       
@@ -124,7 +124,7 @@
           return 1
         fi
         
-        if ! sudo -E git pull origin main; then
+        if ! sudo -E git pull origin master; then
           echo "❌ Git pull failed - resolve conflicts manually"
           cd "$original_dir"
           return 1
