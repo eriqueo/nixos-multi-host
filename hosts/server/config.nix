@@ -21,6 +21,7 @@
     ./containers.nix
     ../../shared/secrets.nix 
     ../../shared/zsh-config.nix  # Add this import
+    ./modules/arr-scripts.nix  # ADD THIS LINE
   ];
 
   ####################################################################

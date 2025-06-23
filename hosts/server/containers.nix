@@ -80,6 +80,9 @@
           "/opt/downloads/sonarr:/config"
           "/mnt/media:/media"
           "/mnt/media/downloads:/downloads"
+          # ADD THESE NEW LINES for RandomNinjaAtk scripts:
+          "/opt/sonarr/custom-services.d:/custom-services.d"
+          "/opt/sonarr/custom-cont-init.d:/custom-cont-init.d"
         ];
       };
 
@@ -97,6 +100,9 @@
           "/opt/downloads/radarr:/config"
           "/mnt/media:/media"
           "/mnt/media/downloads:/downloads"
+          # ADD THESE NEW LINES for RandomNinjaAtk scripts:
+          "/opt/radarr/custom-services.d:/custom-services.d"
+          "/opt/radarr/custom-cont-init.d:/custom-cont-init.d"
         ];
       };
 
@@ -114,6 +120,9 @@
           "/opt/downloads/lidarr:/config"
           "/mnt/media:/media"
           "/mnt/media/downloads:/downloads"
+          # ADD THESE NEW LINES for RandomNinjaAtk scripts:
+          "/opt/lidarr/custom-services.d:/custom-services.d"
+          "/opt/lidarr/custom-cont-init.d:/custom-cont-init.d"
         ];
       };
 
@@ -158,7 +167,7 @@
         image = "mrusse08/soularr:latest";
         autoStart = true;
         volumes = [
-          "/opt/downloads/slskd/downloads:/downloads"  # slskd download folder
+          "/mnt/media/downloads:/downloads"  # slskd download folder
           "/opt/downloads/soularr:/data"               # Soularr config
         ];
         environment = {
@@ -190,46 +199,46 @@
       };
 
       # Photo Management
-      immich = {
-        image = "ghcr.io/immich-app/immich-server:release";
-        autoStart = true;
-        extraOptions = [ "--network=media-network" ];
-        environment = {
-          UPLOAD_LOCATION = "/photos";
-          DB_HOSTNAME = "immich-postgres";
-          DB_USERNAME = "postgres";
-          DB_PASSWORD = "postgres";
-          DB_DATABASE_NAME = "immich";
-          REDIS_HOSTNAME = "immich-redis";
-          TZ = "America/Denver";
-        };
-        ports = [ "2283:3001" ];
-        volumes = [
-          "/opt/downloads/immich/upload:/photos"
-          "/etc/localtime:/etc/localtime:ro"
-        ];
-        dependsOn = [ "immich-postgres" "immich-redis" ];
-      };
+#      immich = {
+#        image = "ghcr.io/immich-app/immich-server:release";
+#        autoStart = true;
+#        extraOptions = [ "--network=media-network" ];
+#        environment = {
+#          UPLOAD_LOCATION = "/photos";
+#          DB_HOSTNAME = "immich-postgres";
+#          DB_USERNAME = "postgres";
+#          DB_PASSWORD = "postgres";
+#          DB_DATABASE_NAME = "immich";
+#          REDIS_HOSTNAME = "immich-redis";
+#          TZ = "America/Denver";
+#        };
+#        ports = [ "2283:3001" ];
+#        volumes = [
+#          "/opt/downloads/immich/upload:/photos"
+#          "/etc/localtime:/etc/localtime:ro"
+#        ];
+#        dependsOn = [ "immich-postgres" "immich-redis" ];
+#      };
 
-      immich-postgres = {
-        image = "tensorchord/pgvecto-rs:pg14-v0.2.0";
-        autoStart = true;
-        extraOptions = [ "--network=media-network" ];
-        environment = {
-          POSTGRES_USER = "postgres";
-          POSTGRES_PASSWORD = "postgres";
-          POSTGRES_DB = "immich";
-        };
-        volumes = [
-          "/opt/downloads/immich/database:/var/lib/postgresql/data"
-        ];
-      };
+#      immich-postgres = {
+#        image = "tensorchord/pgvecto-rs:pg14-v0.2.0";
+#        autoStart = true;
+#        extraOptions = [ "--network=media-network" ];
+#        environment = {
+#          POSTGRES_USER = "postgres";
+#          POSTGRES_PASSWORD = "postgres";
+#          POSTGRES_DB = "immich";
+#        };
+#        volumes = [
+#          "/opt/downloads/immich/database:/var/lib/postgresql/data"
+#        ];
+#      };
 
-      immich-redis = {
-        image = "redis:6.2-alpine";
-        autoStart = true;
-        extraOptions = [ "--network=media-network" ];
-      };
+#      immich-redis = {
+#        image = "redis:6.2-alpine";
+#        autoStart = true;
+#        extraOptions = [ "--network=media-network" ];
+#      };
     };
   };
 
