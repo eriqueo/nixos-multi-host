@@ -104,4 +104,11 @@
   networking.firewall.interfaces."tailscale0" = {
     allowedTCPPorts = [ 5984 8000 8501 ];
   };
+  # Fix Tailscale certificate permissions for Caddy
+    systemd.tmpfiles.rules = [
+      "d /var/lib/tailscale 0755 root root -"
+      "d /var/lib/tailscale/certs 0755 root root -"
+      "Z /var/lib/tailscale/certs/heartwood.ocelot-wahoo.ts.net.crt 0644 root caddy -"
+      "Z /var/lib/tailscale/certs/heartwood.ocelot-wahoo.ts.net.key 0640 root caddy -"
+    ];
 }
