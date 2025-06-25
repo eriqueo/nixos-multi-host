@@ -213,6 +213,28 @@
         cd "$original_dir"
       }
       
+      update-containers() {
+        echo “🔄 Forcing container image updates…”
+        Clear container image cache to force fresh pulls
+        sudo podman image prune -a -f
+        Save current directory
+        local original_dir=”$PWD”
+        Change to NixOS config directory
+        cd /etc/nixos || {
+        echo “❌ Could not access /etc/nixos directory”
+        return 1
+        }
+        echo “🔄 Rebuilding system with fresh container images…”
+        local hostname=$(hostname)
+        if ! sudo nixos-rebuild switch –flake .#”$hostname”; then
+        echo “❌ NixOS rebuild failed”
+        cd “$original_dir”
+        return 1
+        fi
+        echo “✅ Container update complete! Fresh images pulled and services restarted.”
+        cd “$original_dir”
+      }
+          
       # Test-only version
       gtest() {
         grebuild --test "$@"
