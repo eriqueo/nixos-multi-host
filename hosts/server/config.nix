@@ -1,16 +1,20 @@
-# -----------------------------------------------------------------------------
-# SERVER CONFIGURATION - Heartwood Craft Homeserver
-# Main system configuration for business intelligence and media server
-# https://search.nixos.org/options and NixOS manual (nixos-help)
-# -----------------------------------------------------------------------------
+# hosts/server/config.nix
+# Updated configuration with GPU acceleration and hot storage integration
 { config, lib, pkgs, ... }:
 
 {
   ####################################################################
-  # 1. IMPORTS
+  # 1. IMPORTS - Updated with new modules
   ####################################################################
   imports = [
     ./hardware-configuration.nix
+    
+    # New modules for GPU and SSD integration
+    ./modules/gpu-acceleration.nix       # NVIDIA Quadro P1000 support
+    ./modules/hot-storage.nix           # SSD hot storage tier
+    ./modules/media-containers-v2.nix   # Updated containers with GPU and hot/cold storage
+    
+    # Existing modules
     ./modules/surveillance.nix
     ./modules/business-services.nix
     ./modules/business-api.nix
@@ -18,17 +22,16 @@
     ./modules/adhd-tools.nix
     ./modules/obsidian-sync.nix
     ./modules/hardware-tools.nix
-    ./containers.nix
-    ../../shared/secrets.nix 
-    ../../shared/zsh-config.nix  # Add this import
-    ./modules/arr-scripts.nix  # ADD THIS LINE
+    
+    # Shared configuration
+    ../../shared/secrets.nix
   ];
 
   ####################################################################
   # 2. NIX CONFIGURATION
   ####################################################################
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
-  nixpkgs.config.allowUnfree = true;
+  nixpkgs.config.allowUnfree = true;  # Required for NVIDIA drivers
 
   ####################################################################
   # 3. BOOT & SYSTEM
@@ -48,31 +51,21 @@
   ####################################################################
   # 5. STORAGE MOUNTS
   ####################################################################
-  # Media Storage Mount
+  # Existing media storage mount (HDD - cold storage)
   fileSystems."/mnt/media" = {
     device = "/dev/disk/by-label/media";
     fsType = "ext4";
   };
+  
+  # Note: Hot storage mount (/mnt/hot) is configured in modules/hot-storage.nix
 
   ####################################################################
-  # 6. USER MANAGEMENT
+  # 6. ZSH CONFIGURATION - SYSTEM LEVEL
   ####################################################################
-  #users.users.eric = {
-    #isNormalUser = true;
-    #extraGroups = [ "wheel" "networkmanager" ];
-    #shell = pkgs.zsh;
-    #packages = with pkgs; [
-      # User-specific packages can go here
-   # ];
-  #};
+  programs.zsh.enable = true;
 
   ####################################################################
-  # 7. ZSH CONFIGURATION - SYSTEM LEVEL
-  ####################################################################
-  #programs.zsh.enable = true;
-
-  ####################################################################
-  # 8. SYSTEM PACKAGES
+  # 7. SYSTEM PACKAGES
   ####################################################################
   environment.systemPackages = with pkgs; [
     # Network utilities
@@ -103,10 +96,14 @@
     
     # Media tools
     picard                # Music organization
+    
+    # Additional tools for GPU and storage monitoring
+   # nvtop                 # GPU monitoring (from gpu-acceleration.nix)
+   # iotop                 # I/O monitoring (from hot-storage.nix)
   ];
 
   ####################################################################
-  # 9. SSH & X11 SERVICES
+  # 8. SSH & X11 SERVICES
   ####################################################################
   services.openssh = {
     enable = true;
@@ -119,36 +116,41 @@
   # Tailscale for secure remote access
   services.tailscale.enable = true;
 
-  
   ####################################################################
-  # 12. BUSINESS API SERVICES
+  # 9. MEDIA SERVICES - Updated for GPU acceleration
   ####################################################################
-  systemd.services.receipt-api = {
-    description = "Receipt Upload API";
-    after = [ "network.target" ];
-    wantedBy = [ "multi-user.target" ];
-    serviceConfig = {
-      Type = "simple";
-      User = "eric";
-      Group = "users";
-      WorkingDirectory = "/opt/business/api";
-      ExecStart = "${pkgs.python311.withPackages(ps: [ ps.fastapi ps.uvicorn ps.python-multipart ])}/bin/python receipt_upload.py";
-      Restart = "always";
-      RestartSec = "10";
-    };
-  };
-
-  ####################################################################
-  # 13. MEDIA SERVICES
-  ####################################################################
-  # Jellyfin Native Service
+  # Jellyfin Native Service - Enhanced with GPU support
   services.jellyfin = {
     enable = true;
     openFirewall = false;  # We'll manage firewall manually
   };
+  
+  # Override Jellyfin service to enable GPU access
+  systemd.services.jellyfin = {
+    serviceConfig = {
+      # Add GPU device access
+      DeviceAllow = [
+        "/dev/dri/card0 rw"
+        "/dev/dri/renderD128 rw"
+      ];
+    };
+  };
 
   ####################################################################
-  # 14. FIREWALL CONFIGURATION
+  # 10. BUSINESS AI SERVICES - Updated for GPU acceleration
+  ####################################################################
+  # Update existing Ollama service for CUDA support
+  services.ollama = {
+    enable = true;
+    acceleration = "cuda";  # Enable CUDA acceleration
+    host = "127.0.0.1";
+    port = 11434;
+    # Move models to hot storage for faster loading
+    home = "/mnt/hot/ai";
+  };
+
+  ####################################################################
+  # 11. FIREWALL CONFIGURATION - Updated ports
   ####################################################################
   networking.firewall = {
     enable = true;
@@ -164,28 +166,60 @@
       2283  # Immich
       8081  # SABnzbd
       8888  # Receipt API
-      5030    # slskd web interface
-      50300   # Soulseek P2P port
+      5030  # SLSKD
     ];
     allowedUDPPorts = [
-      7359  # Jellyfin
+      7359   # Jellyfin
+      50300  # SLSKD
     ];
-    # Block all other external access
-    extraCommands = ''
-      # Allow Tailscale network
-      iptables -A INPUT -i tailscale0 -j ACCEPT
-      # Allow local network for Samba (optional)
-      iptables -A INPUT -s 192.168.1.0/24 -j ACCEPT
-     '';
+    # Allow Tailscale and local network access
+    interfaces."tailscale0" = {
+      allowedTCPPorts = [ 5000 8123 8554 8555 1883 8000 8501 5432 6379 ];
+      allowedUDPPorts = [ 8555 ];
+    };
   };
 
   ####################################################################
-  # 15. FILE OWNERSHIP & PERMISSIONS
+  # 12. CONTAINER RUNTIME - GPU support
+  ####################################################################
+  virtualisation.podman = {
+    enable = true;
+    dockerCompat = true;
+    defaultNetwork.settings.dns_enabled = true;
+  };
+  virtualisation.oci-containers.backend = "podman";
+  
+  # Enable NVIDIA container runtime
+hardware.nvidia-container-toolkit.enable = true;
+  ####################################################################
+  # 13. FILE OWNERSHIP & PERMISSIONS
   ####################################################################
   # Ensure user can edit NixOS configuration
   systemd.tmpfiles.rules = [
     "Z /etc/nixos - eric users - -"
   ];
+
+  ####################################################################
+  # 14. PERFORMANCE OPTIMIZATIONS
+  ####################################################################
+  # I/O scheduler optimization for mixed SSD/HDD setup
+  services.udev.extraRules = ''
+    # Use mq-deadline for SSDs (better for mixed workloads)
+    ACTION=="add|change", KERNEL=="nvme*", ATTR{queue/scheduler}="mq-deadline"
+    ACTION=="add|change", KERNEL=="sd*", ENV{ID_BUS}=="ata", ATTR{queue/rotational}=="0", ATTR{queue/scheduler}="mq-deadline"
+    
+    # Use CFQ for HDDs (better for sequential workloads)
+    ACTION=="add|change", KERNEL=="sd*", ENV{ID_BUS}=="ata", ATTR{queue/rotational}=="1", ATTR{queue/scheduler}="cfq"
+  '';
+
+  ####################################################################
+  # 15. MONITORING & LOGGING
+  ####################################################################
+  # Enhanced logging for GPU and storage monitoring
+  services.journald.extraConfig = ''
+    SystemMaxUse=500M
+    RuntimeMaxUse=100M
+  '';
 
   ####################################################################
   # 16. SYSTEM STATE VERSION

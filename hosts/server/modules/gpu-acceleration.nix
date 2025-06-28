@@ -61,23 +61,18 @@
     VDPAU_DRIVER = "nvidia";
   };
 
-  # Install GPU utilities and monitoring tools
+# Install GPU utilities and monitoring tools
   environment.systemPackages = with pkgs; [
-    # NVIDIA tools
-    nvidia-smi              # GPU monitoring
-    nvtop                   # GPU process monitor
+    # NVIDIA tools - use the driver package which includes nvidia-smi
+    config.boot.kernelPackages.nvidiaPackages.stable
     
     # Video acceleration testing tools  
     libva-utils             # vainfo command
     vdpauinfo               # VDPAU info
-    
-    # Container runtime for GPU access
-    nvidia-container-toolkit
   ];
 
   # Enable container GPU support
-  virtualisation.containers.cdi.dynamic.nvidia.enable = true;
-  
+hardware.nvidia-container-toolkit.enable = true;  
   # Hardware acceleration optimizations
   systemd.tmpfiles.rules = [
     # CUDA cache directory
@@ -96,8 +91,8 @@
       ExecStart = pkgs.writeShellScript "gpu-monitor" ''
         #!/bin/bash
         while true; do
-          ${pkgs.nvidia-smi}/bin/nvidia-smi --query-gpu=timestamp,name,temperature.gpu,utilization.gpu,utilization.memory,memory.used,memory.total --format=csv,noheader,nounits >> /var/log/gpu-stats/gpu-usage.log
-          sleep 60
+		    ${config.boot.kernelPackages.nvidiaPackages.stable}/bin/nvidia-smi --query-gpu=timestamp,name,temperature.gpu,utilization.gpu,utilization.memory,memory.used,memory.total --format=csv,noheader,nounits >> /var/log/gpu-stats/gpu-usage.log          
+		    sleep 60
         done
       '';
       Restart = "always";

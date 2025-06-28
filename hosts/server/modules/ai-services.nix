@@ -19,13 +19,14 @@
     python3Packages.seaborn
   ];
   
-  # Ollama service for local AI
-  services.ollama = {
-    enable = true;
-    acceleration = false;  # Your i7-8700K will handle this fine
-    host = "127.0.0.1";
-    port = 11434;
-  };
+services.ollama = {
+  enable = true;
+  acceleration = "cuda";  # Enable CUDA acceleration
+  host = "127.0.0.1";
+  port = 11434;
+  # Move models to hot storage for faster loading
+  home = "/mnt/hot/ai";
+};
   
   # Create AI workspace directories
   systemd.tmpfiles.rules = [

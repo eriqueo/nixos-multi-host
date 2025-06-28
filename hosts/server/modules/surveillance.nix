@@ -191,36 +191,36 @@ EOF
   };
 
   virtualisation.oci-containers.containers = {
-    frigate = {
-      image = "ghcr.io/blakeblackshear/frigate:stable";
-      autoStart = true;
-      extraOptions = [
-        "--privileged"
-        "--network=host"
-        "--device=/dev/dri:/dev/dri"
-        "--tmpfs=/tmp/cache:size=1g"
-        "--shm-size=512m"
-        "--memory=6g"
-        "--cpus=2.0"
-      ];
-      environment = {
-        FRIGATE_RTSP_PASSWORD = "il0wwlm?";
-        TZ = "America/Denver";
-        LIBVA_DRIVER_NAME = "i965";
-        FRIGATE_BASE_PATH = "/cameras";
-      };
-      volumes = [
-        "/opt/surveillance/frigate/config:/config"
-        "/mnt/media/surveillance/frigate/media:/media/frigate"
-        "/etc/localtime:/etc/localtime:ro"
-      ];
-      ports = [
-        "5000:5000"
-        "8554:8554"
-        "8555:8555/tcp"
-        "8555:8555/udp"
-      ];
-    };
+#    frigate = {
+#      image = "ghcr.io/blakeblackshear/frigate:stable";
+#      autoStart = true;
+#      extraOptions = [
+#        "--privileged"
+#        "--network=host"
+#        "--device=/dev/dri:/dev/dri"
+#        "--tmpfs=/tmp/cache:size=1g"
+#        "--shm-size=512m"
+#        "--memory=6g"
+#        "--cpus=2.0"
+#      ];
+#      environment = {
+#        FRIGATE_RTSP_PASSWORD = "il0wwlm?";
+#        TZ = "America/Denver";
+#        LIBVA_DRIVER_NAME = "i965";
+#        FRIGATE_BASE_PATH = "/cameras";
+#      };
+#     volumes = [
+#        "/opt/surveillance/frigate/config:/config"
+#        "/mnt/media/surveillance/frigate/media:/media/frigate"
+#        "/etc/localtime:/etc/localtime:ro"
+#      ];
+#      ports = [
+#        "5000:5000"
+#        "8554:8554"
+#        "8555:8555/tcp"
+#        "8555:8555/udp"
+#      ];
+#    };
 
     home-assistant = {
       image = "ghcr.io/home-assistant/home-assistant:stable";
