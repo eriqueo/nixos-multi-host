@@ -149,6 +149,8 @@
     home = "/mnt/hot/ai";
   };
 
+# Allow Caddy to access Tailscale certificates
+services.tailscale.permitCertUid = "caddy";
   ####################################################################
   # 11. FIREWALL CONFIGURATION - Updated ports
   ####################################################################

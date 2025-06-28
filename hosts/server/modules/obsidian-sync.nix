@@ -37,9 +37,7 @@
   services.caddy = {
     enable = true;
     virtualHosts."heartwood.ocelot-wahoo.ts.net".extraConfig = ''
-      # TLS via Tailscale certificates
-      tls /var/lib/tailscale/certs/heartwood.ocelot-wahoo.ts.net.crt \
-          /var/lib/tailscale/certs/heartwood.ocelot-wahoo.ts.net.key
+
 
       # Obsidian LiveSync proxy: strip /sync prefix and forward to CouchDB
       @sync path /sync*
