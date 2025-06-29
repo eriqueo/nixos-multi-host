@@ -16,7 +16,10 @@
       "Bash(nixos-rebuild:*)",
       "Bash(chmod:*)",
       "Bash(hostname)",
-      "Bash(user-info)"
+      "Bash(user-info)",
+      "Bash(for file in /etc/nixos/modules/filesystem/default.nix /etc/nixos/modules/users/eric.nix /etc/nixos/shared/secrets.nix /etc/nixos/hosts/server/modules/hot-storage.nix)",
+      "Bash(do echo \"Checking $file...\")",
+      "Bash(done)"
     ],
     "deny": []
   }

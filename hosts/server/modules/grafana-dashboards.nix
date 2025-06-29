@@ -35,7 +35,7 @@ apiVersion: 1
 providers:
   - name: 'default'
     orgId: 1
-    folder: ''
+    folder: ""
     type: file
     disableDeletion: false
     updateIntervalSeconds: 10

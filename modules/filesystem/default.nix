@@ -241,7 +241,7 @@ in
     })
     
     # Comprehensive filesystem verification script
-    (lib.heartwood.scripts.mkScript "filesystem-check" ''
+    (scripts.mkScript "filesystem-check" ''
       log_info "Filesystem Structure Verification"
       log_info "=================================="
       echo ""
