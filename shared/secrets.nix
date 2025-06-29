@@ -46,39 +46,72 @@
     };
   };
   # User configuration moved to modules/users/eric.nix
-  # Script to help with secrets management
-  environment.systemPackages = with pkgs; [
-    (writeScriptBin "secrets-init" ''
-      #!/bin/bash
-      echo "🔐 Heartwood Craft Secrets Management"
-      echo "===================================="
-      echo
-      echo "Secrets directory: /etc/secrets"
-      echo "Template file: /etc/secrets/template.env"
-      echo
-      echo "To add secrets:"
-      echo "1. sudo cp /etc/secrets/template.env /etc/secrets/production.env"
-      echo "2. sudo nano /etc/secrets/production.env"
-      echo "3. Update with real values"
-      echo "4. sudo chmod 600 /etc/secrets/production.env"
-      echo
-      echo "Current secrets structure:"
-      sudo find /etc/secrets -type f -exec ls -la {} \;
-    '')
+  # Import path and script utilities
+  imports = [
+    ../modules/paths
+    ../modules/scripts/common.nix
+  ];
 
-    (writeScriptBin "secrets-backup" ''
-      #!/bin/bash
-      BACKUP_DIR="/opt/business/backups/secrets"
-      DATE=$(date +%Y%m%d_%H%M%S)
+  # Script to help with secrets management using best practices
+  environment.systemPackages = with pkgs; [
+    # Secrets initialization helper
+    (lib.heartwood.scripts.mkInfoScript "secrets-init" {
+      title = "🔐 Heartwood Craft Secrets Management";
+      sections = {
+        "Secrets Configuration" = ''
+          echo "  Secrets directory: $SECRETS_DIR"
+          echo "  Template file: $SECRETS_DIR/template.env"
+          echo "  SOPS age key: $HEARTWOOD_SOPS_AGE_KEY"
+        '';
+        
+        "Adding Secrets" = ''
+          echo "  1. sudo ${pkgs.coreutils}/bin/cp $SECRETS_DIR/template.env $SECRETS_DIR/production.env"
+          echo "  2. sudo ${pkgs.nano}/bin/nano $SECRETS_DIR/production.env"
+          echo "  3. Update with real values"
+          echo "  4. sudo ${pkgs.coreutils}/bin/chmod 600 $SECRETS_DIR/production.env"
+        '';
+        
+        "Current Structure" = ''
+          if [[ -d "$SECRETS_DIR" ]]; then
+            echo "  Current secrets structure:"
+            ${pkgs.sudo}/bin/sudo ${pkgs.findutils}/bin/find "$SECRETS_DIR" -type f -exec ${pkgs.coreutils}/bin/ls -la {} \; 2>/dev/null || echo "  No secrets found or access denied"
+          else
+            log_warning "Secrets directory not found: $SECRETS_DIR"
+          fi
+        '';
+      };
+    })
+
+    # Encrypted secrets backup with proper error handling
+    (lib.heartwood.scripts.mkScriptWithEnsureDirs "secrets-backup" 
+      [ config.heartwood.paths.backupRoot ] ''
+      BACKUP_DIR="$BACKUP_ROOT/secrets"
+      DATE=$(${pkgs.coreutils}/bin/date +%Y%m%d_%H%M%S)
       
-      echo "🔐 Backing up secrets (encrypted)..."
-      sudo mkdir -p "$BACKUP_DIR"
+      log_info "Backing up secrets (encrypted)..."
+      ensure_directory "$BACKUP_DIR"
+      
+      # Verify secrets directory exists
+      if [[ ! -d "$SECRETS_DIR" ]]; then
+        log_error "Secrets directory not found: $SECRETS_DIR"
+        exit 1
+      fi
       
       # Create encrypted backup of secrets directory
-      sudo tar -czf - /etc/secrets | gpg --symmetric --cipher-algo AES256 > "$BACKUP_DIR/secrets_$DATE.tar.gz.gpg"
-      
-      echo "✅ Secrets backed up to: $BACKUP_DIR/secrets_$DATE.tar.gz.gpg"
-      echo "⚠️  Remember the passphrase for decryption!"
+      if ${pkgs.gnutar}/bin/tar -czf - "$SECRETS_DIR" | \
+         ${pkgs.gnupg}/bin/gpg --symmetric --cipher-algo AES256 > \
+         "$BACKUP_DIR/secrets_$DATE.tar.gz.gpg"; then
+        
+        log_success "Secrets backed up to: $BACKUP_DIR/secrets_$DATE.tar.gz.gpg"
+        log_warning "Remember the passphrase for decryption!"
+        
+        # Cleanup old backups (keep last 30 days)
+        ${pkgs.findutils}/bin/find "$BACKUP_DIR" -name "secrets_*.tar.gz.gpg" -mtime +30 -delete 2>/dev/null || true
+        
+      else
+        log_error "Failed to create encrypted backup"
+        exit 1
+      fi
     '')
   ];
 }

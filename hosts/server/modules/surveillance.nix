@@ -1,10 +1,16 @@
 { config, lib, pkgs, ... }:
 
 let
-  # Common patterns
+  cfg = config.heartwood.paths;
+  # Common container patterns using path configuration
   localtime = "/etc/localtime:/etc/localtime:ro";
+  frigatePath = "${cfg.surveillanceRoot}/frigate";
+  homeAssistantPath = "${cfg.surveillanceRoot}/home-assistant";
 in
 {
+  imports = [
+    ../../../modules/paths
+  ];
   environment.systemPackages = with pkgs; [
     ffmpeg
     mosquitto
@@ -226,7 +232,7 @@ EOF
         TZ = "America/Denver";
       };
       volumes = [
-        "/opt/surveillance/home-assistant/config:/config"
+        "${homeAssistantPath}/config:/config"
         localtime
       ];
       ports = [ "8123:8123" ];

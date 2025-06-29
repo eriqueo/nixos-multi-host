@@ -13,6 +13,8 @@
     ./service-directories.nix     # Service configuration directories (*ARR, surveillance)
     ./security-directories.nix    # Secrets, certificates, and security infrastructure
     ./system-directories.nix      # System caching, logging, and database storage
+    ../paths                      # Centralized path configuration
+    ../scripts/common.nix         # Script building utilities
   ];
   
   ####################################################################
@@ -203,52 +205,55 @@
   # FILESYSTEM MANAGEMENT TOOLS
   ####################################################################
   environment.systemPackages = with pkgs; [
-    (writeScriptBin "filesystem-info" ''
-      #!/bin/bash
-      echo "📁 Heartwood Craft Filesystem Structure"
-      echo "======================================="
-      echo ""
-      echo "📋 Available Documentation:"
-      echo "  • Overview: /etc/filesystem-modules-overview.md"
-      echo "  • User Directories: /etc/user-directories-help.md"
-      echo "  • Business Directories: /etc/business-directories-help.md"
-      echo "  • Media Directories: /etc/media-directories-help.md"
-      echo "  • Service Directories: /etc/service-directories-help.md"
-      echo "  • Security Directories: /etc/security-directories-help.md"
-      echo "  • System Directories: /etc/system-directories-help.md"
-      echo ""
-      echo "💾 Storage Usage:"
-      echo "Hot Storage (SSD):"
-      df -h /mnt/hot 2>/dev/null || echo "  Not mounted"
-      echo "Cold Storage (HDD):"
-      df -h /mnt/media 2>/dev/null || echo "  Not mounted"
-      echo ""
-      echo "🔍 Quick Directory Check:"
-      echo "User directories: $(test -d /home/eric && echo "✅" || echo "❌")"
-      echo "Business directories: $(test -d /opt/business && echo "✅" || echo "❌")"
-      echo "Security directories: $(test -d /etc/secrets && echo "✅" || echo "❌")"
-      echo "Hot storage: $(test -d /mnt/hot && echo "✅" || echo "❌")"
-      echo "Cold storage: $(test -d /mnt/media && echo "✅" || echo "❌")"
-    '')
+    # Filesystem information script
+    (lib.heartwood.scripts.mkInfoScript "filesystem-info" {
+      title = "📁 Heartwood Craft Filesystem Structure";
+      sections = {
+        "📋 Available Documentation" = ''
+          echo "  • Overview: /etc/filesystem-modules-overview.md"
+          echo "  • User Directories: /etc/user-directories-help.md"
+          echo "  • Business Directories: /etc/business-directories-help.md"
+          echo "  • Media Directories: /etc/media-directories-help.md"
+          echo "  • Service Directories: /etc/service-directories-help.md"
+          echo "  • Security Directories: /etc/security-directories-help.md"
+          echo "  • System Directories: /etc/system-directories-help.md"
+        '';
+        
+        "💾 Storage Usage" = ''
+          echo "Hot Storage (SSD):"
+          ${pkgs.coreutils}/bin/df -h "$HOT_STORAGE" 2>/dev/null || echo "  Not mounted"
+          echo "Cold Storage (HDD):"
+          ${pkgs.coreutils}/bin/df -h "$COLD_STORAGE" 2>/dev/null || echo "  Not mounted"
+        '';
+        
+        "🔍 Quick Directory Check" = ''
+          echo "User directories: $([[ -d "$USER_HOME" ]] && echo "✅" || echo "❌")"
+          echo "Business directories: $([[ -d "$BUSINESS_ROOT" ]] && echo "✅" || echo "❌")"
+          echo "Security directories: $([[ -d "$SECRETS_DIR" ]] && echo "✅" || echo "❌")"
+          echo "Hot storage: $([[ -d "$HOT_STORAGE" ]] && echo "✅" || echo "❌")"
+          echo "Cold storage: $([[ -d "$COLD_STORAGE" ]] && echo "✅" || echo "❌")"
+        '';
+      };
+    })
     
-    (writeScriptBin "filesystem-check" ''
-      #!/bin/bash
-      echo "🔍 Filesystem Structure Verification"
-      echo "===================================="
+    # Comprehensive filesystem verification script
+    (lib.heartwood.scripts.mkScript "filesystem-check" ''
+      log_info "Filesystem Structure Verification"
+      log_info "=================================="
       echo ""
       
       # Check critical directories exist
       CRITICAL_DIRS=(
-        "/home/eric"
-        "/opt/business"
-        "/etc/secrets"
-        "/mnt/hot"
-        "/mnt/media"
+        "$USER_HOME"
+        "$BUSINESS_ROOT"
+        "$SECRETS_DIR"
+        "$HOT_STORAGE"
+        "$COLD_STORAGE"
       )
       
-      echo "📁 Critical Directories:"
+      log_info "📁 Critical Directories:"
       for dir in "''${CRITICAL_DIRS[@]}"; do
-        if [ -d "$dir" ]; then
+        if [[ -d "$dir" ]]; then
           echo "  ✅ $dir"
         else
           echo "  ❌ $dir (missing)"
@@ -256,21 +261,43 @@
       done
       
       echo ""
-      echo "🔐 Permission Check:"
-      echo "  /etc/secrets: $(ls -ld /etc/secrets 2>/dev/null | awk '{print $1, $3, $4}' || echo 'missing')"
-      echo "  /home/eric/.ssh: $(ls -ld /home/eric/.ssh 2>/dev/null | awk '{print $1, $3, $4}' || echo 'missing')"
+      log_info "🔐 Permission Check:"
+      for dir in "$SECRETS_DIR" "$USER_SSH"; do
+        if [[ -d "$dir" ]]; then
+          PERMS=$(${pkgs.coreutils}/bin/ls -ld "$dir" 2>/dev/null | ${pkgs.gawk}/bin/awk '{print $1, $3, $4}')
+          echo "  $dir: $PERMS"
+        else
+          echo "  $dir: missing"
+        fi
+      done
       
       echo ""
-      echo "💾 Storage Health:"
-      if command -v smartctl >/dev/null 2>&1; then
-        echo "  SSD Health: $(sudo smartctl -H /dev/nvme0n1 2>/dev/null | grep overall || echo 'check manually')"
+      log_info "💾 Storage Health:"
+      if command -v ${pkgs.smartmontools}/bin/smartctl >/dev/null 2>&1; then
+        # Try to detect the storage device for hot storage
+        if [[ -d "$HOT_STORAGE" ]]; then
+          SSD_DEVICE=$(${pkgs.util-linux}/bin/findmnt -n -o SOURCE "$HOT_STORAGE" 2>/dev/null | head -1)
+          if [[ -n "$SSD_DEVICE" ]]; then
+            SSD_HEALTH=$(${pkgs.sudo}/bin/sudo ${pkgs.smartmontools}/bin/smartctl -H "$SSD_DEVICE" 2>/dev/null | ${pkgs.gnugrep}/bin/grep overall || echo 'check manually')
+            echo "  SSD Health: $SSD_HEALTH"
+          else
+            echo "  SSD Health: device not detected"
+          fi
+        else
+          echo "  SSD Health: hot storage not mounted"
+        fi
       else
         echo "  SSD Health: smartctl not available"
       fi
       
       echo ""
-      echo "📊 Disk Usage Summary:"
-      du -sh /opt/* /home/eric/* /mnt/hot/* /mnt/media/* 2>/dev/null | sort -hr | head -10
+      log_info "📊 Disk Usage Summary:"
+      # Use proper path variables and handle missing directories
+      for base_dir in "$BUSINESS_ROOT" "$USER_HOME" "$HOT_STORAGE" "$COLD_STORAGE"; do
+        if [[ -d "$base_dir" ]]; then
+          ${pkgs.coreutils}/bin/du -sh "$base_dir"/* 2>/dev/null | ${pkgs.coreutils}/bin/sort -hr | ${pkgs.coreutils}/bin/head -5
+        fi
+      done | ${pkgs.coreutils}/bin/head -10
     '')
   ];
 }

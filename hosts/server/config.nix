@@ -20,6 +20,12 @@
     ./modules/hot-storage.nix           # SSD hot storage tier
     ./modules/media-containers-v2.nix   # Updated containers with GPU and hot/cold storage
     
+    # Monitoring stack
+    ./modules/monitoring.nix              # Comprehensive monitoring with Grafana/Prometheus
+    ./modules/media-monitor-setup.nix     # Media pipeline monitoring
+    ./modules/grafana-dashboards.nix      # Custom dashboards
+    ./modules/business-monitoring.nix     # Business intelligence monitoring
+    
     # Existing modules
     ./modules/surveillance.nix
     ./modules/business-services.nix

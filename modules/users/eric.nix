@@ -4,6 +4,13 @@
 
 {
   ####################################################################
+  # IMPORTS
+  ####################################################################
+  imports = [
+    ../paths
+    ../scripts/common.nix
+  ];
+  ####################################################################
   # MAIN USER DEFINITION
   ####################################################################
   users.users.eric = {
@@ -97,49 +104,73 @@
     
     # Version control
     gh           # GitHub CLI
-  ] ++ [
-    # User-specific helper scripts
-    (writeScriptBin "user-info" ''
-      #!/bin/bash
-      echo "👤 User Configuration Information"
-      echo "================================"
-      echo "User: eric"
-      echo "Home: /home/eric"
-      echo "Shell: ${pkgs.zsh}/bin/zsh"
-      echo "Groups: $(groups eric)"
-      echo ""
-      echo "🏠 Directory Structure:"
-      ls -la /home/eric/ | grep "^d"
-      echo ""
-      echo "🔧 Configuration Files:"
-      echo "  SSH Config: ~/.ssh/config"
-      echo "  Git Config: ~/.gitconfig"
-      echo "  ZSH Config: ~/.zshrc (managed by Home Manager)"
-      echo ""
-      echo "🔐 Security:"
-      echo "  SSH Keys: $(ls -la /home/eric/.ssh/ 2>/dev/null | grep -E '\.(pub|key)$' || echo 'None found')"
-      echo "  Sudo Access: $(sudo -l -U eric 2>/dev/null | grep -q NOPASSWD && echo 'Enabled' || echo 'Standard')"
-    '')
+  ] ++ (with lib.heartwood.scripts; [
+    # User information script with proper error handling
+    (mkInfoScript "user-info" {
+      title = "👤 User Configuration Information";
+      sections = {
+        "User Details" = ''
+          echo "  User: eric"
+          echo "  Home: $USER_HOME"
+          echo "  Shell: ${pkgs.zsh}/bin/zsh"
+          echo "  Groups: $(${pkgs.coreutils}/bin/groups eric)"
+        '';
+        
+        "🏠 Directory Structure" = ''
+          if [[ -d "$USER_HOME" ]]; then
+            ${pkgs.coreutils}/bin/ls -la "$USER_HOME/" | ${pkgs.gnugrep}/bin/grep "^d" || echo "  No directories found"
+          else
+            log_error "User home directory not found: $USER_HOME"
+          fi
+        '';
+        
+        "🔧 Configuration Files" = ''
+          echo "  SSH Config: $USER_SSH/config"
+          echo "  Git Config: ~/.gitconfig"
+          echo "  ZSH Config: ~/.zshrc (managed by Home Manager)"
+        '';
+        
+        "🔐 Security" = ''
+          if [[ -d "$USER_SSH" ]]; then
+            SSH_KEYS=$(${pkgs.coreutils}/bin/ls -la "$USER_SSH/" 2>/dev/null | ${pkgs.gnugrep}/bin/grep -E '\.(pub|key)$' || echo 'None found')
+            echo "  SSH Keys: $SSH_KEYS"
+          else
+            echo "  SSH Keys: SSH directory not found"
+          fi
+          
+          SUDO_ACCESS=$(${pkgs.sudo}/bin/sudo -l -U eric 2>/dev/null | ${pkgs.gnugrep}/bin/grep -q NOPASSWD && echo 'Enabled' || echo 'Standard')
+          echo "  Sudo Access: $SUDO_ACCESS"
+        '';
+      };
+    })
 
-    (writeScriptBin "user-maintenance" ''
-      #!/bin/bash
-      echo "🔧 User Maintenance Tasks"
-      echo "========================"
-      echo ""
-      echo "Cleaning up temporary files..."
-      rm -rf /home/eric/99-temp/*
-      
-      echo "Updating user directory permissions..."
-      chown -R eric:users /home/eric/
-      chmod 755 /home/eric/
-      chmod 700 /home/eric/.ssh/
-      
-      echo "Checking disk usage..."
-      du -sh /home/eric/
-      
-      echo "✅ User maintenance completed"
-    '')
-  ];
+    # User maintenance script with comprehensive error handling
+    (mkMaintenanceScript "user-maintenance" {
+      description = "🔧 User Maintenance Tasks";
+      cleanupDirs = [ config.heartwood.paths.userTempDir ];
+      checkDirs = [ 
+        config.heartwood.paths.userHome 
+        config.heartwood.paths.userSshDir 
+        config.heartwood.paths.userDevDir 
+      ];
+      customActions = ''
+        log_info "Updating user directory permissions..."
+        if [[ -d "$USER_HOME" ]]; then
+          ${pkgs.coreutils}/bin/chown -R eric:users "$USER_HOME/" || log_warning "Failed to update ownership"
+          ${pkgs.coreutils}/bin/chmod 755 "$USER_HOME/" || log_warning "Failed to update home permissions"
+        fi
+        
+        if [[ -d "$USER_SSH" ]]; then
+          ${pkgs.coreutils}/bin/chmod 700 "$USER_SSH/" || log_warning "Failed to update SSH permissions"
+        fi
+        
+        log_info "Checking disk usage..."
+        if [[ -d "$USER_HOME" ]]; then
+          ${pkgs.coreutils}/bin/du -sh "$USER_HOME/" 2>/dev/null || log_warning "Failed to get disk usage"
+        fi
+      '';
+    })
+  ]);
 
   ####################################################################
   # BUSINESS-SPECIFIC CONFIGURATION

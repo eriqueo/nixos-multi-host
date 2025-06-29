@@ -1,7 +1,11 @@
 # hosts/server/modules/hot-storage.nix
-{ config, pkgs, ... }:
+{ config, lib, pkgs, ... }:
 
 {
+  imports = [
+    ../../../modules/paths
+    ../../../modules/scripts/common.nix
+  ];
   # SSD Mount Configuration
   fileSystems."/mnt/hot" = {
     device = "/dev/disk/by-label/hot";
@@ -69,23 +73,45 @@
   environment.systemPackages = with pkgs; [
     smartmontools              # SSD health monitoring
     iotop                      # I/O monitoring
-    (writeScriptBin "hot-storage-status" ''
-      #!/bin/bash
-      echo "🔥 Hot Storage Status"
-      echo "===================="
-      echo
-      echo "📊 Disk Usage:"
-      df -h /mnt/hot
-      echo
-      echo "📁 Directory Sizes:"
-      du -sh /mnt/hot/downloads /mnt/hot/manual /mnt/hot/processing /mnt/hot/cache 2>/dev/null || echo "Some directories not yet created"
-      echo
-      echo "💾 SSD Health:"
-      SSD_DEVICE=$(findmnt -n -o SOURCE /mnt/hot | head -1)
-      if [[ -n "$SSD_DEVICE" ]]; then
-        smartctl -H "$SSD_DEVICE" | grep -E "(overall-health|result)"
-      fi
-    '')
+    (lib.heartwood.scripts.mkInfoScript "hot-storage-status" {
+      title = "🔥 Hot Storage Status";
+      sections = {
+        "📊 Disk Usage" = ''
+          if [[ -d "$HOT_STORAGE" ]]; then
+            ${pkgs.coreutils}/bin/df -h "$HOT_STORAGE"
+          else
+            log_error "Hot storage not mounted at $HOT_STORAGE"
+          fi
+        '';
+        
+        "📁 Directory Sizes" = ''
+          HOT_DIRS=("$HOT_STORAGE/downloads" "$HOT_STORAGE/manual" "$HOT_STORAGE/processing" "$HOT_STORAGE/cache")
+          for dir in "''${HOT_DIRS[@]}"; do
+            if [[ -d "$dir" ]]; then
+              SIZE=$(${pkgs.coreutils}/bin/du -sh "$dir" 2>/dev/null | ${pkgs.gawk}/bin/awk '{print $1}')
+              echo "  $(basename "$dir"): $SIZE"
+            else
+              echo "  $(basename "$dir"): not created"
+            fi
+          done
+        '';
+        
+        "💾 SSD Health" = ''
+          if [[ -d "$HOT_STORAGE" ]]; then
+            SSD_DEVICE=$(${pkgs.util-linux}/bin/findmnt -n -o SOURCE "$HOT_STORAGE" 2>/dev/null | head -1)
+            if [[ -n "$SSD_DEVICE" ]]; then
+              HEALTH=$(${pkgs.smartmontools}/bin/smartctl -H "$SSD_DEVICE" 2>/dev/null | ${pkgs.gnugrep}/bin/grep -E "(overall-health|result)" || echo "Unable to get health status")
+              echo "  Device: $SSD_DEVICE"
+              echo "  Health: $HEALTH"
+            else
+              echo "  Unable to detect SSD device"
+            fi
+          else
+            echo "  Hot storage not available"
+          fi
+        '';
+      };
+    })
   ];
 
   # Backup script for hot storage critical data
