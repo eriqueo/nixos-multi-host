@@ -20,8 +20,7 @@
         "/mnt/media:/media:ro"
         "/etc/localtime:/etc/localtime:ro"
       ];
-      workingDir = "/app";
-      cmd = [ "streamlit" "run" "dashboard.py" "--server.port=8501" "--server.address=0.0.0.0" ];
+      cmd = [ "sh" "-c" "cd /app && streamlit run dashboard.py --server.port=8501 --server.address=0.0.0.0" ];
     };
 
     # Business Metrics Exporter
@@ -36,8 +35,7 @@
         "/var/log:/logs:ro"
         "/etc/localtime:/etc/localtime:ro"
       ];
-      workingDir = "/app";
-      cmd = [ "python" "business_metrics.py" ];
+      cmd = [ "sh" "-c" "cd /app && python business_metrics.py" ];
     };
   };
 

@@ -156,8 +156,7 @@ in
         "/opt/downloads:/downloads:ro"
         "/etc/localtime:/etc/localtime:ro"
       ];
-      workingDir = "/app";
-      cmd = [ "python" "media_monitor.py" ];
+      cmd = [ "sh" "-c" "cd /app && python media_monitor.py" ];
     };
   };
 

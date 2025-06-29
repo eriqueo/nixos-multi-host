@@ -78,12 +78,6 @@ let
 in
 
 {
-  # Import common container utilities
-  imports = [ ../../../modules/containers/common.nix ];
-  
-  # Enable common container utilities
-  containers.common.enable = true;
-
   ####################################################################
   # 1. CONTAINER ORCHESTRATION WITH GPU SUPPORT
   ####################################################################

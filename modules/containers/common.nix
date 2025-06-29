@@ -167,7 +167,7 @@ let
 
     buildMediaServiceContainer = { name, image, mediaType, extraVolumes ? [], extraOptions ? [], environment ? {} }:
       buildLinuxServerContainer {
-        inherit name image extraOptions environment;
+        inherit name image environment;
         port = ports.${name} or null;
         volumes = [
           (volumes.config name)
@@ -182,7 +182,7 @@ let
 
     buildDownloadContainer = { name, image, downloadPath, network ? "vpn", extraVolumes ? [], extraOptions ? [], environment ? {} }:
       buildLinuxServerContainer {
-        inherit name image extraOptions environment;
+        inherit name image environment;
         port = ports.${name} or null;
         volumes = [
           (volumes.config name)
