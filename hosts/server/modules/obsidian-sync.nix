@@ -44,7 +44,8 @@
   # Systemd service to set CouchDB admin password from SOPS secret
   systemd.services.couchdb-setup-admin = {
     description = "Set CouchDB admin password from SOPS secret";
-    after = [ "couchdb.service" ];
+    after = [ "couchdb.service" "sops-install-secrets.service" ];
+    wants = [ "sops-install-secrets.service" ];
     wantedBy = [ "multi-user.target" ];
     serviceConfig = {
       Type = "oneshot";

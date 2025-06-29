@@ -34,6 +34,11 @@
   nixpkgs.config.allowUnfree = true;  # Required for NVIDIA drivers
 
   ####################################################################
+  # 2.1. SOPS SECRETS CONFIGURATION
+  ####################################################################
+  sops.age.keyFile = "/etc/sops/age/keys.txt";
+
+  ####################################################################
   # 3. BOOT & SYSTEM
   ####################################################################
   boot.loader.systemd-boot.enable = true;

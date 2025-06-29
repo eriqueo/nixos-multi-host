@@ -42,23 +42,37 @@
     enable = true;
     package = pkgs.postgresql_15;
     
-    # Create business database and user
+    # Create business database and user with proper PostgreSQL syntax
     initialScript = pkgs.writeShellScript "postgres-init.sh" ''
       # Read password from SOPS secret
       DB_PASSWORD=$(cat ${config.sops.secrets.database_password.path})
       
-      # Create SQL script with the actual password
-      cat << EOF | ${pkgs.postgresql_15}/bin/psql -U postgres
-      CREATE DATABASE IF NOT EXISTS heartwood_business;
-      CREATE USER IF NOT EXISTS business_user WITH PASSWORD '$DB_PASSWORD';
-      GRANT ALL PRIVILEGES ON DATABASE heartwood_business TO business_user;
+      # Check if database exists, create if not
+      if ! ${pkgs.postgresql_15}/bin/psql -U postgres -lqt | cut -d \| -f 1 | grep -qw heartwood_business; then
+        echo "Creating heartwood_business database..."
+        ${pkgs.postgresql_15}/bin/psql -U postgres -c "CREATE DATABASE heartwood_business;"
+      else
+        echo "Database heartwood_business already exists"
+      fi
       
-      -- Connect to the business database
-      \c heartwood_business;
+      # Create role (user) with proper conditional syntax
+      ${pkgs.postgresql_15}/bin/psql -U postgres -c "
+      DO \$\$
+      BEGIN
+        IF NOT EXISTS (SELECT FROM pg_catalog.pg_user WHERE usename = 'business_user') THEN
+          CREATE ROLE business_user WITH LOGIN PASSWORD '$DB_PASSWORD';
+        END IF;
+      END
+      \$\$;
+      "
       
-      -- Enable UUID extension
-      CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-EOF
+      # Grant privileges
+      ${pkgs.postgresql_15}/bin/psql -U postgres -c "GRANT ALL PRIVILEGES ON DATABASE heartwood_business TO business_user;"
+      
+      # Enable UUID extension in the business database
+      ${pkgs.postgresql_15}/bin/psql -U postgres -d heartwood_business -c "CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\";"
+      
+      echo "PostgreSQL initialization completed successfully"
     '';
     
     # Basic PostgreSQL optimizations
@@ -68,6 +82,10 @@ EOF
       maintenance_work_mem = "64MB";
     };
   };
+
+  # Ensure PostgreSQL waits for SOPS secrets to be available
+  systemd.services.postgresql.after = [ "sops-install-secrets.service" ];
+  systemd.services.postgresql.wants = [ "sops-install-secrets.service" ];
   
   # Redis for caching and sessions
   services.redis.servers.business = {
