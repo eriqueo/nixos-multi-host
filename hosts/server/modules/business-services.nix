@@ -1,6 +1,14 @@
 { config, pkgs, ... }:
 
 {
+  # SOPS secrets configuration for database credentials
+  sops.secrets.database_password = {
+    sopsFile = ../../../secrets/database.yaml;
+    key = "postgres/password";
+    mode = "0400";
+    owner = "postgres";
+    group = "postgres";
+  };
   # Business-specific packages
   environment.systemPackages = with pkgs; [
     # OCR and document processing
@@ -35,9 +43,14 @@
     package = pkgs.postgresql_15;
     
     # Create business database and user
-    initialScript = pkgs.writeText "postgres-init.sql" ''
-      CREATE DATABASE heartwood_business;
-      CREATE USER business_user WITH PASSWORD 'secure_password_change_me';
+    initialScript = pkgs.writeShellScript "postgres-init.sh" ''
+      # Read password from SOPS secret
+      DB_PASSWORD=$(cat ${config.sops.secrets.database_password.path})
+      
+      # Create SQL script with the actual password
+      cat << EOF | ${pkgs.postgresql_15}/bin/psql -U postgres
+      CREATE DATABASE IF NOT EXISTS heartwood_business;
+      CREATE USER IF NOT EXISTS business_user WITH PASSWORD '$DB_PASSWORD';
       GRANT ALL PRIVILEGES ON DATABASE heartwood_business TO business_user;
       
       -- Connect to the business database
@@ -45,6 +58,7 @@
       
       -- Enable UUID extension
       CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+EOF
     '';
     
     # Basic PostgreSQL optimizations

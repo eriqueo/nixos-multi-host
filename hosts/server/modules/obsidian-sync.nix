@@ -1,12 +1,20 @@
 { config, pkgs, ... }:
 {
+  # SOPS secrets configuration for CouchDB admin credentials
+  sops.secrets.couchdb_admin_password = {
+    sopsFile = ../../../secrets/admin.yaml;
+    key = "couchdb/admin_password";
+    mode = "0400";
+    owner = "couchdb";
+    group = "couchdb";
+  };
   # CouchDB for Obsidian LiveSync – let CouchDB handle CORS
   services.couchdb = {
     enable      = true;
     port        = 5984;
     bindAddress = "127.0.0.1";
     adminUser   = "eric";
-    adminPass   = "il0wwlm?";
+    # Password will be set via systemd service override using SOPS secret
 
     extraConfig = {
       chttpd = {
@@ -30,6 +38,31 @@
       couchdb = {
         max_document_size = "50000000";
       };
+    };
+  };
+
+  # Systemd service to set CouchDB admin password from SOPS secret
+  systemd.services.couchdb-setup-admin = {
+    description = "Set CouchDB admin password from SOPS secret";
+    after = [ "couchdb.service" ];
+    wantedBy = [ "multi-user.target" ];
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+      ExecStart = pkgs.writeShellScript "couchdb-setup-admin" ''
+        # Wait for CouchDB to be ready
+        while ! ${pkgs.curl}/bin/curl -s http://127.0.0.1:5984/ > /dev/null; do
+          echo "Waiting for CouchDB to start..."
+          sleep 2
+        done
+        
+        # Read password from SOPS secret
+        ADMIN_PASSWORD=$(cat ${config.sops.secrets.couchdb_admin_password.path})
+        
+        # Set up admin user with the secret password
+        ${pkgs.curl}/bin/curl -X PUT http://127.0.0.1:5984/_config/admins/eric \
+          -d "\"$ADMIN_PASSWORD\""
+      '';
     };
   };
 
