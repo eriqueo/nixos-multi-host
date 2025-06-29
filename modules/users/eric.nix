@@ -158,25 +158,22 @@
   ####################################################################
   # SSH CLIENT CONFIGURATION
   ####################################################################
-  # System-wide SSH client configuration for user
-  programs.ssh = {
-    enable = true;
-    extraConfig = ''
-      # Heartwood Craft server connection
-      Host homeserver
-        HostName heartwood.ocelot-wahoo.ts.net
-        User eric
-        IdentityFile ~/.ssh/id_ed25519
-        ForwardX11 yes
-        ForwardX11Trusted yes
-      
-      # Local server connection
-      Host local-server
-        HostName 192.168.1.100
-        User eric
-        IdentityFile ~/.ssh/id_ed25519
-    '';
-  };
+  # SSH client configuration via environment file
+  environment.etc."ssh/ssh_config".text = ''
+    # Heartwood Craft server connection
+    Host homeserver
+      HostName heartwood.ocelot-wahoo.ts.net
+      User eric
+      IdentityFile ~/.ssh/id_ed25519
+      ForwardX11 yes
+      ForwardX11Trusted yes
+    
+    # Local server connection
+    Host local-server
+      HostName 192.168.1.100
+      User eric
+      IdentityFile ~/.ssh/id_ed25519
+  '';
 
   ####################################################################
   # GIT GLOBAL CONFIGURATION
