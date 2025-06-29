@@ -9,7 +9,10 @@
       "Bash(sudo /etc/nixos/scripts/deploy-age-keys.sh:*)",
       "Bash(/etc/nixos/scripts/sops-verify.sh:*)",
       "Bash(nix-env:*)",
-      "Bash(sudo nixos-rebuild:*)"
+      "Bash(sudo nixos-rebuild:*)",
+      "Bash(mkdir:*)",
+      "Bash(nix-instantiate:*)",
+      "Bash(grep:*)"
     ],
     "deny": []
   }

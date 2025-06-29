@@ -9,6 +9,12 @@
   imports = [
     ./hardware-configuration.nix
     
+    # User configuration
+    ../../modules/users/eric.nix
+    
+    # Consolidated filesystem structure
+    ../../modules/filesystem
+    
     # New modules for GPU and SSD integration
     ./modules/gpu-acceleration.nix       # NVIDIA Quadro P1000 support
     ./modules/hot-storage.nix           # SSD hot storage tier
@@ -22,9 +28,6 @@
     ./modules/adhd-tools.nix
     ./modules/obsidian-sync.nix
     ./modules/hardware-tools.nix
-    
-    # Shared configuration
-    ../../shared/secrets.nix
   ];
 
   ####################################################################
@@ -67,29 +70,16 @@
   ####################################################################
   # 6. ZSH CONFIGURATION - SYSTEM LEVEL
   ####################################################################
-  programs.zsh.enable = true;
+  # ZSH system enablement now handled in modules/users/eric.nix
 
   ####################################################################
-  # 7. SYSTEM PACKAGES
+  # 7. SERVER-SPECIFIC SYSTEM PACKAGES
   ####################################################################
+  # Core packages now provided by modules/users/eric.nix
+  # Only server-specific packages are included here
   environment.systemPackages = with pkgs; [
-    # Network utilities
-    wget                    # Download files from web
-    curl                    # Transfer data from/to servers
-    
-    # Development tools
-    git                     # Version control system
-    micro                   # Modern terminal text editor
-    
-    # System monitoring
-    htop                    # Interactive process viewer
-    neofetch               # System information display
-    tree                   # Directory structure display
+    # Claude Code CLI
     claude-code
-    # Security tools
-    ssh-to-age             # SSH key to age key converter
-    sops                   # Secrets management tool
-    age                    # File encryption tool
     
     # GUI applications (X11 forwarding support)
     kitty                  # Terminal emulator
@@ -99,7 +89,7 @@
     evince                # PDF viewer
     feh                   # Image viewer (lightweight)
     
-    # Media tools
+    # Media tools (server-specific)
     picard                # Music organization
     
     # Additional tools for GPU and storage monitoring
@@ -201,10 +191,7 @@ hardware.nvidia-container-toolkit.enable = true;
   ####################################################################
   # 13. FILE OWNERSHIP & PERMISSIONS
   ####################################################################
-  # Ensure user can edit NixOS configuration
-  systemd.tmpfiles.rules = [
-    "Z /etc/nixos - eric users - -"
-  ];
+  # File ownership rules now handled in modules/users/eric.nix
 
   ####################################################################
   # 14. PERFORMANCE OPTIMIZATIONS

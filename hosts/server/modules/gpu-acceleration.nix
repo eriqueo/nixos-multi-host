@@ -74,13 +74,7 @@
   # Enable container GPU support
 hardware.nvidia-container-toolkit.enable = true;  
   # Hardware acceleration optimizations
-  systemd.tmpfiles.rules = [
-    # CUDA cache directory
-    "d /tmp/cuda-cache 0755 eric users -"
-    
-    # GPU stats directory for monitoring
-    "d /var/log/gpu-stats 0755 eric users -"
-  ];
+  # GPU cache and monitoring directories now created by modules/filesystem/system-directories.nix
 
   # GPU monitoring service
   systemd.services.gpu-monitor = {

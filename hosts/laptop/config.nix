@@ -8,9 +8,10 @@
   # 1. IMPORTS
   ####################################################################
   imports = [
-    ./hardware-configuration.nix  
-    ../../shared/secrets.nix
-    ../../shared/zsh-config.nix  # Add this import
+    ./hardware-configuration.nix
+    ../../modules/users/eric.nix     # Consolidated user configuration
+    ../../modules/filesystem         # Consolidated filesystem structure
+    ../../shared/zsh-config.nix      # Shared ZSH configuration
     # REMOVED: UI modules are now in Home Manager
   ];
 
@@ -18,9 +19,7 @@
   # 2. HOST IDENTITY
   ####################################################################
   networking.hostName = "heartwood-laptop";
-  systemd.tmpfiles.rules = [
-    "Z /etc/nixos - eric users - -"
-  ];
+  # File ownership rules now handled in modules/users/eric.nix
 
   ####################################################################
   # 3. BOOT & SYSTEM
@@ -55,7 +54,7 @@
   ####################################################################
   # 6. ZSH CONFIGURATION - SYSTEM LEVEL
   ####################################################################
-  # now in /shared/zsh-config.nix
+  # ZSH system enablement now handled in modules/users/eric.nix
 
   ####################################################################
   # 7. LOGIN MANAGER
@@ -140,8 +139,10 @@
   virtualisation.oci-containers.backend = "podman";
 
   ####################################################################
-  # 13. ESSENTIAL SYSTEM PACKAGES (laptop-only) - FIXED SYNTAX
+  # 13. LAPTOP-SPECIFIC SYSTEM PACKAGES
   ####################################################################
+  # Core packages now provided by modules/users/eric.nix
+  # Only laptop-specific packages are included here
   environment.systemPackages = with pkgs; [
     # Login Manager
     greetd.tuigreet
@@ -152,63 +153,37 @@
     # Printing Support
     cups
     system-config-printer
-	claude-code
-    # Power & Sensor Tools
+    
+    # Claude Code CLI
+    claude-code
+    
+    # Power & Sensor Tools (laptop-specific)
     acpi
     lm_sensors
+    powertop
 
-    # Fonts
+    # Fonts for UI
     nerd-fonts.caskaydia-cove
 
-    # Editors
-    neovim
-    micro
-
-    # Network Tools
-    wget
-    curl
-
-    # File Tools
-    unzip
-    zip
-    p7zip
-    rsync
-
-    # Navigation & Info
-    tree
-    btop
-    neofetch
-
-    # Terminal UX Enhancements
-    bat
-    eza
-    fzf
-    ripgrep
-    tmux
-
-    # GNU Utilities
+    # Laptop-specific networking
+    speedtest-cli
+    nmap
+    wireguard-tools
+    
+    # GUI utilities
+    xclip
+    
+    # Remote access tools
+    sshfs
+    rclone
+    
+    # Documentation and conversion
+    pandoc
+    
+    # System utilities
     diffutils
     less
     which
-
-    # Data Manipulation
-    jq
-    yq
-    pandoc
-    python3 
-    nodejs 
-    gh 
-    speedtest-cli 
-    nmap 
-    wireguard-tools
-    sshfs 
-    rclone 
-    xclip 
-    usbutils 
-    pciutils 
-    dmidecode 
-    powertop
-    python3Packages.pip
   ];
 
   ####################################################################

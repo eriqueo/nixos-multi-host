@@ -2,7 +2,88 @@
 # Updated container configuration with GPU acceleration and hot/cold storage tiers
 { config, lib, pkgs, ... }:
 
+let
+  # Helper function for config volumes
+  configVol = service: "/opt/downloads/${service}:/config";
+  
+  # Standard environment for media services
+  mediaServiceEnv = {
+    PUID = "1000";
+    PGID = "1000";
+    TZ = "America/Denver";
+  };
+  
+  # Network options
+  mediaNetworkOptions = [ "--network=media-network" ];
+  vpnNetworkOptions = [ "--network=container:gluetun" ];
+  
+  # GPU options
+  nvidiaGpuOptions = [ "--runtime=nvidia" "--gpus=all" ];
+  intelGpuOptions = [ "--device=/dev/dri:/dev/dri" ];
+  
+  # GPU environment
+  nvidiaEnv = {
+    NVIDIA_VISIBLE_DEVICES = "all";
+    NVIDIA_DRIVER_CAPABILITIES = "compute,video,utility";
+  };
+  
+  intelEnv = {
+    LIBVA_DRIVER_NAME = "nvidia";
+    VDPAU_DRIVER = "nvidia";
+  };
+  
+  # Volume patterns
+  hotCache = service: "/mnt/hot/cache/${service}:/cache";
+  torrentDownloads = "/mnt/hot/downloads/torrents:/downloads";
+  usenetDownloads = "/mnt/hot/downloads/usenet:/downloads";
+  coldMedia = "/mnt/media:/cold-media";
+  localtime = "/etc/localtime:/etc/localtime:ro";
+  
+  # Container builders
+  buildMediaServiceContainer = { name, image, mediaType, extraVolumes ? [], extraOptions ? [], environment ? {} }: {
+    inherit image;
+    autoStart = true;
+    extraOptions = mediaNetworkOptions ++ extraOptions;
+    environment = mediaServiceEnv // environment;
+    ports = {
+      "sonarr" = [ "8989:8989" ];
+      "radarr" = [ "7878:7878" ];
+      "lidarr" = [ "8686:8686" ];
+    }.${name} or [];
+    volumes = [
+      (configVol name)
+      "/mnt/media/${mediaType}:/${mediaType}"
+      "/mnt/hot/downloads:/hot-downloads"
+      "/mnt/hot/manual/${mediaType}:/manual"
+      "/mnt/hot/quarantine/${mediaType}:/quarantine"
+      "/mnt/hot/processing/${name}-temp:/processing"
+    ] ++ extraVolumes;
+  };
+  
+  buildDownloadContainer = { name, image, downloadPath, network ? "vpn", extraVolumes ? [], extraOptions ? [], environment ? {} }: {
+    inherit image;
+    autoStart = true;
+    dependsOn = if network == "vpn" then [ "gluetun" ] else [];
+    extraOptions = (if network == "vpn" then vpnNetworkOptions else mediaNetworkOptions) ++ extraOptions;
+    environment = mediaServiceEnv // environment;
+    ports = {
+      "qbittorrent" = [ "8080:8080" ];
+      "sabnzbd" = [ "8081:8081" ];
+    }.${name} or [];
+    volumes = [
+      (configVol name)
+      downloadPath
+    ] ++ extraVolumes;
+  };
+in
+
 {
+  # Import common container utilities
+  imports = [ ../../../modules/containers/common.nix ];
+  
+  # Enable common container utilities
+  containers.common.enable = true;
+
   ####################################################################
   # 1. CONTAINER ORCHESTRATION WITH GPU SUPPORT
   ####################################################################
@@ -28,115 +109,55 @@
       };
 
       # Download Clients - Updated for Hot Storage
-      qbittorrent = {
+      qbittorrent = buildDownloadContainer {
+        name = "qbittorrent";
         image = "lscr.io/linuxserver/qbittorrent";
-        autoStart = true;
-        dependsOn = [ "gluetun" ];
-        extraOptions = [ "--network=container:gluetun" ];
-        environment = {
-          PUID = "1000";
-          PGID = "1000";
-          TZ = "America/Denver";
-          WEBUI_PORT = "8080";
-        };
-        volumes = [
-          "/opt/downloads/qbittorrent:/config"
-          "/mnt/media:/cold-media"                      # Cold storage access for library
-          "/mnt/hot/downloads/torrents:/downloads"      # Hot storage for active downloads
-          "/mnt/hot/cache:/cache"                       # Hot storage for temp files
+        downloadPath = torrentDownloads;
+        network = "vpn";
+        extraVolumes = [
+          coldMedia
+          (hotCache "qbittorrent")
         ];
+        environment = { WEBUI_PORT = "8080"; };
       };
 
-      sabnzbd = {
+      sabnzbd = buildDownloadContainer {
+        name = "sabnzbd";
         image = "lscr.io/linuxserver/sabnzbd:latest";
-        autoStart = true;
-        dependsOn = [ "gluetun" ];
-        extraOptions = [ "--network=container:gluetun" ];
-        environment = {
-          PUID = "1000";
-          PGID = "1000";
-          TZ = "America/Denver";
-        };
-        volumes = [
-          "/opt/downloads/sabnzbd:/config"
-          "/mnt/hot/downloads/usenet:/downloads"        # Hot storage for downloads
-          "/mnt/hot/cache:/incomplete-downloads"        # Hot storage for incomplete
+        downloadPath = usenetDownloads;
+        network = "vpn";
+        extraVolumes = [
+          "/mnt/hot/cache:/incomplete-downloads"
         ];
       };
 
       # Media Management - Updated for Hot/Cold Storage Split
-      lidarr = {
+      lidarr = buildMediaServiceContainer {
+        name = "lidarr";
         image = "lscr.io/linuxserver/lidarr:latest";
-        autoStart = true;
-        extraOptions = [ "--network=media-network" ];
-        environment = {
-          PUID = "1000";
-          PGID = "1000";
-          TZ = "America/Denver";
-        };
-        ports = [ "8686:8686" ];
-        volumes = [
-          "/opt/downloads/lidarr:/config"
-          "/mnt/media/music:/music"                     # Cold storage - final library
-          "/mnt/hot/downloads:/hot-downloads"           # Hot storage - active downloads
-          "/mnt/hot/manual/music:/manual"               # Hot storage - manual processing
-          "/mnt/hot/quarantine/music:/quarantine"       # Hot storage - quarantine
-          "/mnt/hot/processing/lidarr-temp:/processing" # Hot storage - temp work
-        ];
+        mediaType = "music";
       };
 
-      sonarr = {
+      sonarr = buildMediaServiceContainer {
+        name = "sonarr";
         image = "lscr.io/linuxserver/sonarr:latest";
-        autoStart = true;
-        extraOptions = [ "--network=media-network" ];
-        environment = {
-          PUID = "1000";
-          PGID = "1000";
-          TZ = "America/Denver";
-        };
-        ports = [ "8989:8989" ];
-        volumes = [
-          "/opt/downloads/sonarr:/config"
-          "/mnt/media/tv:/tv"                           # Cold storage - final library
-          "/mnt/hot/downloads:/hot-downloads"           # Hot storage - active downloads
-          "/mnt/hot/manual/tv:/manual"                  # Hot storage - manual processing
-          "/mnt/hot/quarantine/tv:/quarantine"          # Hot storage - quarantine
-          "/mnt/hot/processing/sonarr-temp:/processing" # Hot storage - temp work
-        ];
+        mediaType = "tv";
       };
 
-      radarr = {
+      radarr = buildMediaServiceContainer {
+        name = "radarr";
         image = "lscr.io/linuxserver/radarr:latest";
-        autoStart = true;
-        extraOptions = [ "--network=media-network" ];
-        environment = {
-          PUID = "1000";
-          PGID = "1000";
-          TZ = "America/Denver";
-        };
-        ports = [ "7878:7878" ];
-        volumes = [
-          "/opt/downloads/radarr:/config"
-          "/mnt/media/movies:/movies"                   # Cold storage - final library
-          "/mnt/hot/downloads:/hot-downloads"           # Hot storage - active downloads
-          "/mnt/hot/manual/movies:/manual"              # Hot storage - manual processing
-          "/mnt/hot/quarantine/movies:/quarantine"      # Hot storage - quarantine
-          "/mnt/hot/processing/radarr-temp:/processing" # Hot storage - temp work
-        ];
+        mediaType = "movies";
       };
 
       prowlarr = {
         image = "lscr.io/linuxserver/prowlarr:latest";
         autoStart = true;
-        extraOptions = [ "--network=media-network" ];
-        environment = {
-          PUID = "1000";
-          PGID = "1000";
-          TZ = "America/Denver";
-        };
+        extraOptions = mediaNetworkOptions;
+        environment = mediaServiceEnv;
         ports = [ "9696:9696" ];
         volumes = [
-          "/opt/downloads/prowlarr:/config"
+          (configVol "prowlarr")
         ];
       };
 
@@ -144,26 +165,13 @@
       jellyfin = {
         image = "lscr.io/linuxserver/jellyfin:latest";
         autoStart = true;
-        extraOptions = [ 
-          "--network=media-network"
-          # GPU acceleration for transcoding
-          "--device=/dev/dri:/dev/dri"                  # Intel iGPU access
-          "--runtime=nvidia"                            # NVIDIA runtime
-          "--gpus=all"                                  # All NVIDIA GPUs
-        ];
-        environment = {
-          PUID = "1000";
-          PGID = "1000";
-          TZ = "America/Denver";
-          # NVIDIA specific environment variables
-          NVIDIA_VISIBLE_DEVICES = "all";
-          NVIDIA_DRIVER_CAPABILITIES = "compute,video,utility";
-        };
+        extraOptions = mediaNetworkOptions ++ nvidiaGpuOptions ++ intelGpuOptions;
+        environment = mediaServiceEnv // nvidiaEnv;
         ports = [ "8096:8096" ];
         volumes = [
-          "/opt/downloads/jellyfin:/config"
-          "/mnt/media:/media"                           # Cold storage - media libraries
-          "/mnt/hot/cache/jellyfin:/cache"              # Hot storage - transcoding cache
+          (configVol "jellyfin")
+          "/mnt/media:/media"
+          (hotCache "jellyfin")
         ];
       };
 
@@ -171,7 +179,7 @@
       navidrome = {
         image = "deluan/navidrome";
         autoStart = true;
-        extraOptions = [ "--network=media-network" ];
+        extraOptions = mediaNetworkOptions;
         environment = {
           ND_MUSICFOLDER = "/music";
           ND_DATAFOLDER = "/data";
@@ -180,8 +188,8 @@
         };
         ports = [ "4533:4533" ];
         volumes = [
-          "/opt/downloads/navidrome:/data"
-          "/mnt/media/music:/music:ro"                  # Cold storage - music library
+          (configVol "navidrome")
+          "/mnt/media/music:/music:ro"
         ];
       };
 
@@ -189,13 +197,8 @@
       frigate = {
         image = "ghcr.io/blakeblackshear/frigate:stable";
         autoStart = true;
-        extraOptions = [
+        extraOptions = [ "--network=host" ] ++ nvidiaGpuOptions ++ [
           "--privileged"
-          "--network=host"
-          # GPU acceleration for video processing
-          "--runtime=nvidia"
-          "--gpus=all"
-          # Shared memory and resource limits
           "--tmpfs=/tmp/cache:size=1g"
           "--shm-size=512m"
           "--memory=6g"
@@ -204,18 +207,12 @@
         environment = {
           FRIGATE_RTSP_PASSWORD = "iL0wwlm?";
           TZ = "America/Denver";
-          # NVIDIA specific for hardware acceleration
-          NVIDIA_VISIBLE_DEVICES = "all";
-          NVIDIA_DRIVER_CAPABILITIES = "compute,video,utility";
-          # Hardware acceleration environment
-          LIBVA_DRIVER_NAME = "nvidia";
-          VDPAU_DRIVER = "nvidia";
-        };
+        } // nvidiaEnv // intelEnv;
         volumes = [
           "/opt/surveillance/frigate/config:/config"
-          "/mnt/media/surveillance/frigate/media:/media/frigate"     # Cold storage - recordings
-          "/mnt/hot/surveillance/buffer:/tmp/frigate"                # Hot storage - buffer
-          "/etc/localtime:/etc/localtime:ro"
+          "/mnt/media/surveillance/frigate/media:/media/frigate"
+          "/mnt/hot/surveillance/buffer:/tmp/frigate"
+          localtime
         ];
         ports = [
           "5000:5000"
@@ -234,28 +231,12 @@
         };
         volumes = [
           "/opt/surveillance/home-assistant/config:/config"
-          "/etc/localtime:/etc/localtime:ro"
+          localtime
         ];
         ports = [ "8123:8123" ];
       };
     };
   };
 
-  ####################################################################
-  # 2. CONTAINER NETWORK SETUP (unchanged)
-  ####################################################################
-  systemd.services.init-media-network = {
-    description = "Create media-network";
-    after = [ "network.target" ];
-    wantedBy = [ "multi-user.target" ];
-    serviceConfig.Type = "oneshot";
-    script = let dockercli = "${pkgs.podman}/bin/podman"; in ''
-      check=$(${dockercli} network ls | grep "media-network" || true)
-      if [ -z "$check" ]; then
-        ${dockercli} network create media-network
-      else
-        echo "media-network already exists in podman"
-      fi
-    '';
-  };
+  # Network setup is now handled by the common module
 }

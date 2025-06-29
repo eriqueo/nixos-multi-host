@@ -94,16 +94,7 @@
     bind = "127.0.0.1";
      };
   
-  # Create business directories
-  systemd.tmpfiles.rules = [
-    "d /opt/business 0755 eric users -"
-    "d /opt/business/api 0755 eric users -"
-    "d /opt/business/dashboard 0755 eric users -"
-    "d /opt/business/uploads 0755 eric users -"
-    "d /opt/business/receipts 0755 eric users -"
-    "d /opt/business/processed 0755 eric users -"
-    "d /opt/business/backups 0755 eric users -"
-  ];
+  # Business directories now created by modules/filesystem/business-directories.nix
   
   # Backup script for business data
   systemd.services.business-backup = {

@@ -3,25 +3,7 @@
 
 {
   # Create necessary directories
-  systemd.tmpfiles.rules = [
-    # Lidarr directories
-    "d /opt/lidarr 0755 eric users -"
-    "d /opt/lidarr/config 0755 eric users -"
-    "d /opt/lidarr/custom-services.d 0755 eric users -"
-    "d /opt/lidarr/custom-cont-init.d 0755 eric users -"
-    
-    # Radarr directories
-    "d /opt/radarr 0755 eric users -"
-    "d /opt/radarr/config 0755 eric users -"
-    "d /opt/radarr/custom-services.d 0755 eric users -"
-    "d /opt/radarr/custom-cont-init.d 0755 eric users -"
-    
-    # Sonarr directories
-    "d /opt/sonarr 0755 eric users -"
-    "d /opt/sonarr/config 0755 eric users -"
-    "d /opt/sonarr/custom-services.d 0755 eric users -"
-    "d /opt/sonarr/custom-cont-init.d 0755 eric users -"
-  ];
+  # *ARR application directories now created by modules/filesystem/service-directories.nix
 
   # Service to download initialization script
   systemd.services.setup-arr-scripts = {

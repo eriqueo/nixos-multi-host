@@ -1,4 +1,9 @@
-{ config, pkgs, ... }:
+{ config, lib, pkgs, ... }:
+
+let
+  # Common patterns
+  localtime = "/etc/localtime:/etc/localtime:ro";
+in
 {
   environment.systemPackages = with pkgs; [
     ffmpeg
@@ -16,17 +21,8 @@
     }];
   };
 
-  systemd.tmpfiles.rules = [
-    "d /opt/surveillance 0755 eric users -"
-    "d /opt/surveillance/frigate 0755 eric users -"
-    "d /opt/surveillance/frigate/config 0755 eric users -"
-    "d /opt/surveillance/frigate/media 0755 eric users -"
-    "d /opt/surveillance/home-assistant 0755 eric users -"
-    "d /opt/surveillance/home-assistant/config 0755 eric users -"
-    "d /tmp/frigate-cache 0755 eric users -"
-    "d /var/lib/tailscale 0755 root root -"
-    "d /var/lib/tailscale/certs 0755 root root -"
-  ];
+  # Surveillance directories now created by modules/filesystem/service-directories.nix
+  # Temporary cache and system directories created by modules/filesystem/system-directories.nix
 
   systemd.services.frigate-config = {
     description = "Generate Frigate configuration";
@@ -231,7 +227,7 @@ EOF
       };
       volumes = [
         "/opt/surveillance/home-assistant/config:/config"
-        "/etc/localtime:/etc/localtime:ro"
+        localtime
       ];
       ports = [ "8123:8123" ];
     };

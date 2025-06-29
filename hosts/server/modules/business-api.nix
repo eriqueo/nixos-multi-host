@@ -34,14 +34,7 @@
   ];
   
   # Create business API directories
-  systemd.tmpfiles.rules = [
-    "d /opt/business/api/app 0755 eric users -"
-    "d /opt/business/api/models 0755 eric users -"
-    "d /opt/business/api/routes 0755 eric users -"
-    "d /opt/business/api/services 0755 eric users -"
-    "d /opt/business/dashboard 0755 eric users -"
-    "d /opt/business/config 0755 eric users -"
-  ];
+  # Business API directories now created by modules/filesystem/business-directories.nix
   
   # Business API development environment setup
   environment.etc."business/setup-dev-env.sh" = {

@@ -2,13 +2,7 @@
 { lib, config, pkgs, ... }:
 
 {
-  # Create secrets directory structure
-  systemd.tmpfiles.rules = [
-    "d /etc/secrets 0750 root root -"
-    "d /etc/secrets/api-keys 0750 root root -"
-    "d /etc/secrets/certificates 0750 root root -"
-    "d /etc/secrets/ssh 0750 root root -"
-  ];
+  # Secrets directory structure now created by modules/filesystem/security-directories.nix
 
   # Placeholder for secret files - create these manually or via deployment scripts
   environment.etc = {
@@ -51,17 +45,7 @@
       mode = "0600";
     };
   };
-  users.users.eric = {
-    isNormalUser = true;
-    home = "/home/eric";
-    description = "Eric - Heartwood Craft";
-    shell = pkgs.zsh;
-    extraGroups = [ "wheel" "networkmanager" "video" "audio" "docker" "podman" ];
-    openssh.authorizedKeys.keys = [
-      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILQFHXbcZCYrqyJoRPJddpEpnEquRJUxtopQkZsZdGhl hwc@laptop"
-    ];
-    initialPassword = "il0wwlm?";
-  };
+  # User configuration moved to modules/users/eric.nix
   # Script to help with secrets management
   environment.systemPackages = with pkgs; [
     (writeScriptBin "secrets-init" ''

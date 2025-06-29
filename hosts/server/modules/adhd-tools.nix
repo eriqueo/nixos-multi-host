@@ -21,13 +21,7 @@
   ];
   
   # Create ADHD tools directories
-  systemd.tmpfiles.rules = [
-    "d /opt/adhd-tools 0755 eric users -"
-    "d /opt/adhd-tools/context-snapshots 0755 eric users -"
-    "d /opt/adhd-tools/focus-logs 0755 eric users -"
-    "d /opt/adhd-tools/energy-tracking 0755 eric users -"
-    "d /opt/adhd-tools/scripts 0755 eric users -"
-  ];
+  # ADHD tools directories now created by modules/filesystem/business-directories.nix
   
   # Context Snapshotter service
   systemd.services.context-monitor = {

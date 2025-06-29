@@ -16,62 +16,9 @@
 
   # Hot Storage Directory Structure
   # Following the established "Safety-First" design from the handoff guide
-  systemd.tmpfiles.rules = [
-    # Root hot storage directory
-    "d /mnt/hot 0755 eric users -"
-    
-    # DOWNLOAD STAGING AREA (hot processing)
-    "d /mnt/hot/downloads 0755 eric users -"
-    "d /mnt/hot/downloads/torrents 0755 eric users -"
-    "d /mnt/hot/downloads/torrents/music 0755 eric users -"
-    "d /mnt/hot/downloads/torrents/movies 0755 eric users -"
-    "d /mnt/hot/downloads/torrents/tv 0755 eric users -"
-    "d /mnt/hot/downloads/usenet 0755 eric users -"
-    "d /mnt/hot/downloads/usenet/music 0755 eric users -"
-    "d /mnt/hot/downloads/usenet/movies 0755 eric users -"
-    "d /mnt/hot/downloads/usenet/tv 0755 eric users -"
-    "d /mnt/hot/downloads/usenet/software 0755 eric users -"
-    "d /mnt/hot/downloads/soulseek 0755 eric users -"
-    
-    # SAFE PROCESSING ZONES (moved to SSD for faster processing)
-    "d /mnt/hot/manual 0755 eric users -"
-    "d /mnt/hot/manual/music 0755 eric users -"
-    "d /mnt/hot/manual/movies 0755 eric users -"
-    "d /mnt/hot/manual/tv 0755 eric users -"
-    "d /mnt/hot/quarantine 0755 eric users -"
-    "d /mnt/hot/quarantine/music 0755 eric users -"
-    "d /mnt/hot/quarantine/movies 0755 eric users -"
-    "d /mnt/hot/quarantine/tv 0755 eric users -"
-    
-    # *ARR WORKING DIRECTORIES (temp processing on SSD)
-    "d /mnt/hot/processing 0755 eric users -"
-    "d /mnt/hot/processing/lidarr-temp 0755 eric users -"
-    "d /mnt/hot/processing/sonarr-temp 0755 eric users -"
-    "d /mnt/hot/processing/radarr-temp 0755 eric users -"
-    
-    # DATABASE STORAGE (when they grow beyond tiny)
-    "d /mnt/hot/databases 0755 eric users -"
-    "d /mnt/hot/databases/postgresql 0755 eric users -"
-    "d /mnt/hot/databases/arr-databases 0755 eric users -"
-    
-    # AI MODEL STORAGE (for faster Ollama loading)
-    "d /mnt/hot/ai 0755 eric users -"
-    "d /mnt/hot/ai/models 0755 eric users -"
-    "d /mnt/hot/ai/cache 0755 eric users -"
-    
-    # CONTAINER CACHE & TEMP FILES
-    "d /mnt/hot/cache 0755 eric users -"
-    "d /mnt/hot/cache/frigate 0755 eric users -"
-    "d /mnt/hot/cache/jellyfin 0755 eric users -"
-    "d /mnt/hot/cache/immich 0755 eric users -"
-    
-    # SURVEILLANCE BUFFER (for immediate recordings before archival)
-    "d /mnt/hot/surveillance 0755 eric users -"
-    "d /mnt/hot/surveillance/buffer 0755 eric users -"
-
-    # Create log file for SSD health monitoring (ADD THIS LINE to the existing rules)
-    "f /var/log/ssd-health.log 0644 root root -"
-  ];
+  # Hot storage directory structure now created by modules/filesystem/media-directories.nix
+  # Database and AI storage directories created by modules/filesystem/system-directories.nix
+  # SSD health logging handled by modules/filesystem/system-directories.nix
 
   # Performance optimizations for SSD
   services.fstrim.enable = true;  # Enable automatic TRIM for SSD health

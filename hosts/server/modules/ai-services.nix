@@ -29,13 +29,7 @@ services.ollama = {
 };
   
   # Create AI workspace directories
-  systemd.tmpfiles.rules = [
-    "d /opt/ai 0755 eric users -"
-    "d /opt/ai/models 0755 eric users -"
-    "d /opt/ai/context-snapshots 0755 eric users -"
-    "d /opt/ai/document-embeddings 0755 eric users -"
-    "d /opt/ai/business-rag 0755 eric users -"
-  ];
+  # AI services directories now created by modules/filesystem/business-directories.nix
   
   # AI model management service
   systemd.services.ai-model-setup = {
