@@ -1,6 +1,11 @@
 # modules/secrets/secrets.nix
 { lib, config, pkgs, ... }:
 
+let
+  # Import script utilities
+  scripts = import ../lib/scripts.nix { inherit lib pkgs config; };
+in
+
 {
   # Secrets directory structure now created by modules/filesystem/security-directories.nix
 
@@ -46,16 +51,15 @@
     };
   };
   # User configuration moved to modules/users/eric.nix
-  # Import path and script utilities
+  # Import path utilities
   imports = [
     ../modules/paths
-    ../modules/scripts/common.nix
   ];
 
   # Script to help with secrets management using best practices
   environment.systemPackages = with pkgs; [
     # Secrets initialization helper
-    (lib.heartwood.scripts.mkInfoScript "secrets-init" {
+    (scripts.mkInfoScript "secrets-init" {
       title = "🔐 Heartwood Craft Secrets Management";
       sections = {
         "Secrets Configuration" = ''
@@ -83,7 +87,7 @@
     })
 
     # Encrypted secrets backup with proper error handling
-    (lib.heartwood.scripts.mkScriptWithEnsureDirs "secrets-backup" 
+    (scripts.mkScriptWithEnsureDirs "secrets-backup" 
       [ config.heartwood.paths.backupRoot ] ''
       BACKUP_DIR="$BACKUP_ROOT/secrets"
       DATE=$(${pkgs.coreutils}/bin/date +%Y%m%d_%H%M%S)

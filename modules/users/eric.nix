@@ -2,13 +2,17 @@
 # This module contains all user-related configuration for Eric across all hosts
 { config, lib, pkgs, ... }:
 
+let
+  # Import script utilities
+  scripts = import ../../lib/scripts.nix { inherit lib pkgs config; };
+in
+
 {
   ####################################################################
   # IMPORTS
   ####################################################################
   imports = [
     ../paths
-    ../scripts/common.nix
   ];
   ####################################################################
   # MAIN USER DEFINITION
@@ -104,9 +108,9 @@
     
     # Version control
     gh           # GitHub CLI
-  ] ++ (with lib.heartwood.scripts; [
+  ] ++ [
     # User information script with proper error handling
-    (mkInfoScript "user-info" {
+    (scripts.mkInfoScript "user-info" {
       title = "👤 User Configuration Information";
       sections = {
         "User Details" = ''
@@ -145,7 +149,7 @@
     })
 
     # User maintenance script with comprehensive error handling
-    (mkMaintenanceScript "user-maintenance" {
+    (scripts.mkMaintenanceScript "user-maintenance" {
       description = "🔧 User Maintenance Tasks";
       cleanupDirs = [ config.heartwood.paths.userTempDir ];
       checkDirs = [ 
@@ -170,7 +174,7 @@
         fi
       '';
     })
-  ]);
+  ];
 
   ####################################################################
   # BUSINESS-SPECIFIC CONFIGURATION

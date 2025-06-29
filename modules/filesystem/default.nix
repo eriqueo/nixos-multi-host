@@ -2,6 +2,11 @@
 # Main filesystem module that imports all consolidated directory structures
 { config, lib, pkgs, ... }:
 
+let
+  # Import script utilities
+  scripts = import ../../lib/scripts.nix { inherit lib pkgs config; };
+in
+
 {
   ####################################################################
   # CONSOLIDATED FILESYSTEM MODULES
@@ -14,7 +19,6 @@
     ./security-directories.nix    # Secrets, certificates, and security infrastructure
     ./system-directories.nix      # System caching, logging, and database storage
     ../paths                      # Centralized path configuration
-    ../scripts/common.nix         # Script building utilities
   ];
   
   ####################################################################
@@ -206,7 +210,7 @@
   ####################################################################
   environment.systemPackages = with pkgs; [
     # Filesystem information script
-    (lib.heartwood.scripts.mkInfoScript "filesystem-info" {
+    (scripts.mkInfoScript "filesystem-info" {
       title = "📁 Heartwood Craft Filesystem Structure";
       sections = {
         "📋 Available Documentation" = ''

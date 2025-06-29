@@ -47,32 +47,25 @@ let
     }
     
     # Path variables from configuration
-    export USER_HOME="${cfg.userHome}"
-    export USER_TEMP="${cfg.userTempDir}"
-    export USER_SSH="${cfg.userSshDir}"
-    export USER_DEV="${cfg.userDevDir}"
-    export HOT_STORAGE="${cfg.hotStorage}"
-    export COLD_STORAGE="${cfg.coldStorage}"
-    export BUSINESS_ROOT="${cfg.businessRoot}"
-    export SURVEILLANCE_ROOT="${cfg.surveillanceRoot}"
-    export AI_ROOT="${cfg.aiRoot}"
-    export ADHD_TOOLS_ROOT="${cfg.adhdToolsRoot}"
-    export SECRETS_DIR="${cfg.secretsDir}"
-    export NIXOS_CONFIG="${cfg.nixosConfigDir}"
-    export BACKUP_ROOT="${cfg.backupRoot}"
-    export LOG_DIR="${cfg.logDir}"
-    export TEMP_DIR="${cfg.tempDir}"
+    export USER_HOME="${cfg.userHome or "/home/eric"}"
+    export USER_TEMP="${cfg.userTempDir or "/home/eric/99-temp"}"
+    export USER_SSH="${cfg.userSshDir or "/home/eric/.ssh"}"
+    export USER_DEV="${cfg.userDevDir or "/home/eric/dev"}"
+    export HOT_STORAGE="${cfg.hotStorage or "/mnt/hot"}"
+    export COLD_STORAGE="${cfg.coldStorage or "/mnt/media"}"
+    export BUSINESS_ROOT="${cfg.businessRoot or "/opt/business"}"
+    export SURVEILLANCE_ROOT="${cfg.surveillanceRoot or "/opt/surveillance"}"
+    export AI_ROOT="${cfg.aiRoot or "/opt/ai"}"
+    export ADHD_TOOLS_ROOT="${cfg.adhdToolsRoot or "/opt/adhd-tools"}"
+    export SECRETS_DIR="${cfg.secretsDir or "/etc/secrets"}"
+    export NIXOS_CONFIG="${cfg.nixosConfigDir or "/etc/nixos"}"
+    export BACKUP_ROOT="${cfg.backupRoot or "/opt/business/backups"}"
+    export LOG_DIR="${cfg.logDir or "/var/log"}"
+    export TEMP_DIR="${cfg.tempDir or "/tmp"}"
   '';
-  
-in
-{
-  imports = [
-    ../paths
-  ];
-  
-  # Utility functions for building robust scripts
-  lib.heartwood.scripts = {
-    
+
+  # Script building utilities
+  heartwoodScripts = {
     # Build a script with common utilities and error handling
     mkScript = name: script: pkgs.writeScriptBin name (scriptHeader + script);
     
@@ -140,7 +133,7 @@ in
         '') checkDirs;
         
       in
-      lib.heartwood.scripts.mkScript name ''
+      heartwoodScripts.mkScript name ''
         log_info "${description}"
         log_info "$(${pkgs.coreutils}/bin/echo "${description}" | ${pkgs.gnused}/bin/sed 's/./ /g')"
         echo
@@ -184,7 +177,7 @@ in
           ${sectionContent}
         '') sections);
       in
-      lib.heartwood.scripts.mkScript name ''
+      heartwoodScripts.mkScript name ''
         blue "${title}"
         blue "$(${pkgs.coreutils}/bin/echo "${title}" | ${pkgs.gnused}/bin/sed 's/./=/g')"
         echo
@@ -192,4 +185,15 @@ in
         ${sectionOutput}
       '';
   };
+
+in
+{
+  imports = [
+    ../paths
+  ];
+  
+  # Extend lib with heartwood script utilities
+  _module.args.lib = lib.extend (final: prev: {
+    heartwood.scripts = heartwoodScripts;
+  });
 }

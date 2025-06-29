@@ -1,10 +1,14 @@
 # hosts/server/modules/hot-storage.nix
 { config, lib, pkgs, ... }:
 
+let
+  # Import script utilities
+  scripts = import ../../../lib/scripts.nix { inherit lib pkgs config; };
+in
+
 {
   imports = [
     ../../../modules/paths
-    ../../../modules/scripts/common.nix
   ];
   # SSD Mount Configuration
   fileSystems."/mnt/hot" = {
@@ -73,7 +77,7 @@
   environment.systemPackages = with pkgs; [
     smartmontools              # SSD health monitoring
     iotop                      # I/O monitoring
-    (lib.heartwood.scripts.mkInfoScript "hot-storage-status" {
+    (scripts.mkInfoScript "hot-storage-status" {
       title = "🔥 Hot Storage Status";
       sections = {
         "📊 Disk Usage" = ''
