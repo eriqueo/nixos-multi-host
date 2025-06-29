@@ -147,7 +147,7 @@
     # Printing Support
     cups
     system-config-printer
-
+	claude-cli
     # Power & Sensor Tools
     acpi
     lm_sensors

@@ -80,7 +80,7 @@
     htop                    # Interactive process viewer
     neofetch               # System information display
     tree                   # Directory structure display
-    
+    claude-cli
     # Security tools
     ssh-to-age             # SSH key to age key converter
     sops                   # Secrets management tool
