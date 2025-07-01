@@ -12,6 +12,10 @@
     # User configuration
     ../../modules/users/eric.nix
     
+    # Shared configuration
+    ../../shared/secrets.nix
+    ../../shared/zsh-config.nix
+    
     # Consolidated filesystem structure
     ../../modules/filesystem
     
@@ -126,6 +130,43 @@
     openFirewall = false;  # We'll manage firewall manually
   };
   
+  # Immich Native Service - Photo management with GPU support
+  services.immich = {
+    enable = true;
+    host = "0.0.0.0";
+    port = 2283;
+    mediaLocation = "/mnt/media/pictures";
+    
+    # Database configuration on hot storage for performance
+    database = {
+      enable = true;
+      name = "immich";
+      user = "immich";
+      createDB = true;
+    };
+    
+    # Redis configuration for caching 
+    redis = {
+      enable = true;
+      host = "127.0.0.1";
+      port = 6380;  # Use different port to avoid conflict
+    };
+    
+    environment = {
+      # Hot storage paths for processing and caching
+      IMMICH_UPLOAD_LOCATION = "/mnt/hot/cache/immich/upload";
+      IMMICH_THUMBNAIL_LOCATION = "/mnt/hot/cache/immich/thumb";
+      IMMICH_ENCODED_VIDEO_LOCATION = "/mnt/hot/cache/immich/encoded";
+      
+      # Redis connection to Immich-specific instance
+      REDIS_HOSTNAME = "127.0.0.1";
+      REDIS_PORT = "6380";
+      
+      # GPU acceleration settings
+      IMMICH_MACHINE_LEARNING_ENABLED = "true";
+    };
+  };
+  
   # Override Jellyfin service to enable GPU access
   systemd.services.jellyfin = {
     serviceConfig = {
@@ -133,7 +174,58 @@
       DeviceAllow = [
         "/dev/dri/card0 rw"
         "/dev/dri/renderD128 rw"
+        "/dev/nvidia0 rw"
+        "/dev/nvidiactl rw"
+        "/dev/nvidia-modeset rw"
+        "/dev/nvidia-uvm rw"
+        "/dev/nvidia-uvm-tools rw"
       ];
+    };
+    environment = {
+      # NVIDIA GPU acceleration
+      NVIDIA_VISIBLE_DEVICES = "all";
+      NVIDIA_DRIVER_CAPABILITIES = "compute,video,utility";
+    };
+  };
+
+  # Override Immich services to enable GPU access
+  systemd.services.immich-server = {
+    serviceConfig = {
+      # Add GPU device access for photo/video processing
+      DeviceAllow = [
+        "/dev/dri/card0 rw"
+        "/dev/dri/renderD128 rw"
+        "/dev/nvidia0 rw"
+        "/dev/nvidiactl rw"
+        "/dev/nvidia-modeset rw"
+        "/dev/nvidia-uvm rw"
+        "/dev/nvidia-uvm-tools rw"
+      ];
+    };
+    environment = {
+      # NVIDIA GPU acceleration
+      NVIDIA_VISIBLE_DEVICES = "all";
+      NVIDIA_DRIVER_CAPABILITIES = "compute,video,utility";
+    };
+  };
+
+  systemd.services.immich-machine-learning = {
+    serviceConfig = {
+      # Add GPU device access for ML processing
+      DeviceAllow = [
+        "/dev/dri/card0 rw"
+        "/dev/dri/renderD128 rw"
+        "/dev/nvidia0 rw"
+        "/dev/nvidiactl rw"
+        "/dev/nvidia-modeset rw"
+        "/dev/nvidia-uvm rw"
+        "/dev/nvidia-uvm-tools rw"
+      ];
+    };
+    environment = {
+      # NVIDIA GPU acceleration for ML workloads
+      NVIDIA_VISIBLE_DEVICES = "all";
+      NVIDIA_DRIVER_CAPABILITIES = "compute,video,utility";
     };
   };
 
@@ -192,8 +284,7 @@ services.tailscale.permitCertUid = "caddy";
   };
   virtualisation.oci-containers.backend = "podman";
   
-  # Enable NVIDIA container runtime
-hardware.nvidia-container-toolkit.enable = true;
+  # NVIDIA container runtime is enabled in gpu-acceleration.nix
   ####################################################################
   # 13. FILE OWNERSHIP & PERMISSIONS
   ####################################################################

@@ -20,7 +20,7 @@
         "/mnt/media:/media:ro"
         "/etc/localtime:/etc/localtime:ro"
       ];
-      cmd = [ "sh" "-c" "cd /app && streamlit run dashboard.py --server.port=8501 --server.address=0.0.0.0" ];
+      cmd = [ "sh" "-c" "cd /app && pip install streamlit pandas plotly requests prometheus_client && streamlit run dashboard.py --server.port=8501 --server.address=0.0.0.0" ];
     };
 
     # Business Metrics Exporter
@@ -35,7 +35,7 @@
         "/var/log:/logs:ro"
         "/etc/localtime:/etc/localtime:ro"
       ];
-      cmd = [ "sh" "-c" "cd /app && python business_metrics.py" ];
+      cmd = [ "sh" "-c" "cd /app && pip install prometheus_client requests && python business_metrics.py" ];
     };
   };
 

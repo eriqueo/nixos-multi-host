@@ -20,7 +20,24 @@
       "Bash(for file in /etc/nixos/modules/filesystem/default.nix /etc/nixos/modules/users/eric.nix /etc/nixos/shared/secrets.nix /etc/nixos/hosts/server/modules/hot-storage.nix)",
       "Bash(do echo \"Checking $file...\")",
       "Bash(done)",
-      "Bash(systemctl status:*)"
+      "Bash(systemctl status:*)",
+      "Bash(journalctl:*)",
+      "Bash(systemctl:*)",
+      "Bash(podman info:*)",
+      "Bash(podman network:*)",
+      "Bash(nvidia-container-runtime:*)",
+      "Bash(nvidia-smi:*)",
+      "Bash(nix search:*)",
+      "Bash(sudo systemctl start:*)",
+      "Bash(sudo modprobe:*)",
+      "Bash(dmesg:*)",
+      "Bash(sudo:*)",
+      "Bash(rg:*)",
+      "Bash(cat:*)",
+      "Bash(podman version:*)",
+      "Bash(curl:*)",
+      "WebFetch(domain:search.nixos.org)",
+      "Bash(ss:*)"
     ],
     "deny": []
   }

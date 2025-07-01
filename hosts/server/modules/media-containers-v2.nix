@@ -17,8 +17,15 @@ let
   mediaNetworkOptions = [ "--network=media-network" ];
   vpnNetworkOptions = [ "--network=container:gluetun" ];
   
-  # GPU options
-  nvidiaGpuOptions = [ "--runtime=nvidia" "--gpus=all" ];
+  # GPU options - Direct device access without runtime
+  nvidiaGpuOptions = [ 
+    "--device=/dev/nvidia0:/dev/nvidia0:rwm"
+    "--device=/dev/nvidiactl:/dev/nvidiactl:rwm" 
+    "--device=/dev/nvidia-modeset:/dev/nvidia-modeset:rwm"
+    "--device=/dev/nvidia-uvm:/dev/nvidia-uvm:rwm"
+    "--device=/dev/nvidia-uvm-tools:/dev/nvidia-uvm-tools:rwm"
+    "--device=/dev/dri:/dev/dri:rwm"
+  ];
   intelGpuOptions = [ "--device=/dev/dri:/dev/dri" ];
   
   # GPU environment
@@ -78,6 +85,26 @@ let
 in
 
 {
+  ####################################################################
+  # 0. NETWORK SETUP
+  ####################################################################
+  
+  # Create media-network for container communication
+  systemd.services.init-media-network = {
+    description = "Create media-network";
+    after = [ "network.target" ];
+    wantedBy = [ "multi-user.target" ];
+    serviceConfig.Type = "oneshot";
+    script = let dockercli = "${pkgs.podman}/bin/podman"; in ''
+      check=$(${dockercli} network ls | grep "media-network" || true)
+      if [ -z "$check" ]; then
+        ${dockercli} network create media-network
+      else
+        echo "media-network already exists in podman"
+      fi
+    '';
+  };
+
   ####################################################################
   # 1. CONTAINER ORCHESTRATION WITH GPU SUPPORT
   ####################################################################
@@ -156,18 +183,19 @@ in
       };
 
       # Media Streaming - GPU Accelerated
-      jellyfin = {
-        image = "lscr.io/linuxserver/jellyfin:latest";
-        autoStart = true;
-        extraOptions = mediaNetworkOptions ++ nvidiaGpuOptions ++ intelGpuOptions;
-        environment = mediaServiceEnv // nvidiaEnv;
-        ports = [ "8096:8096" ];
-        volumes = [
-          (configVol "jellyfin")
-          "/mnt/media:/media"
-          (hotCache "jellyfin")
-        ];
-      };
+      # jellyfin = {
+      #   image = "lscr.io/linuxserver/jellyfin:latest";
+      #   autoStart = true;
+      #   extraOptions = mediaNetworkOptions ++ nvidiaGpuOptions ++ intelGpuOptions;
+      #   environment = mediaServiceEnv // nvidiaEnv;
+      #   ports = [ "8096:8096" ];
+      #   volumes = [
+      #     (configVol "jellyfin")
+      #     "/mnt/media:/media"
+      #     (hotCache "jellyfin")
+      #   ];
+      # };
+      # Disabled: Using native Jellyfin service instead to avoid port conflicts
 
       # Music Streaming
       navidrome = {
@@ -216,19 +244,6 @@ in
         ];
       };
 
-      home-assistant = {
-        image = "ghcr.io/home-assistant/home-assistant:stable";
-        autoStart = true;
-        extraOptions = [ "--network=host" ];
-        environment = {
-          TZ = "America/Denver";
-        };
-        volumes = [
-          "/opt/surveillance/home-assistant/config:/config"
-          localtime
-        ];
-        ports = [ "8123:8123" ];
-      };
     };
   };
 

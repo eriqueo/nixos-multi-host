@@ -109,11 +109,12 @@ in
         "--volume=/:/rootfs:ro"
         "--volume=/var/run:/var/run:ro"
         "--volume=/sys:/sys:ro"
-        "--volume=/var/lib/docker/:/var/lib/docker:ro"
-        "--volume=/var/run/docker.sock:/var/run/docker.sock:ro"
+        "--volume=/run/podman:/var/run/docker:ro"
+        "--volume=/run/podman/podman.sock:/var/run/docker.sock:ro"
         "--network=host"
       ];
-      ports = [ "8080:8080" ];
+      # Pass port as argument to cAdvisor binary (not Podman)
+      cmd = [ "--port=8083" ];  # Changed from default 8080 to avoid conflicts
     };
 
     # Blackbox Exporter - Endpoint monitoring
@@ -130,17 +131,22 @@ in
 
     # NVIDIA GPU Exporter
     nvidia-gpu-exporter = {
-      image = "mindprince/nvidia_gpu_prometheus_exporter:latest";
+      image = "utkuozdemir/nvidia_gpu_exporter:latest";
       autoStart = true;
       extraOptions = [
-        "--runtime=nvidia"
-        "--gpus=all"
         "--network=host"
+        # Direct GPU device access (same as Frigate)
+        "--device=/dev/nvidia0:/dev/nvidia0:rwm"
+        "--device=/dev/nvidiactl:/dev/nvidiactl:rwm" 
+        "--device=/dev/nvidia-modeset:/dev/nvidia-modeset:rwm"
+        "--device=/dev/nvidia-uvm:/dev/nvidia-uvm:rwm"
+        "--device=/dev/nvidia-uvm-tools:/dev/nvidia-uvm-tools:rwm"
       ];
       environment = {
         NVIDIA_VISIBLE_DEVICES = "all";
+        NVIDIA_DRIVER_CAPABILITIES = "compute,utility";
       };
-      ports = [ "9445:9445" ];
+      # No port mapping needed with host networking - runs on port 9445
     };
 
     # Custom Media Pipeline Monitor
@@ -156,7 +162,7 @@ in
         "/opt/downloads:/downloads:ro"
         "/etc/localtime:/etc/localtime:ro"
       ];
-      cmd = [ "sh" "-c" "cd /app && python media_monitor.py" ];
+      cmd = [ "sh" "-c" "cd /app && pip install psutil prometheus_client requests && python media_monitor.py" ];
     };
   };
 
@@ -170,12 +176,12 @@ in
     # Prometheus directories
     "d /opt/monitoring/prometheus 0755 eric users -"
     "d /opt/monitoring/prometheus/config 0755 eric users -"
-    "d /opt/monitoring/prometheus/data 0755 eric users -"
+    "d /opt/monitoring/prometheus/data 0755 65534 65534 -"
     
     # Grafana directories
     "d /opt/monitoring/grafana 0755 eric users -"
     "d /opt/monitoring/grafana/config 0755 eric users -"
-    "d /opt/monitoring/grafana/data 0755 eric users -"
+    "d /opt/monitoring/grafana/data 0755 472 472 -"
     
     # Alertmanager directories
     "d /opt/monitoring/alertmanager 0755 eric users -"
@@ -245,7 +251,7 @@ scrape_configs:
   # Container metrics
   - job_name: 'cadvisor'
     static_configs:
-      - targets: ['host.containers.internal:8080']
+      - targets: ['host.containers.internal:8083']
 
   # GPU metrics
   - job_name: 'nvidia-gpu'
@@ -264,6 +270,8 @@ scrape_configs:
         - http://host.containers.internal:8686  # Lidarr
         - http://host.containers.internal:9696  # Prowlarr
         - http://host.containers.internal:8096  # Jellyfin
+        - http://127.0.0.1:2283  # Immich (local)
+        - https://heartwood.ocelot-wahoo.ts.net/immich  # Immich (HTTPS)
         - http://host.containers.internal:4533  # Navidrome
         - http://host.containers.internal:5000  # Frigate
         - http://host.containers.internal:8123  # Home Assistant
@@ -466,8 +474,30 @@ modules:
       preferred_ip_protocol: "ip4"
 EOF
 
+      # Generate Grafana configuration
+      cat > /opt/monitoring/grafana/config/grafana.ini << 'EOF'
+[server]
+http_port = 3000
+root_url = http://localhost:3000
+
+[security]
+admin_user = admin
+admin_password = admin123
+
+[users]
+allow_sign_up = false
+
+[analytics]
+reporting_enabled = false
+
+[install]
+check_for_updates = false
+EOF
+
       # Set proper permissions
       chown -R eric:users /opt/monitoring/
+      chown -R 472:472 /opt/monitoring/grafana/data
+      chown -R 65534:65534 /opt/monitoring/prometheus/data
     '';
   };
 
@@ -475,7 +505,7 @@ EOF
   # 4. FIREWALL CONFIGURATION
   ####################################################################
   networking.firewall.interfaces."tailscale0" = {
-    allowedTCPPorts = [ 3000 9090 9093 9100 8080 9115 9445 8888 ];
+    allowedTCPPorts = [ 3000 9090 9093 9100 8083 9115 9445 8888 ];
   };
 
   # Allow local network access

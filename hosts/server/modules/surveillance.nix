@@ -235,7 +235,6 @@ EOF
         "${homeAssistantPath}/config:/config"
         localtime
       ];
-      ports = [ "8123:8123" ];
     };
   };
 

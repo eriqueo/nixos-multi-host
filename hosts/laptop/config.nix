@@ -11,6 +11,9 @@
     ./hardware-configuration.nix
     ../../modules/users/eric.nix     # Consolidated user configuration
     ../../modules/filesystem         # Consolidated filesystem structure
+    
+    # Shared configuration
+    ../../shared/secrets.nix         # Shared secrets management
     ../../shared/zsh-config.nix      # Shared ZSH configuration
     # REMOVED: UI modules are now in Home Manager
   ];

@@ -43,6 +43,7 @@
 
   # Load NVIDIA kernel modules early in boot process
   boot.kernelModules = [ "nvidia" "nvidia_modeset" "nvidia_uvm" "nvidia_drm" ];
+  boot.blacklistedKernelModules = [ "nouveau" ];  # Disable nouveau
   
   # Kernel parameters for NVIDIA
   boot.kernelParams = [ 
