@@ -207,6 +207,8 @@ in
         image = "mrusse08/soularr:latest";
         autoStart = true;
         extraOptions = mediaNetworkOptions;
+	ports = [ "8989:8989" ];
+     	cmd = [ "--config" "/config/config.ini" ];
         environment = mediaServiceEnv // {
           SCRIPT_INTERVAL = "300";  # Check every 5 minutes
         };
