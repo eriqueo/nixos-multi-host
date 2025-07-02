@@ -206,17 +206,18 @@ in
       soularr = {
         image = "mrusse08/soularr:latest";
         autoStart = true;
-        extraOptions = mediaNetworkOptions;
-	ports = [ "8989:8989" ];
-     	cmd = [ "--config" "/config/config.ini" ];
+        extraOptions = mediaNetworkOptions ++ [
+          "--health-cmd" ""
+          "--health-interval" "10m"
+        ];
+        ports = [ "9898:8989" ];
+        cmd = [ "--config" "/config/config.ini" ];
         environment = mediaServiceEnv // {
-          SCRIPT_INTERVAL = "300";  # Check every 5 minutes
+          SCRIPT_INTERVAL = "300";
         };
         volumes = [
           (configVol "soularr")
-          "/opt/downloads/soularr:/data"    # CORRECT - container expects /data
-
-          "/mnt/hot/downloads:/downloads"  # Monitor unified downloads structure
+          "/mnt/hot/downloads:/downloads"
         ];
         dependsOn = [ "slskd" "lidarr" ];
       };
