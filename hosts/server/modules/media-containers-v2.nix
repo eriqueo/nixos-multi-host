@@ -195,9 +195,9 @@ in
         cmd = [ "--config" "/config/slskd.yml" ];
         volumes = [
           (configVol "slskd")
-          "/mnt/hot/downloads:/data/downloads/soulseek"
+          "/mnt/hot/downloads:/data/downloads"
           "/mnt/media/music:/data/music:ro"
-          "/mnt/media/music-soulseek:/data/music-soulseek"
+          "/mnt/media/music:/data/downloads"
         ];
       };
 
