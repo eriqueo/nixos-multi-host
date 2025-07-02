@@ -190,6 +190,8 @@ in
         environment = mediaServiceEnv // {
           SLSKD__WEB__AUTHENTICATION__USERNAME = "eriqueok";
           SLSKD__WEB__AUTHENTICATION__PASSWORD = "il0wwlm?";
+	  SLSKD__SOULSEEK__USERNAME = "eriqueok";              # Add this
+          SLSKD__SOULSEEK__PASSWORD = "il0wwlm?";
         };
         ports = [ "5030:5030" ];
         cmd = [ "--config" "/config/slskd.yml" ];
@@ -210,6 +212,8 @@ in
         };
         volumes = [
           (configVol "soularr")
+          "/opt/downloads/soularr:/data"    # CORRECT - container expects /data
+
           "/mnt/hot/downloads:/downloads"  # Monitor unified downloads structure
         ];
         dependsOn = [ "slskd" "lidarr" ];
