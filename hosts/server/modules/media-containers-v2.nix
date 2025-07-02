@@ -199,6 +199,7 @@ in
           (configVol "slskd")
           "/mnt/hot/downloads:/downloads"
           "/mnt/media/music:/data/music:ro"
+          "/mnt/media/music-soulseek:/data/music-soulseek:ro"
           "/mnt/media/music:/data/downloads"
         ];
       };

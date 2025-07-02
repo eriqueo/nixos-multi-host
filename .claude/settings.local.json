@@ -39,7 +39,8 @@
       "WebFetch(domain:search.nixos.org)",
       "Bash(ss:*)",
       "Bash(ldd:*)",
-      "Bash(htop:*)"
+      "Bash(htop:*)",
+      "Bash(mv:*)"
     ],
     "deny": []
   }
