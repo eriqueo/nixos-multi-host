@@ -100,25 +100,25 @@ in
     };
 
     # cAdvisor - Container metrics
-    cadvisor = {
-      image = "gcr.io/cadvisor/cadvisor:latest";
-      autoStart = true;
-      healthCheck = null;  # disable Dockerfile HEALTHCHECK entirely
-      extraOptions = [
-        "--privileged"
-        "--device=/dev/kmsg"
-        "--volume=/:/rootfs:ro"
-        "--volume=/var/run:/var/run:ro"
-        "--volume=/sys:/sys:ro"
-        "--volume=/run/podman:/var/run/docker:ro"
-        "--volume=/run/podman/podman.sock:/var/run/docker.sock:ro"
-        "--network=host"
-      	"--health-cmd" ""
-      	"--health-interval" "10m"
-      ];
-      # Pass port as argument to cAdvisor binary (not Podman)
-      cmd = [ "--port=8083" ];  # Changed from default 8080 to avoid conflicts
-    };
+#     cadvisor = {
+#       image = "gcr.io/cadvisor/cadvisor:latest";
+#       autoStart = true;
+#       healthCheck = null;  # disable Dockerfile HEALTHCHECK entirely
+#       extraOptions = [
+#         "--privileged"
+#         "--device=/dev/kmsg"
+#         "--volume=/:/rootfs:ro"
+#         "--volume=/var/run:/var/run:ro"
+#         "--volume=/sys:/sys:ro"
+#         "--volume=/run/podman:/var/run/docker:ro"
+#         "--volume=/run/podman/podman.sock:/var/run/docker.sock:ro"
+#         "--network=host"
+#       	"--health-cmd" ""
+#       	"--health-interval" "10m"
+#       ];
+#       # Pass port as argument to cAdvisor binary (not Podman)
+#       cmd = [ "--port=8083" ];  # Changed from default 8080 to avoid conflicts
+#     };
 
     # Blackbox Exporter - Endpoint monitoring
     blackbox-exporter = {
