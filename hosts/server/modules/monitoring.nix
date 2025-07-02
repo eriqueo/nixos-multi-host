@@ -112,6 +112,8 @@ in
         "--volume=/run/podman:/var/run/docker:ro"
         "--volume=/run/podman/podman.sock:/var/run/docker.sock:ro"
         "--network=host"
+      	"--health-cmd" ""
+      	"--health-interval" "10m"
       ];
       # Pass port as argument to cAdvisor binary (not Podman)
       cmd = [ "--port=8083" ];  # Changed from default 8080 to avoid conflicts
