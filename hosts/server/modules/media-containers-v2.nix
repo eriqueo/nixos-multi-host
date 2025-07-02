@@ -208,7 +208,6 @@ in
         autoStart = true;
         extraOptions = mediaNetworkOptions;
         ports = [ "9898:8989" ];
-        cmd = [ "--config" "/config/config.ini" ];
         environment = mediaServiceEnv // {
           SCRIPT_INTERVAL = "300";
         };
