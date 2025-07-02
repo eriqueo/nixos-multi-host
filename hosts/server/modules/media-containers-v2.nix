@@ -1,4 +1,4 @@
-IO# hosts/server/modules/media-containers-v2.nix
+# hosts/server/modules/media-containers-v2.nix
 # Updated container configuration with GPU acceleration and hot/cold storage tiers
 { config, lib, pkgs, ... }:
 
