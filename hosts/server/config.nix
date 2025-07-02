@@ -172,8 +172,10 @@
     serviceConfig = {
       # Add GPU device access
       DeviceAllow = [
-        "/dev/dri/card0 rw"
+        "/dev/dri/card1 rw"
+        "/dev/dri/card2 rw"
         "/dev/dri/renderD128 rw"
+        "/dev/dri/renderD129 rw"
         "/dev/nvidia0 rw"
         "/dev/nvidiactl rw"
         "/dev/nvidia-modeset rw"

@@ -188,10 +188,10 @@ in
         autoStart = true;
         extraOptions = mediaNetworkOptions;
         environment = mediaServiceEnv // {
-          SLSKD__WEB__AUTHENTICATION__USERNAME = "eriqueok";
-          SLSKD__WEB__AUTHENTICATION__PASSWORD = "il0wwlm?";
-	  SLSKD__SOULSEEK__USERNAME = "eriqueok";              # Add this
-          SLSKD__SOULSEEK__PASSWORD = "il0wwlm?";
+          SLSKD_USERNAME = "eriqueok";
+          SLSKD_PASSWORD = "il0wwlm?";
+	  SLSKD_SLSK_USERNAME = "eriqueok";              # Add this
+          SLSKD_SLSK_PASSWORD = "il0wwlm?";
         };
         ports = [ "5030:5030" ];
         cmd = [ "--config" "/config/slskd.yml" ];
