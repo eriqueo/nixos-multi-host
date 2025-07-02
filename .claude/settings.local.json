@@ -37,7 +37,8 @@
       "Bash(podman version:*)",
       "Bash(curl:*)",
       "WebFetch(domain:search.nixos.org)",
-      "Bash(ss:*)"
+      "Bash(ss:*)",
+      "Bash(ldd:*)"
     ],
     "deny": []
   }

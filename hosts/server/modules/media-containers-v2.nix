@@ -182,6 +182,25 @@ in
         ];
       };
 
+      # Soulseek Client
+      slskd = {
+        image = "slskd/slskd";
+        autoStart = true;
+        extraOptions = mediaNetworkOptions;
+        environment = mediaServiceEnv // {
+          SLSKD__WEB__AUTHENTICATION__USERNAME = "eriqueok";
+          SLSKD__WEB__AUTHENTICATION__PASSWORD = "il0wwlm?";
+        };
+        ports = [ "5030:5030" ];
+        cmd = [ "--config" "/config/slskd.yml" ];
+        volumes = [
+          (configVol "slskd")
+          "/mnt/hot/downloads/soulseek:/data/downloads/soulseek"
+          "/mnt/media/music:/data/music:ro"
+          "/mnt/media/music-soulseek:/data/music-soulseek"
+        ];
+      };
+
       # Media Streaming - GPU Accelerated
       # jellyfin = {
       #   image = "lscr.io/linuxserver/jellyfin:latest";

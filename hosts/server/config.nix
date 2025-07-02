@@ -206,6 +206,8 @@
       # NVIDIA GPU acceleration
       NVIDIA_VISIBLE_DEVICES = "all";
       NVIDIA_DRIVER_CAPABILITIES = "compute,video,utility";
+      # Critical: Add library path for NVIDIA libraries
+      LD_LIBRARY_PATH = "/run/opengl-driver/lib:/run/opengl-driver-32/lib";
     };
   };
 
@@ -226,6 +228,8 @@
       # NVIDIA GPU acceleration for ML workloads
       NVIDIA_VISIBLE_DEVICES = "all";
       NVIDIA_DRIVER_CAPABILITIES = "compute,video,utility";
+      # Critical: Add library path for NVIDIA libraries
+      LD_LIBRARY_PATH = "/run/opengl-driver/lib:/run/opengl-driver-32/lib";
     };
   };
 
