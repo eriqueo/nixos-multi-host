@@ -1,4 +1,4 @@
-# hosts/server/modules/media-containers-v2.nix
+IO# hosts/server/modules/media-containers-v2.nix
 # Updated container configuration with GPU acceleration and hot/cold storage tiers
 { config, lib, pkgs, ... }:
 
@@ -41,8 +41,8 @@ let
   
   # Volume patterns
   hotCache = service: "/mnt/hot/cache/${service}:/cache";
-  torrentDownloads = "/mnt/hot/downloads/torrents:/downloads";
-  usenetDownloads = "/mnt/hot/downloads/usenet:/downloads";
+  torrentDownloads = "/mnt/hot/downloads:/downloads";
+  usenetDownloads = "/mnt/hot/downloads:/downloads";
   coldMedia = "/mnt/media:/cold-media";
   localtime = "/etc/localtime:/etc/localtime:ro";
   
@@ -195,10 +195,24 @@ in
         cmd = [ "--config" "/config/slskd.yml" ];
         volumes = [
           (configVol "slskd")
-          "/mnt/hot/downloads/music/soulseek:/data/downloads/soulseek"
+          "/mnt/hot/downloads:/data/downloads/soulseek"
           "/mnt/media/music:/data/music:ro"
           "/mnt/media/music-soulseek:/data/music-soulseek"
         ];
+      };
+
+      soularr = {
+        image = "mrusse08/soularr:latest";
+        autoStart = true;
+        extraOptions = mediaNetworkOptions;
+        environment = mediaServiceEnv // {
+          SCRIPT_INTERVAL = "300";  # Check every 5 minutes
+        };
+        volumes = [
+          (configVol "soularr")
+          "/mnt/hot/downloads:/downloads"  # Monitor unified downloads structure
+        ];
+        dependsOn = [ "slskd" "lidarr" ];
       };
 
       # Media Streaming - GPU Accelerated
@@ -246,7 +260,7 @@ in
           "--cpus=2.0"
         ];
         environment = {
-          FRIGATE_RTSP_PASSWORD = "iL0wwlm?";
+          FRIGATE_RTSP_PASSWORD = "il0wwlm?";
           TZ = "America/Denver";
         } // nvidiaEnv // intelEnv;
         volumes = [
