@@ -206,10 +206,7 @@ in
       soularr = {
         image = "mrusse08/soularr:latest";
         autoStart = true;
-        extraOptions = mediaNetworkOptions ++ [
-          "--health-cmd" ""
-          "--health-interval" "10m"
-        ];
+        extraOptions = mediaNetworkOptions;
         ports = [ "9898:8989" ];
         cmd = [ "--config" "/config/config.ini" ];
         environment = mediaServiceEnv // {
