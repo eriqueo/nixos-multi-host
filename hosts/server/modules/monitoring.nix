@@ -103,6 +103,7 @@ in
     cadvisor = {
       image = "gcr.io/cadvisor/cadvisor:latest";
       autoStart = true;
+      healthCheck = null;  # disable Dockerfile HEALTHCHECK entirely
       extraOptions = [
         "--privileged"
         "--device=/dev/kmsg"

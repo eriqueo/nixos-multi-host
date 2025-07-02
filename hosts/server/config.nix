@@ -286,9 +286,7 @@ services.tailscale.permitCertUid = "caddy";
   virtualisation.podman = {
     enable = true;
     dockerCompat = true;
-    defaultExtraOptions = [
-      "--health-cmd" ""             # disable every Dockerfile HEALTHCHECK
-    	];
+
     defaultNetwork.settings.dns_enabled = true;
   };
   virtualisation.oci-containers.backend = "podman";
