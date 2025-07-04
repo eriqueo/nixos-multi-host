@@ -56,6 +56,9 @@ detectors:
   nvidia:
     type: tensorrt
     device: 0
+  cpu1:
+    type: cpu
+    num_threads: 3
 
 ffmpeg: &ffmpeg_defaults
   hwaccel_args:
@@ -64,7 +67,7 @@ ffmpeg: &ffmpeg_defaults
     - -hwaccel_device
     - "0"
     - -hwaccel_output_format
-    - cuda
+    - yuv420p
   input_args:
     - -rtsp_transport
     - tcp
@@ -85,6 +88,7 @@ cameras:
       width: 1280
       height: 720
       fps: 3
+    detector: cpu1
     record:
       enabled: true
       retain:
@@ -104,6 +108,7 @@ cameras:
       width: 1280
       height: 720
       fps: 3
+    detector: cpu1
     record:
       enabled: true
       retain:
@@ -123,6 +128,7 @@ cameras:
       width: 320
       height: 240
       fps: 3
+    detector: cpu1
     record:
       enabled: true
       retain:

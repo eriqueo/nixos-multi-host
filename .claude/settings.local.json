@@ -41,7 +41,8 @@
       "Bash(ldd:*)",
       "Bash(htop:*)",
       "Bash(mv:*)",
-      "Bash(ping:*)"
+      "Bash(ping:*)",
+      "Bash(ffmpeg:*)"
     ],
     "deny": []
   }
