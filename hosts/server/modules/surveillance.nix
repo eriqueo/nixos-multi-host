@@ -6,10 +6,27 @@ let
   localtime = "/etc/localtime:/etc/localtime:ro";
   frigatePath = "${cfg.surveillanceRoot}/frigate";
   homeAssistantPath = "${cfg.surveillanceRoot}/home-assistant";
+  
+  # GPU acceleration options from gpu-acceleration module
+  nvidiaGpuOptions = [ 
+    "--device=/dev/nvidia0:/dev/nvidia0:rwm"
+    "--device=/dev/nvidiactl:/dev/nvidiactl:rwm" 
+    "--device=/dev/nvidia-modeset:/dev/nvidia-modeset:rwm"
+    "--device=/dev/nvidia-uvm:/dev/nvidia-uvm:rwm"
+    "--device=/dev/nvidia-uvm-tools:/dev/nvidia-uvm-tools:rwm"
+    "--device=/dev/dri:/dev/dri:rwm"
+  ];
+  
+  # GPU environment variables
+  nvidiaEnv = {
+    NVIDIA_VISIBLE_DEVICES = "all";
+    NVIDIA_DRIVER_CAPABILITIES = "compute,video,utility";
+  };
 in
 {
   imports = [
     ../../../modules/paths
+    ./gpu-acceleration.nix
   ];
   environment.systemPackages = with pkgs; [
     ffmpeg
@@ -205,31 +222,31 @@ EOF
       autoStart = true;
       extraOptions = [
         "--network=host"
-        "--device=/dev/nvidia0:/dev/nvidia0:rwm"
-        "--device=/dev/nvidiactl:/dev/nvidiactl:rwm" 
-        "--device=/dev/nvidia-modeset:/dev/nvidia-modeset:rwm"
-        "--device=/dev/nvidia-uvm:/dev/nvidia-uvm:rwm"
-        "--device=/dev/nvidia-uvm-tools:/dev/nvidia-uvm-tools:rwm"
-        "--device=/dev/dri:/dev/dri:rwm"
+        "--runtime=nvidia"
         "--privileged"
         "--tmpfs=/tmp/cache:size=1g"
         "--shm-size=512m"
         "--memory=6g"
         "--cpus=2.0"
-      ];
+      ] ++ nvidiaGpuOptions;
       environment = {
         FRIGATE_RTSP_PASSWORD = "il0wwlm?";
         TZ = "America/Denver";
-        NVIDIA_VISIBLE_DEVICES = "all";
-        NVIDIA_DRIVER_CAPABILITIES = "compute,video,utility";
         LIBVA_DRIVER_NAME = "nvidia";
         VDPAU_DRIVER = "nvidia";
-      };
+        # Add library path for NVIDIA libraries
+        LD_LIBRARY_PATH = "/run/opengl-driver/lib:/run/opengl-driver-32/lib";
+      } // nvidiaEnv;
       volumes = [
         "/opt/surveillance/frigate/config:/config"
         "/mnt/media/surveillance/frigate/media:/media/frigate"
         "/mnt/hot/surveillance/buffer:/tmp/frigate"
         "/etc/localtime:/etc/localtime:ro"
+        # Mount NVIDIA libraries for CUDA access
+        "/run/opengl-driver:/run/opengl-driver:ro"
+        "/run/opengl-driver-32:/run/opengl-driver-32:ro"
+        # Mount CUDA libraries
+        "${config.boot.kernelPackages.nvidiaPackages.stable}/lib:/usr/local/cuda/lib64:ro"
       ];
       ports = [
         "5000:5000"

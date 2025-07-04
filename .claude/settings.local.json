@@ -40,7 +40,8 @@
       "Bash(ss:*)",
       "Bash(ldd:*)",
       "Bash(htop:*)",
-      "Bash(mv:*)"
+      "Bash(mv:*)",
+      "Bash(ping:*)"
     ],
     "deny": []
   }
