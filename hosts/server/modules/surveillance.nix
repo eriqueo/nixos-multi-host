@@ -88,7 +88,6 @@ cameras:
       width: 1280
       height: 720
       fps: 3
-    detector: cpu1
     record:
       enabled: true
       retain:
@@ -108,7 +107,6 @@ cameras:
       width: 1280
       height: 720
       fps: 3
-    detector: cpu1
     record:
       enabled: true
       retain:
@@ -128,7 +126,6 @@ cameras:
       width: 320
       height: 240
       fps: 3
-    detector: cpu1
     record:
       enabled: true
       retain:
