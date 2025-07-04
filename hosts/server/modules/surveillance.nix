@@ -222,7 +222,8 @@ EOF
       autoStart = true;
       extraOptions = [
         "--network=host"
-        "--runtime=nvidia"
+        "--device=nvidia.com/gpu=all"
+        "--security-opt=label=disable"
         "--privileged"
         "--tmpfs=/tmp/cache:size=1g"
         "--shm-size=512m"

@@ -73,7 +73,10 @@
   ];
 
   # Enable container GPU support
-hardware.nvidia-container-toolkit.enable = true;  
+  hardware.nvidia-container-toolkit.enable = true;
+  
+  # Enable NVIDIA support in Podman
+  virtualisation.podman.enableNvidia = true;  
   # Hardware acceleration optimizations
   # GPU cache and monitoring directories now created by modules/filesystem/system-directories.nix
 
