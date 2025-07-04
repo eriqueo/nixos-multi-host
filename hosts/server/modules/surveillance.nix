@@ -66,6 +66,8 @@ ffmpeg: &ffmpeg_defaults
     - cuda
     - -hwaccel_device
     - "0"
+    - -hwaccel_output_format
+    - yuv420p
   input_args:
     - -rtsp_transport
     - tcp
