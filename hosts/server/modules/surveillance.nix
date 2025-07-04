@@ -66,8 +66,6 @@ ffmpeg: &ffmpeg_defaults
     - cuda
     - -hwaccel_device
     - "0"
-    - -hwaccel_output_format
-    - yuv420p
   input_args:
     - -rtsp_transport
     - tcp
@@ -75,6 +73,10 @@ ffmpeg: &ffmpeg_defaults
     - +genpts
     - -avoid_negative_ts
     - make_zero
+    - -analyzeduration
+    - "10000000"
+    - -probesize
+    - "10000000"
 
 cameras:
   cobra_cam_1:
@@ -88,6 +90,7 @@ cameras:
       width: 1280
       height: 720
       fps: 3
+      detector: cpu1
     record:
       enabled: true
       retain:
@@ -107,6 +110,7 @@ cameras:
       width: 1280
       height: 720
       fps: 3
+      detector: cpu1
     record:
       enabled: true
       retain:
@@ -212,7 +216,7 @@ EOF
 
   virtualisation.oci-containers.containers = {
     frigate = {
-      image = "ghcr.io/blakeblackshear/frigate:stable";
+      image = "ghcr.io/blakeblackshear/frigate:stable-tensorrt";
       autoStart = true;
       extraOptions = [
         "--network=host"
