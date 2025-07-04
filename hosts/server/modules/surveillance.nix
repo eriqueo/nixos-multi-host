@@ -7,15 +7,6 @@ let
   frigatePath = "${cfg.surveillanceRoot}/frigate";
   homeAssistantPath = "${cfg.surveillanceRoot}/home-assistant";
   
-  # GPU acceleration options from gpu-acceleration module
-  nvidiaGpuOptions = [ 
-    "--device=/dev/nvidia0:/dev/nvidia0:rwm"
-    "--device=/dev/nvidiactl:/dev/nvidiactl:rwm" 
-    "--device=/dev/nvidia-modeset:/dev/nvidia-modeset:rwm"
-    "--device=/dev/nvidia-uvm:/dev/nvidia-uvm:rwm"
-    "--device=/dev/nvidia-uvm-tools:/dev/nvidia-uvm-tools:rwm"
-    "--device=/dev/dri:/dev/dri:rwm"
-  ];
   
   # GPU environment variables
   nvidiaEnv = {
@@ -222,13 +213,14 @@ EOF
       autoStart = true;
       extraOptions = [
         "--network=host"
+        "--device=nvidia.com/gpu=all"
         "--security-opt=label=disable"
         "--privileged"
         "--tmpfs=/tmp/cache:size=1g"
         "--shm-size=512m"
         "--memory=6g"
         "--cpus=2.0"
-      ] ++ nvidiaGpuOptions;
+      ];
       environment = {
         FRIGATE_RTSP_PASSWORD = "il0wwlm?";
         TZ = "America/Denver";
@@ -242,11 +234,6 @@ EOF
         "/mnt/media/surveillance/frigate/media:/media/frigate"
         "/mnt/hot/surveillance/buffer:/tmp/frigate"
         "/etc/localtime:/etc/localtime:ro"
-        # Mount NVIDIA libraries for CUDA access
-        "/run/opengl-driver:/run/opengl-driver:ro"
-        "/run/opengl-driver-32:/run/opengl-driver-32:ro"
-        # Mount CUDA libraries
-        "${config.boot.kernelPackages.nvidiaPackages.stable}/lib:/usr/local/cuda/lib64:ro"
       ];
       ports = [
         "5000:5000"
