@@ -75,8 +75,12 @@
   # Enable container GPU support
   hardware.nvidia-container-toolkit.enable = true;
   
-  # Configure CDI support for Podman
-  virtualisation.containers.cdi.dynamic.nvidia.enable = true;  
+  # Configure CDI support for containers
+  virtualisation.containers.containersConf.settings = {
+    engine = {
+      cdi_spec_dirs = ["/var/run/cdi"];
+    };
+  };  
   # Hardware acceleration optimizations
   # GPU cache and monitoring directories now created by modules/filesystem/system-directories.nix
 
