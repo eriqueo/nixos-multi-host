@@ -252,34 +252,6 @@ in
         ];
       };
 
-      # Surveillance System - GPU Accelerated
-      frigate = {
-        image = "ghcr.io/blakeblackshear/frigate:stable";
-        autoStart = true;
-        extraOptions = [ "--network=host" ] ++ nvidiaGpuOptions ++ [
-          "--privileged"
-          "--tmpfs=/tmp/cache:size=1g"
-          "--shm-size=512m"
-          "--memory=6g"
-          "--cpus=2.0"
-        ];
-        environment = {
-          FRIGATE_RTSP_PASSWORD = "il0wwlm?";
-          TZ = "America/Denver";
-        } // nvidiaEnv // intelEnv;
-        volumes = [
-          "/opt/surveillance/frigate/config:/config"
-          "/mnt/media/surveillance/frigate/media:/media/frigate"
-          "/mnt/hot/surveillance/buffer:/tmp/frigate"
-          localtime
-        ];
-        ports = [
-          "5000:5000"
-          "8554:8554"
-          "8555:8555/tcp"
-          "8555:8555/udp"
-        ];
-      };
 
     };
   };

@@ -45,11 +45,18 @@ mqtt:
   port: 1883
 
 detectors:
-  cpu1:
-    type: cpu
-    num_threads: 2
+  nvidia:
+    type: tensorrt
+    device: 0
 
 ffmpeg: &ffmpeg_defaults
+  hwaccel_args:
+    - -hwaccel
+    - cuda
+    - -hwaccel_device
+    - "0"
+    - -hwaccel_output_format
+    - cuda
   input_args:
     - -rtsp_transport
     - tcp
@@ -193,36 +200,44 @@ EOF
   };
 
   virtualisation.oci-containers.containers = {
-#    frigate = {
-#      image = "ghcr.io/blakeblackshear/frigate:stable";
-#      autoStart = true;
-#      extraOptions = [
-#        "--privileged"
-#        "--network=host"
-#        "--device=/dev/dri:/dev/dri"
-#        "--tmpfs=/tmp/cache:size=1g"
-#        "--shm-size=512m"
-#        "--memory=6g"
-#        "--cpus=2.0"
-#      ];
-#      environment = {
-#        FRIGATE_RTSP_PASSWORD = "il0wwlm?";
-#        TZ = "America/Denver";
-#        LIBVA_DRIVER_NAME = "i965";
-#        FRIGATE_BASE_PATH = "/cameras";
-#      };
-#     volumes = [
-#        "/opt/surveillance/frigate/config:/config"
-#        "/mnt/media/surveillance/frigate/media:/media/frigate"
-#        "/etc/localtime:/etc/localtime:ro"
-#      ];
-#      ports = [
-#        "5000:5000"
-#        "8554:8554"
-#        "8555:8555/tcp"
-#        "8555:8555/udp"
-#      ];
-#    };
+    frigate = {
+      image = "ghcr.io/blakeblackshear/frigate:stable";
+      autoStart = true;
+      extraOptions = [
+        "--network=host"
+        "--device=/dev/nvidia0:/dev/nvidia0:rwm"
+        "--device=/dev/nvidiactl:/dev/nvidiactl:rwm" 
+        "--device=/dev/nvidia-modeset:/dev/nvidia-modeset:rwm"
+        "--device=/dev/nvidia-uvm:/dev/nvidia-uvm:rwm"
+        "--device=/dev/nvidia-uvm-tools:/dev/nvidia-uvm-tools:rwm"
+        "--device=/dev/dri:/dev/dri:rwm"
+        "--privileged"
+        "--tmpfs=/tmp/cache:size=1g"
+        "--shm-size=512m"
+        "--memory=6g"
+        "--cpus=2.0"
+      ];
+      environment = {
+        FRIGATE_RTSP_PASSWORD = "il0wwlm?";
+        TZ = "America/Denver";
+        NVIDIA_VISIBLE_DEVICES = "all";
+        NVIDIA_DRIVER_CAPABILITIES = "compute,video,utility";
+        LIBVA_DRIVER_NAME = "nvidia";
+        VDPAU_DRIVER = "nvidia";
+      };
+      volumes = [
+        "/opt/surveillance/frigate/config:/config"
+        "/mnt/media/surveillance/frigate/media:/media/frigate"
+        "/mnt/hot/surveillance/buffer:/tmp/frigate"
+        "/etc/localtime:/etc/localtime:ro"
+      ];
+      ports = [
+        "5000:5000"
+        "8554:8554"
+        "8555:8555/tcp"
+        "8555:8555/udp"
+      ];
+    };
 
     home-assistant = {
       image = "ghcr.io/home-assistant/home-assistant:stable";
