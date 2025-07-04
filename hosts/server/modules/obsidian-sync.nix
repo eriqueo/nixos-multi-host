@@ -86,9 +86,6 @@
       }
 
       # Additional service proxies
-      handle /cameras* {
-        reverse_proxy localhost:5000 { header_up Host {host} }
-      }
       handle_path /qbt/* {
         reverse_proxy localhost:8080
       }

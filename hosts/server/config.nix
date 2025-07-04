@@ -257,6 +257,7 @@ services.tailscale.permitCertUid = "caddy";
     enable = true;
     allowedTCPPorts = [
       22    # SSH
+      5000  # Frigate (direct port access)
       8080  # qBittorrent (via Gluetun)
       7878  # Radarr
       8989  # Sonarr

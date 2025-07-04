@@ -95,13 +95,13 @@
     
     # Universal shell functions with enhanced grebuild
     interactiveShellInit = ''
-      # Enhanced grebuild function with git sync
+      # Enhanced grebuild function with improved safety and multi-host sync
       grebuild() {
         if [[ -z "$1" ]]; then
           echo "Usage: grebuild <commit message>"
           echo "       grebuild --test <commit message>  (test only, no switch)"
           echo "       grebuild --sync  (sync only, no rebuild)"
-          echo "Example: grebuild added Jellyfin port to firewall"
+          echo "Example: grebuild 'added Jellyfin port to firewall'"
           return 1
         fi
         
@@ -116,27 +116,6 @@
         
         echo "📁 Working in: /etc/nixos"
         
-        # SYNC FIRST - Pull latest changes
-        echo "🔄 Syncing with remote..."
-        if ! sudo -E git fetch origin; then
-          echo "❌ Git fetch failed"
-          cd "$original_dir"
-          return 1
-        fi
-        
-        if ! sudo -E git pull origin master; then
-          echo "❌ Git pull failed - resolve conflicts manually"
-          cd "$original_dir"
-          return 1
-        fi
-        
-        # Handle sync-only mode
-        if [[ "$1" == "--sync" ]]; then
-          echo "✅ Git sync complete!"
-          cd "$original_dir"
-          return 0
-        fi
-        
         # Check for test mode
         local test_mode=false
         if [[ "$1" == "--test" ]]; then
@@ -144,19 +123,128 @@
           shift
           if [[ -z "$1" ]]; then
             echo "❌ Commit message required even in test mode"
+            cd "$original_dir"
             return 1
           fi
         fi
         
-        # Git operations
-        echo "📝 Adding changes..."
+        # Handle sync-only mode
+        if [[ "$1" == "--sync" ]]; then
+          echo "🔄 Syncing with remote..."
+          if ! sudo -E git fetch origin; then
+            echo "❌ Git fetch failed"
+            cd "$original_dir"
+            return 1
+          fi
+          if ! sudo -E git pull origin master; then
+            echo "❌ Git pull failed - resolve conflicts manually"
+            cd "$original_dir"
+            return 1
+          fi
+          echo "✅ Git sync complete!"
+          cd "$original_dir"
+          return 0
+        fi
+        
+        # Check if tree is dirty
+        if ! sudo git diff-index --quiet HEAD 2>/dev/null; then
+          echo "📋 Detected local changes to commit"
+          local has_changes=true
+        else
+          echo "✅ Working tree is clean"
+          local has_changes=false
+        fi
+        
+        # ENHANCED SYNC - Handle multi-host scenarios safely
+        echo "🔄 Syncing with remote (safe multi-host sync)..."
+        
+        # Stash local changes if any exist
+        local stash_created=false
+        if [[ "$has_changes" == true ]]; then
+          echo "💾 Stashing local changes for safe sync..."
+          if sudo git stash push -m "grebuild-temp-$(date +%s)"; then
+            stash_created=true
+            echo "✅ Local changes stashed"
+          else
+            echo "❌ Failed to stash local changes"
+            cd "$original_dir"
+            return 1
+          fi
+        fi
+        
+        # Fetch and pull latest changes
+        if ! sudo -E git fetch origin; then
+          echo "❌ Git fetch failed"
+          if [[ "$stash_created" == true ]]; then
+            echo "🔄 Restoring stashed changes..."
+            sudo git stash pop
+          fi
+          cd "$original_dir"
+          return 1
+        fi
+        
+        if ! sudo -E git pull origin master; then
+          echo "❌ Git pull failed - resolve conflicts manually"
+          if [[ "$stash_created" == true ]]; then
+            echo "🔄 Restoring stashed changes..."
+            sudo git stash pop
+          fi
+          cd "$original_dir"
+          return 1
+        fi
+        
+        # Restore local changes on top of pulled changes
+        if [[ "$stash_created" == true ]]; then
+          echo "🔄 Applying local changes on top of remote changes..."
+          if ! sudo git stash pop; then
+            echo "❌ Merge conflict applying local changes!"
+            echo "💡 Resolve conflicts manually and run 'git stash drop' when done"
+            cd "$original_dir"
+            return 1
+          fi
+          echo "✅ Local changes applied successfully"
+        fi
+        
+        # Add all changes (including any merged ones)
+        echo "📝 Adding all changes..."
         if ! sudo git add .; then
           echo "❌ Git add failed"
           cd "$original_dir"
           return 1
         fi
         
-        echo "💾 Committing: $*"
+        # IMPROVED FLOW: Test BEFORE committing
+        echo "🧪 Testing configuration before committing..."
+        local hostname=$(hostname)
+        local test_success=false
+        
+        if [[ -f flake.nix ]]; then
+          if sudo nixos-rebuild test --flake .#"$hostname"; then
+            test_success=true
+          fi
+        else
+          if sudo nixos-rebuild test; then
+            test_success=true
+          fi
+        fi
+        
+        if [[ "$test_success" != true ]]; then
+          echo "❌ NixOS test failed! No changes committed."
+          echo "💡 Fix configuration issues and try again"
+          cd "$original_dir"
+          return 1
+        fi
+        
+        echo "✅ Test passed! Configuration is valid."
+        
+        if [[ "$test_mode" == true ]]; then
+          echo "✅ Test mode complete! Configuration is valid but not committed."
+          cd "$original_dir"
+          return 0
+        fi
+        
+        # Only commit if test passed
+        echo "💾 Committing tested changes: $*"
         if ! sudo git commit -m "$*"; then
           echo "❌ Git commit failed"
           cd "$original_dir"
@@ -170,40 +258,17 @@
           return 1
         fi
         
-        # Test build first
-        echo "🧪 Testing NixOS configuration..."
-        local hostname=$(hostname)
-        if [[ -f flake.nix ]]; then
-          if ! sudo nixos-rebuild test --flake .#"$hostname"; then
-            echo "❌ NixOS test build failed!"
-            cd "$original_dir"
-            return 1
-          fi
-        else
-          if ! sudo nixos-rebuild test; then
-            echo "❌ NixOS test build failed!"
-            cd "$original_dir"
-            return 1
-          fi
-        fi
-        
-        if [[ "$test_mode" == true ]]; then
-          echo "✅ Test mode complete! Configuration is valid."
-          cd "$original_dir"
-          return 0
-        fi
-        
-        # Switch to new configuration
-        echo "🔄 Test passed! Switching to new configuration..."
+        # Switch to new configuration (already tested)
+        echo "🔄 Switching to new configuration..."
         if [[ -f flake.nix ]]; then
           if ! sudo nixos-rebuild switch --flake .#"$hostname"; then
-            echo "❌ NixOS switch failed"
+            echo "❌ NixOS switch failed (but changes are committed)"
             cd "$original_dir"
             return 1
           fi
         else
           if ! sudo nixos-rebuild switch; then
-            echo "❌ NixOS switch failed"
+            echo "❌ NixOS switch failed (but changes are committed)"
             cd "$original_dir"
             return 1
           fi
