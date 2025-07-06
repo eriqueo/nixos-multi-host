@@ -1,0 +1,46 @@
+{
+  "mcpServers": {
+    "context-7": {
+      "command": "npx",
+      "args": [
+        "@context-7/mcp-server"
+      ],
+      "env": {
+        "CONTEXT_7_API_KEY": "your-api-key-here"
+      }
+    },
+    "playwright": {
+      "command": "npx",
+      "args": [
+        "@playwright/mcp-server"
+      ]
+    },
+    "perplexity": {
+      "command": "npx",
+      "args": [
+        "@perplexity/mcp-server"
+      ],
+      "env": {
+        "PERPLEXITY_API_KEY": "your-perplexity-key"
+      }
+    },
+    "github": {
+      "command": "npx",
+      "args": [
+        "@github/mcp-server"
+      ],
+      "env": {
+        "GITHUB_TOKEN": "your-github-token"
+      }
+    },
+    "filesystem": {
+      "command": "npx",
+      "args": [
+        "@filesystem/mcp-server"
+      ],
+      "args": [
+        "/path/to/project"
+      ]
+    }
+  }
+}

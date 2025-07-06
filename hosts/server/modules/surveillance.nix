@@ -7,7 +7,6 @@ let
   frigatePath = "${cfg.surveillanceRoot}/frigate";
   homeAssistantPath = "${cfg.surveillanceRoot}/home-assistant";
   
-  
   # GPU environment variables
   nvidiaEnv = {
     NVIDIA_VISIBLE_DEVICES = "all";
@@ -15,10 +14,6 @@ let
   };
 in
 {
-  imports = [
-    ../../../modules/paths
-    ./gpu-acceleration.nix
-  ];
   environment.systemPackages = with pkgs; [
     ffmpeg
     mosquitto
@@ -35,9 +30,6 @@ in
     }];
   };
 
-  # Surveillance directories now created by modules/filesystem/service-directories.nix
-  # Temporary cache and system directories created by modules/filesystem/system-directories.nix
-
   systemd.services.frigate-config = {
     description = "Generate Frigate configuration";
     wantedBy = [ "podman-frigate.service" ];
@@ -53,12 +45,15 @@ mqtt:
   port: 1883
 
 detectors:
-  nvidia:
+  tensorrt:
     type: tensorrt
     device: 0
-  cpu1:
-    type: cpu
-    num_threads: 3
+    model:
+      path: /config/model_cache/tensorrt/yolov7-320.trt
+      input_tensor: nchw
+      input_pixel_format: rgb
+      width: 320
+      height: 320
 
 ffmpeg: &ffmpeg_defaults
   hwaccel_args:
@@ -72,26 +67,35 @@ ffmpeg: &ffmpeg_defaults
     - -rtsp_transport
     - tcp
     - -fflags
-    - +genpts
+    - +genpts+discardcorrupt
     - -avoid_negative_ts
     - make_zero
     - -analyzeduration
-    - "10000000"
+    - "20000000"
     - -probesize
-    - "10000000"
+    - "20000000"
+    - -reconnect
+    - "1"
+    - -reconnect_streamed
+    - "1"
+    - -reconnect_delay_max
+    - "5"
 
 cameras:
   cobra_cam_1:
+    enabled: false  # Temporarily disabled - camera stream issues
     ffmpeg:
       <<: *ffmpeg_defaults
       inputs:
         - path: rtsp://admin:il0wwlm%3F@192.168.1.101:554/ch01/0
+          roles: [ detect, record ]
+        - path: rtsp://admin:il0wwlm%3F@192.168.1.101:554/ch01/1  
           roles: [ record ]
     detect:
       enabled: true
-      width: 1280
-      height: 720
-      fps: 3
+      width: 640  # Reduced from 1280 
+      height: 360 # Reduced from 720
+      fps: 2      # Reduced from 3
     record:
       enabled: true
       retain:
@@ -108,9 +112,9 @@ cameras:
           roles: [ record ]
     detect:
       enabled: true
-      width: 1280
-      height: 720
-      fps: 3
+      width: 640  # Reduced resolution
+      height: 360
+      fps: 2
     record:
       enabled: true
       retain:
@@ -209,6 +213,7 @@ logger:
   logs:
     frigate.record: debug
     frigate.detect: info
+    frigate.detectors.plugins.tensorrt: debug
 EOF
       chown eric:users /opt/surveillance/frigate/config/config.yaml
     '';
@@ -225,15 +230,24 @@ EOF
         "--privileged"
         "--tmpfs=/tmp/cache:size=1g"
         "--shm-size=512m"
-        "--memory=6g"
-        "--cpus=2.0"
+        "--memory=4g"        # Reduced from 6g
+        "--cpus=1.5"         # Reduced from 2.0
       ];
       environment = {
         FRIGATE_RTSP_PASSWORD = "il0wwlm?";
         TZ = "America/Denver";
+        
+        # Critical: TensorRT model generation for Pascal architecture
+        YOLO_MODELS = "yolov7-320";
+        USE_FP16 = "false";  # Required for Pascal (P1000) - Tensor cores need FP16 disabled
+        
+        # Reduce detection load temporarily
+        FRIGATE_DEFAULT_DETECT_FPS = "1";  # Reduce from 3 to 1 FPS
+        
+              # GPU acceleration environment
         LIBVA_DRIVER_NAME = "nvidia";
         VDPAU_DRIVER = "nvidia";
-        # Add library path for NVIDIA libraries
+        # Add library path for NVIDIA libraries  
         LD_LIBRARY_PATH = "/run/opengl-driver/lib:/run/opengl-driver-32/lib";
       } // nvidiaEnv;
       volumes = [
@@ -241,12 +255,6 @@ EOF
         "/mnt/media/surveillance/frigate/media:/media/frigate"
         "/mnt/hot/surveillance/buffer:/tmp/frigate"
         "/etc/localtime:/etc/localtime:ro"
-      ];
-      ports = [
-        "5000:5000"
-        "8554:8554"
-        "8555:8555/tcp"
-        "8555:8555/udp"
       ];
     };
 
