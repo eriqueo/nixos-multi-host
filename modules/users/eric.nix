@@ -61,6 +61,7 @@ in
     git
     micro
     neovim
+   
     
     # System monitoring and utilities
     htop
@@ -83,11 +84,20 @@ in
     eza          # better ls
     fzf          # fuzzy finder
     ripgrep      # better grep
+    fd
     
     # Development languages
     python3
     python3Packages.pip
     nodejs
+    python3Packages.pynvim         # the ‘pynvim’ host module
+    nodePackages.neovim            # npm ‘neovim’ package (alternative host)
+    tree-sitter                    # CLI for building parsers
+    lua-language-server            # LSP support for Lua (e.g. nvim-treesitter)
+    universal-ctags                # tag navigation (:Telescope lsp_dynamic_workspace_symbols)
+    the_silver_searcher            # ‘ag’, alternative to ripgrep
+
+
     
     # Security and secrets management
     sops

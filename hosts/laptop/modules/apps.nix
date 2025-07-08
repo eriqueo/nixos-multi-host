@@ -21,6 +21,13 @@
       enable_audio_bell = false;
       window_padding_width = 4;
     };
+    
+   programs.neovim = {
+      enable = true;
+      defaultEditor = true;
+      viAlias = true;
+      vimAlias = true;
+   };
   };
 
   # ALL OTHER APPLICATIONS
