@@ -78,7 +78,26 @@ in
     zip
     p7zip
     rsync
-    
+
+	     # Language servers
+	  lua-language-server              # Lua LSP
+	  nil                             # Nix LSP  
+	  pyright                         # Python LSP
+	  nodePackages.typescript-language-server  # TypeScript/JavaScript LSP
+	  rust-analyzer                   # Rust LSP
+	  gopls                          # Go LSP
+	  clang-tools                    # C/C++ LSP (includes clangd)
+	  
+	  # Development build tools (needed for some LSP features)
+	  gcc
+	  gnumake
+	  cmake
+	  pkg-config
+	  nodejs                         # Needed for some LSPs
+	  python3                        # Needed for Python development
+	  cargo                          # Rust package manager
+	  go                            # Go compiler
+	    
     # Enhanced CLI tools
     bat          # better cat
     eza          # better ls
