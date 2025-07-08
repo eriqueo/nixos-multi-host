@@ -95,7 +95,7 @@ in
     tree-sitter                    # CLI for building parsers
     lua-language-server            # LSP support for Lua (e.g. nvim-treesitter)
     universal-ctags                # tag navigation (:Telescope lsp_dynamic_workspace_symbols)
-    the_silver_searcher            # ‘ag’, alternative to ripgrep
+    #the_silver_searcher            # ‘ag’, alternative to ripgrep
 
 
     
