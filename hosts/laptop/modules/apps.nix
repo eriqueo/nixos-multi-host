@@ -26,37 +26,37 @@ in
       window_padding_width = 4;
       
       # Deep Nord color scheme (darker + creamier)
-      foreground = "colors.foreground";
-      background = "colors.background";
-      selection_foreground = "colors.background";
-      selection_background = "colors.selection_bg";
+      foreground = "#f2f0e8";
+      background = "#1f2329";
+      selection_foreground = "#1f2329";
+      selection_background = "#88c0d0";
       
       # Cursor
-      cursor = "colors.foreground";
-      cursor_text_color = "colors.background";
+      cursor = "#f2f0e8";
+      cursor_text_color = "#1f2329";
       
       # URL color
-      url_color = "colors.selection_bg";
+      url_color = "#88c0d0";
       
       # Normal colors
-      color0 = colors.color0;  # black
-      color1 = colors.color1;  # red
-      color2 = colors.color2;  # green
-      color3 = colors.color3;  # yellow
-      color4 = colors.color4;  # blue
-      color5 = colors.color5;  # magenta
-      color6 = "colors.selection_bg";  # cyan
-      color7 = "colors.foreground";  # white
+      color0 = "#3b4252";  # black
+      color1 = "#bf616a";  # red
+      color2 = "#a3be8c";  # green
+      color3 = "#ebcb8b";  # yellow
+      color4 = "#81a1c1";  # blue
+      color5 = "#b48ead";  # magenta
+      color6 = "#88c0d0";  # cyan
+      color7 = "#f2f0e8";  # white
       
       # Bright colors
-      color8 = colors.color8;   # bright black
-      color9 = colors.color9;   # bright red
-      color10 = colors.color10;  # bright green
-      color11 = colors.color11;  # bright yellow
-      color12 = colors.color12;  # bright blue
-      color13 = colors.color13;  # bright magenta
-      color14 = colors.color14;  # bright cyan
-      color15 = "colors.foreground";  # bright white
+      color8 = "#4c566a";   # bright black
+      color9 = "#bf616a";   # bright red
+      color10 = "#a3be8c";  # bright green
+      color11 = "#ebcb8b";  # bright yellow
+      color12 = "#81a1c1";  # bright blue
+      color13 = "#b48ead";  # bright magenta
+      color14 = "#8fbcbb";  # bright cyan
+      color15 = "#f2f0e8";  # bright white
       
       # Window styling to match Hyprland
       background_opacity = "0.95";
