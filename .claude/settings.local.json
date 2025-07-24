@@ -42,7 +42,9 @@
       "Bash(htop:*)",
       "Bash(mv:*)",
       "Bash(ping:*)",
-      "Bash(ffmpeg:*)"
+      "Bash(ffmpeg:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
     ],
     "deny": []
   }

@@ -23,7 +23,7 @@ in
     settings = [{
       layer = "top";
       position = "top";
-      height = 34;
+      height = 60;
       spacing = 4;
       
       modules-left = [
@@ -184,7 +184,7 @@ in
     style = ''
      * {
        font-family: "JetBrainsMono Nerd Font", FontAwesome, Roboto, Helvetica, Arial, sans-serif;
-       font-size: 14px;
+       font-size: 16px;
        border: none;
        border-radius: 0;
        min-height: 0;
