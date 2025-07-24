@@ -1,4 +1,5 @@
-{ config, pkgs, lib, ... }:
+{ config, pkgs, lib, ... }
+:
 
 let
   colors = (import ../../../shared/colors/deep-nord.nix).colors;
@@ -9,12 +10,14 @@ in
   programs.firefox = {
     enable = true;
     package = pkgs.librewolf;
-  };
+  }
+;
   
   programs.chromium = {
     enable = true;
     package = pkgs.ungoogled-chromium;
-  };
+  }
+;
 
   # TERMINAL
   programs.kitty = {
@@ -60,14 +63,17 @@ in
       
       # Window styling to match Hyprland
       background_opacity = "0.95";
-    };
-   }; 
+    }
+;
+   }
+; 
    programs.neovim = {
       enable = true;
       defaultEditor = true;
       viAlias = true;
       vimAlias = true;
-   };
+   }
+;
 
   # ALL OTHER APPLICATIONS
   home.packages = with pkgs; [
@@ -112,3 +118,117 @@ in
   ];
 }
 
+
+
+  # ================================================================
+  # THEME FILES - Consistent Gruvbox Material across all apps
+  # ================================================================
+
+  # Obsidian CSS (correct vault path)
+  home.file."Documents/01-vaults/00_tech/.obsidian/snippets/gruvbox-material.css".text = ''
+    /* Gruvbox Material theme for Obsidian */
+    .theme-dark {
+      --background-primary: #282828;
+      --background-secondary: #32302f;
+      --background-modifier-border: #45403d;
+      --text-normal: #d4be98;
+      --text-muted: #a89984;
+      --text-accent: #7daea3;
+      --text-accent-hover: #89b482;
+      --interactive-accent: #7daea3;
+      --interactive-accent-hover: #89b482;
+    }
+
+  '';
+
+  # qBittorrent Qt stylesheet
+  home.file.".config/qBittorrent/gruvbox-material.qss".text = ''
+    /* Gruvbox Material theme for qBittorrent */
+    QWidget {
+      background-color: #282828;
+      color: #d4be98;
+      font-family: "CaskaydiaCove Nerd Font";
+    }
+
+    
+    QMainWindow {
+      background-color: #282828;
+      color: #d4be98;
+    }
+
+    
+    QTableView {
+      background-color: #32302f;
+      alternate-background-color: #3c3836;
+      selection-background-color: #7daea3;
+      selection-color: #282828;
+      gridline-color: #45403d;
+    }
+
+    
+    QHeaderView::section {
+      background-color: #45403d;
+      color: #d4be98;
+      border: 1px solid #282828;
+      padding: 4px;
+    }
+
+    
+    QMenuBar {
+      background-color: #282828;
+      color: #d4be98;
+    }
+
+    
+    QMenuBar::item:selected {
+      background-color: #7daea3;
+      color: #282828;
+    }
+
+    
+    QMenu {
+      background-color: #32302f;
+      color: #d4be98;
+      border: 1px solid #45403d;
+    }
+
+    
+    QMenu::item:selected {
+      background-color: #7daea3;
+      color: #282828;
+    }
+
+  '';
+
+  # Chromium/Ungoogled-Chromium theme CSS
+  home.file.".config/chromium/Default/User StyleSheets/Custom.css".text = ''
+    /* Gruvbox Material theme for Chromium */
+    :root {
+      --background-primary: #282828 \!important;
+      --background-secondary: #32302f \!important;
+      --text-primary: #d4be98 \!important;
+      --text-secondary: #a89984 \!important;
+      --accent-color: #7daea3 \!important;
+      --border-color: #45403d \!important;
+    }
+
+    
+    body, html {
+      background-color: var(--background-primary) \!important;
+      color: var(--text-primary) \!important;
+    }
+
+  '';
+
+  # LibreOffice dark theme configuration
+  home.file.".config/libreoffice/4/user/config/registrymodifications.xcu".text = ''
+    <?xml version="1.0" encoding="UTF-8"?>
+    <oor:items xmlns:oor="http://openoffice.org/2001/registry" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+      <item oor:path="/org.openoffice.Office.Common/VCL">
+        <prop oor:name="PreferredAppearance" oor:op="fuse">
+          <value>1</value>
+        </prop>
+      </item>
+    </oor:items>
+  '';
+EOF < /dev/null}
