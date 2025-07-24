@@ -20,6 +20,42 @@
       font_size = 12;
       enable_audio_bell = false;
       window_padding_width = 4;
+      
+      # Nord color scheme
+      foreground = "#e5e9f0";
+      background = "#2e3440";
+      selection_foreground = "#2e3440";
+      selection_background = "#88c0d0";
+      
+      # Cursor
+      cursor = "#e5e9f0";
+      cursor_text_color = "#2e3440";
+      
+      # URL color
+      url_color = "#88c0d0";
+      
+      # Normal colors
+      color0 = "#3b4252";  # black
+      color1 = "#bf616a";  # red
+      color2 = "#a3be8c";  # green
+      color3 = "#ebcb8b";  # yellow
+      color4 = "#81a1c1";  # blue
+      color5 = "#b48ead";  # magenta
+      color6 = "#88c0d0";  # cyan
+      color7 = "#e5e9f0";  # white
+      
+      # Bright colors
+      color8 = "#4c566a";   # bright black
+      color9 = "#bf616a";   # bright red
+      color10 = "#a3be8c";  # bright green
+      color11 = "#ebcb8b";  # bright yellow
+      color12 = "#81a1c1";  # bright blue
+      color13 = "#b48ead";  # bright magenta
+      color14 = "#8fbcbb";  # bright cyan
+      color15 = "#eceff4";  # bright white
+      
+      # Window styling to match Hyprland
+      background_opacity = "0.95";
     };
    }; 
    programs.neovim = {
