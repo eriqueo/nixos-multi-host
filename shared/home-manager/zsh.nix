@@ -93,7 +93,7 @@
     };
     
     # Universal shell functions with enhanced grebuild  
-    initExtra = ''
+    initContent = ''
       # Enhanced grebuild function with improved safety and multi-host sync
       grebuild() {
         if [[ -z "$1" ]]; then
