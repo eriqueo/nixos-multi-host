@@ -21,15 +21,15 @@
       enable_audio_bell = false;
       window_padding_width = 4;
       
-      # Nord color scheme
-      foreground = "#e5e9f0";
-      background = "#2e3440";
-      selection_foreground = "#2e3440";
+      # Deep Nord color scheme (darker + creamier)
+      foreground = "#f2f0e8";
+      background = "#1f2329";
+      selection_foreground = "#1f2329";
       selection_background = "#88c0d0";
       
       # Cursor
-      cursor = "#e5e9f0";
-      cursor_text_color = "#2e3440";
+      cursor = "#f2f0e8";
+      cursor_text_color = "#1f2329";
       
       # URL color
       url_color = "#88c0d0";
@@ -42,7 +42,7 @@
       color4 = "#81a1c1";  # blue
       color5 = "#b48ead";  # magenta
       color6 = "#88c0d0";  # cyan
-      color7 = "#e5e9f0";  # white
+      color7 = "#f2f0e8";  # white
       
       # Bright colors
       color8 = "#4c566a";   # bright black
@@ -52,7 +52,7 @@
       color12 = "#81a1c1";  # bright blue
       color13 = "#b48ead";  # bright magenta
       color14 = "#8fbcbb";  # bright cyan
-      color15 = "#eceff4";  # bright white
+      color15 = "#f2f0e8";  # bright white
       
       # Window styling to match Hyprland
       background_opacity = "0.95";
