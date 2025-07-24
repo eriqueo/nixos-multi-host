@@ -18,8 +18,8 @@
   home.stateVersion = "23.05";
   programs.home-manager.enable = true;
 
-  # Services for file manager functionality
-  services.gvfs.enable = true;
+  # XDG desktop integration for file manager
+  xdg.enable = true;
 
   # STANDARDIZED DIRECTORY STRUCTURE
   home.file = {
