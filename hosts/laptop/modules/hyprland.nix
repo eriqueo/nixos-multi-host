@@ -179,8 +179,8 @@ in
         gaps_in = 6;
         gaps_out = 12;
         border_size = 2;
-        "col.active_border" = "rgba(88c0d0ff) rgba(5e81acff) 45deg"; # Nord frost colors
-        "col.inactive_border" = "rgba(4c566aaa)"; # Nord darker gray
+        "col.active_border" = "rgba(7daea3ff) rgba(89b482ff) 45deg"; # Gruvbox Material soft teal gradient
+        "col.inactive_border" = "rgba(45403daa)"; # Gruvbox Material muted gray
         layout = "dwindle";
         resize_on_border = true;
       };

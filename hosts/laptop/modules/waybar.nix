@@ -184,7 +184,7 @@ in
     style = ''
      * {
        font-family: "JetBrainsMono Nerd Font", FontAwesome, Roboto, Helvetica, Arial, sans-serif;
-       font-size: 12px;
+       font-size: 14px;
        border: none;
        border-radius: 0;
        min-height: 0;
@@ -193,9 +193,9 @@ in
      }
      
      window#waybar {
-       background: rgba(31, 35, 41, 0.9); /* Deep Nord background */
+       background: rgba(40, 40, 40, 0.95); /* Gruvbox Material background */
        color: ${colors.css.foreground};
-       border-bottom: 2px solid ${colors.nord10};
+       border-bottom: 2px solid ${colors.css.accent};
        transition-property: background-color;
        transition-duration: 0.5s;
      }
@@ -213,7 +213,7 @@ in
      #workspaces button {
        padding: 4px 8px;
        background: transparent;
-       color: #81a1c1;
+       color: ${colors.css.accent};
        border: none;
        border-bottom: 2px solid transparent;
        border-radius: 0;
@@ -222,22 +222,22 @@ in
      }
      
      #workspaces button:hover {
-       background: rgba(129, 161, 193, 0.2);
-       border-bottom: 2px solid #81a1c1;
+       background: rgba(125, 174, 163, 0.2);
+       border-bottom: 2px solid ${colors.css.accent};
        box-shadow: none;
      }
      
      #workspaces button.active {
-       background: rgba(136, 192, 208, 0.3);
-       color: #88c0d0;
-       border-bottom: 2px solid #88c0d0;
+       background: rgba(125, 174, 163, 0.3);
+       color: ${colors.css.accent};
+       border-bottom: 2px solid ${colors.css.accent};
        font-weight: bold;
      }
      
      #workspaces button.urgent {
-       background: rgba(191, 97, 106, 0.3);
-       color: #bf616a;
-       border-bottom: 2px solid #bf616a;
+       background: rgba(234, 105, 98, 0.3);
+       color: ${colors.css.error};
+       border-bottom: 2px solid ${colors.css.error};
        animation: blink 1s linear infinite alternate;
      }
      

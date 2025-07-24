@@ -14,13 +14,13 @@ in
     x11.enable = true;
   };
 
-  # GTK theming (Nord-style)
+  # GTK theming (Gruvbox Material style)
   gtk = {
     enable = true;
     
     theme = {
-      name = "Nordic";
-      package = pkgs.nordic;
+      name = "Gruvbox-Dark";
+      package = pkgs.gruvbox-gtk-theme;
     };
     
     iconTheme = {

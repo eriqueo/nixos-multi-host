@@ -111,3 +111,18 @@ in
     noto-fonts-emoji
   ];
 }
+  # Create Obsidian CSS for Gruvbox Material theme
+  home.file.".config/obsidian/snippets/gruvbox-material.css".text = ''
+    /* Gruvbox Material theme for Obsidian */
+    .theme-dark {
+      --background-primary: #282828;
+      --background-secondary: #32302f;
+      --background-modifier-border: #45403d;
+      --text-normal: #d4be98;
+      --text-muted: #a89984;
+      --text-accent: #7daea3;
+      --text-accent-hover: #89b482;
+      --interactive-accent: #7daea3;
+      --interactive-accent-hover: #89b482;
+    }
+  '';
