@@ -3,41 +3,41 @@
 
 {
   colors = {
-    # Base colors
-    background = "#1f2329";      # Darker than Nord
-    foreground = "#f2f0e8";      # Warm cream
+    # Base colors (Gruvbox Material inspired - much softer contrast)
+    background = "#282828";      # Gruvbox material bg (warmer, softer than our dark blue)
+    foreground = "#d4be98";      # Muted cream (less bright, easier on eyes)
     
-    # Selection colors
-    selection_bg = "#88c0d0";
-    selection_fg = "#1f2329";
+    # Selection colors (softer)
+    selection_bg = "#7daea3";    # Muted teal instead of bright cyan
+    selection_fg = "#282828";
     
-    # Cursor
-    cursor = "#f2f0e8";
-    cursor_text = "#1f2329";
+    # Cursor (softer)
+    cursor = "#d4be98";
+    cursor_text = "#282828";
     
-    # URL/links
-    url = "#88c0d0";
+    # URL/links (softer)
+    url = "#7daea3";
     
-    # Nord color palette adapted for Deep Nord
-    # Dark colors (normal)
-    color0  = "#3b4252";  # black
-    color1  = "#bf616a";  # red
-    color2  = "#a3be8c";  # green  
-    color3  = "#ebcb8b";  # yellow
-    color4  = "#81a1c1";  # blue
-    color5  = "#b48ead";  # magenta
-    color6  = "#88c0d0";  # cyan
-    color7  = "#f2f0e8";  # white (cream)
+    # Gruvbox Material inspired colors (much softer, muted)
+    # Dark colors (normal) - desaturated for eye comfort
+    color0  = "#32302F";  # softer black
+    color1  = "#ea6962";  # muted red (less harsh than Nord)
+    color2  = "#a9b665";  # muted green
+    color3  = "#d8a657";  # warm muted yellow
+    color4  = "#7daea3";  # soft teal-blue (instead of bright blue)
+    color5  = "#d3869b";  # soft pink-purple
+    color6  = "#89b482";  # muted aqua
+    color7  = "#d4be98";  # soft cream (main foreground)
     
-    # Bright colors
-    color8  = "#4c566a";  # bright black
-    color9  = "#bf616a";  # bright red
-    color10 = "#a3be8c";  # bright green
-    color11 = "#ebcb8b";  # bright yellow
-    color12 = "#81a1c1";  # bright blue
-    color13 = "#b48ead";  # bright magenta
-    color14 = "#8fbcbb";  # bright cyan
-    color15 = "#f2f0e8";  # bright white (cream)
+    # Bright colors - slightly brighter but still muted
+    color8  = "#45403d";  # muted bright black  
+    color9  = "#ea6962";  # same muted red
+    color10 = "#a9b665";  # same muted green  
+    color11 = "#d8a657";  # same muted yellow
+    color12 = "#7daea3";  # same soft blue
+    color13 = "#d3869b";  # same soft purple
+    color14 = "#89b482";  # same muted aqua
+    color15 = "#d4be98";  # same soft cream
     
     # Nord semantic colors for UI elements
     nord0  = "#1f2329";  # darkest (our custom background)
@@ -61,15 +61,15 @@
     opacity_terminal = "0.95";
     opacity_inactive = "0.90";
     
-    # CSS/Web colors (with # prefix for web use)
+    # CSS/Web colors (with # prefix for web use) - Gruvbox Material inspired
     css = {
-      background = "#1f2329";
-      foreground = "#f2f0e8";
-      accent = "#88c0d0";
-      warning = "#ebcb8b";
-      error = "#bf616a";
-      success = "#a3be8c";
-      info = "#81a1c1";
+      background = "#282828";
+      foreground = "#d4be98";
+      accent = "#7daea3";      # soft teal
+      warning = "#d8a657";     # muted yellow
+      error = "#ea6962";       # muted red
+      success = "#a9b665";     # muted green
+      info = "#7daea3";        # soft blue
     };
   };
 }
