@@ -133,11 +133,102 @@ in
           natural_scroll = true;
         };
       };
-        windowrulev2 = [
-          "tile,class:^(Chromium-browser)$,title:^.*JobTread.*$"
-          "workspace 3,class:^(Chromium-browser)$,title:^.*JobTread.*$"
-          "tile,class:^(chromium-.*|Chromium-.*)$"
+
+      # Decoration (rounded corners, blur, etc.)
+      decoration = {
+        rounding = 12;
+        blur = {
+          enabled = true;
+          size = 6;
+          passes = 3;
+          new_optimizations = true;
+          ignore_opacity = true;
+        };
+        shadow = {
+          enabled = true;
+          range = 8;
+          render_power = 2;
+          color = "rgba(0, 0, 0, 0.4)";
+        };
+        dim_inactive = false;
+        drop_shadow = true;
+      };
+
+      # Animation settings
+      animations = {
+        enabled = true;
+        bezier = [
+          "easeOutQuint,0.23,1,0.32,1"
+          "easeInOutCubic,0.65,0.05,0.36,1"
+          "linear,0,0,1,1"
         ];
+        animation = [
+          "windows,1,4,easeOutQuint,slide"
+          "windowsOut,1,4,easeInOutCubic,slide"
+          "border,1,10,default"
+          "fade,1,4,default"
+          "workspaces,1,4,easeOutQuint,slide"
+        ];
+      };
+
+      # General settings
+      general = {
+        gaps_in = 6;
+        gaps_out = 12;
+        border_size = 2;
+        "col.active_border" = "rgba(88c0d0ff) rgba(5e81acff) 45deg";
+        "col.inactive_border" = "rgba(4c566aaa)";
+        layout = "dwindle";
+        resize_on_border = true;
+      };
+
+      # Dwindle layout settings
+      dwindle = {
+        pseudotile = true;
+        preserve_split = true;
+        smart_split = false;
+        smart_resizing = true;
+      };
+
+      # Miscellaneous settings
+      misc = {
+        disable_hyprland_logo = true;
+        disable_splash_rendering = true;
+        mouse_move_enables_dpms = true;
+        key_press_enables_dpms = true;
+        vrr = 1;
+        enable_swallow = true;
+        swallow_regex = "^(kitty)$";
+      };
+
+      windowrulev2 = [
+        # Browser rules
+        "tile,class:^(Chromium-browser)$,title:^.*JobTread.*$"
+        "workspace 3,class:^(Chromium-browser)$,title:^.*JobTread.*$"
+        "tile,class:^(chromium-.*|Chromium-.*)$"
+        
+        # Floating windows
+        "float,class:^(pavucontrol)$"
+        "float,class:^(blueman-manager)$"
+        "size 800 600,class:^(pavucontrol)$"
+        
+        # Opacity rules
+        "opacity 0.95,class:^(kitty)$"
+        "opacity 0.90,class:^(thunar)$"
+        
+        # Workspace assignments
+        "workspace 2,class:^(LibreWolf)$"
+        "workspace 4,class:^(obsidian)$"
+        "workspace 5,class:^(electron-mail)$"
+        
+        # Picture-in-picture
+        "float,title:^(Picture-in-Picture)$"
+        "pin,title:^(Picture-in-Picture)$"
+        "size 640 360,title:^(Picture-in-Picture)$"
+        
+        # No shadows for certain windows
+        "noshadow,floating:0"
+      ];
       # Variables
       "$mod" = "SUPER";
 
@@ -157,6 +248,8 @@ in
         # Screenshots
         ", Print, exec, hyprshot -m region -o ~/Pictures/01-screenshots"
         "SHIFT, Print, exec, hyprshot -m region -c"
+        "CTRL, Print, exec, hyprshot -m window -o ~/Pictures/01-screenshots"
+        "ALT, Print, exec, hyprshot -m output -o ~/Pictures/01-screenshots"
 
         # Focus movement (SUPER + arrows)
         "$mod, left, movefocus, l"
@@ -213,6 +306,19 @@ in
         "$mod CTRL ALT, R, exec, hyprsome workspace 8"
         "$mod CTRL ALT, left, workspace, e-1"
         "$mod CTRL ALT, right, workspace, e+1"
+        
+        # Volume controls
+        ", XF86AudioRaiseVolume, exec, wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+"
+        ", XF86AudioLowerVolume, exec, wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"
+        ", XF86AudioMute, exec, wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"
+        ", XF86AudioMicMute, exec, wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"
+        
+        # Brightness controls
+        ", XF86MonBrightnessUp, exec, brightnessctl set 10%+"
+        ", XF86MonBrightnessDown, exec, brightnessctl set 10%-"
+        
+        # Clipboard history
+        "$mod, V, exec, cliphist list | wofi --dmenu | cliphist decode | wl-copy"
       ];
     };
   };

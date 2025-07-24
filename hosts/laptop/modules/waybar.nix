@@ -9,6 +9,7 @@
   home.packages = with pkgs; [
     pavucontrol
     swaynotificationcenter
+    wlogout  # Power menu
   ];
 
   programs.waybar = {
@@ -31,6 +32,7 @@
       ];
       
       modules-right = [
+        "idle_inhibitor"
         "mpd"
         "pulseaudio"
         "network"
@@ -39,6 +41,7 @@
         "temperature"
         "battery"
         "tray"
+        "custom/notification"
         "custom/power"
       ];
 
@@ -136,6 +139,37 @@
         on-click = "pavucontrol";
       };
 
+      idle_inhibitor = {
+        format = "{icon}";
+        format-icons = {
+          activated = "󰅶";
+          deactivated = "󰾪";
+        };
+        tooltip-format-activated = "Idle inhibitor active";
+        tooltip-format-deactivated = "Idle inhibitor inactive";
+      };
+
+      "custom/notification" = {
+        tooltip = false;
+        format = "{icon}";
+        format-icons = {
+          notification = "<span foreground='red'><sup></sup></span>";
+          none = "";
+          dnd-notification = "<span foreground='red'><sup></sup></span>";
+          dnd-none = "";
+          inhibited-notification = "<span foreground='red'><sup></sup></span>";
+          inhibited-none = "";
+          dnd-inhibited-notification = "<span foreground='red'><sup></sup></span>";
+          dnd-inhibited-none = "";
+        };
+        return-type = "json";
+        exec-if = "which swaync-client";
+        exec = "swaync-client -swb";
+        on-click = "swaync-client -t -sw";
+        on-click-right = "swaync-client -d -sw";
+        escape = true;
+      };
+
       "custom/power" = {
         format = "󰐥";
         tooltip = false;
@@ -228,7 +262,9 @@
      #network,
      #pulseaudio,
      #mpd,
+     #idle_inhibitor,
      #tray,
+     #custom-notification,
      #custom-power {
        margin: 0 2px;
        padding: 0 8px;
@@ -318,6 +354,25 @@
        font-size: 14px;
      }
      
+     #idle_inhibitor {
+       color: #ebcb8b;
+     }
+     
+     #idle_inhibitor.activated {
+       background: rgba(235, 203, 139, 0.3);
+       color: #ebcb8b;
+     }
+     
+     #custom-notification {
+       color: #81a1c1;
+       font-size: 16px;
+     }
+     
+     #custom-notification.notification {
+       background: rgba(191, 97, 106, 0.3);
+       animation: blink 1s linear infinite alternate;
+     }
+
      #custom-power:hover {
        background: rgba(191, 97, 106, 0.3);
        color: #ffffff;
