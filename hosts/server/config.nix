@@ -14,7 +14,6 @@
     
     # Shared configuration
     ../../shared/secrets.nix
-    ../../shared/zsh-config.nix
     
     # Consolidated filesystem structure
     ../../modules/filesystem

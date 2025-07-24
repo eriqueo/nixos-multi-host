@@ -9,6 +9,7 @@
     ./modules/theming.nix
     ./modules/startup.nix
     ./modules/apps.nix
+    ../../shared/home-manager/zsh.nix
   ];
 
   # IDENTITY
