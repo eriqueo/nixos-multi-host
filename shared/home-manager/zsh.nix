@@ -92,8 +92,8 @@
       "server" = "ssh eric@100.110.68.48";
     };
     
-    # Universal shell functions with enhanced grebuild
-    initContent = ''
+    # Universal shell functions with enhanced grebuild  
+    initExtra = ''
       # Enhanced grebuild function with improved safety and multi-host sync
       grebuild() {
         if [[ -z "$1" ]]; then
