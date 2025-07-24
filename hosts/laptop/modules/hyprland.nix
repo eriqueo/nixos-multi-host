@@ -151,7 +151,6 @@ in
           color = "rgba(0, 0, 0, 0.4)";
         };
         dim_inactive = false;
-        drop_shadow = true;
       };
 
       # Animation settings
