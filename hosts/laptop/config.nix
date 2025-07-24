@@ -84,6 +84,11 @@
   xdg.portal.enable = true;
   xdg.portal.wlr.enable = true;
   
+  # File manager support
+  services.gvfs.enable = true;
+  services.udisks2.enable = true;
+  services.tumbler.enable = true;
+  
   security.rtkit.enable = true;
   services.pipewire = {
     enable = true;
@@ -142,7 +147,14 @@
   virtualisation.oci-containers.backend = "podman";
 
   ####################################################################
-  # 13. LAPTOP-SPECIFIC SYSTEM PACKAGES
+  # 13. POWER MANAGEMENT (laptop-specific)
+  ####################################################################
+  services.thermald.enable = true;
+  services.auto-cpufreq.enable = true;
+  powerManagement.enable = true;
+  
+  ####################################################################
+  # 14. LAPTOP-SPECIFIC SYSTEM PACKAGES
   ####################################################################
   # Core packages now provided by modules/users/eric.nix
   # Only laptop-specific packages are included here
@@ -190,7 +202,7 @@
   ];
 
   ####################################################################
-  # 14. SYSTEM STATE VERSION
+  # 15. SYSTEM STATE VERSION
   ####################################################################
   system.stateVersion = "23.05";
 }
