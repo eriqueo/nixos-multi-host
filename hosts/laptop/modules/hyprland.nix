@@ -241,6 +241,7 @@ in
         "$mod, B, exec, librewolf"
         "$mod, O, exec, obsidian"
         "$mod, E, exec, electron-mail"
+        "$mod, N, exec, kitty nvim"
         "$mod SHIFT, M, exec, monitor-toggle"
         "$mod, TAB, exec, workspace-overview"
         "$mod, T, togglefloating"
