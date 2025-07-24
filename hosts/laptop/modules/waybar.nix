@@ -4,6 +4,10 @@
 # -----------------------------------------------------------------------------
 { config, lib, pkgs, ... }:
 
+let
+  colors = (import ../../../shared/colors/deep-nord.nix).colors;
+in
+
 {
   # Waybar dependencies
   home.packages = with pkgs; [
@@ -189,9 +193,9 @@
      }
      
      window#waybar {
-       background: rgba(36, 39, 58, 0.9);
-       color: #e5e9f0;
-       border-bottom: 2px solid #5e81ac;
+       background: rgba(31, 35, 41, 0.9); /* Deep Nord background */
+       color: ${colors.css.foreground};
+       border-bottom: 2px solid ${colors.nord10};
        transition-property: background-color;
        transition-duration: 0.5s;
      }
@@ -247,7 +251,7 @@
      /* Center modules */
      #clock {
        margin: 0 8px;
-       color: #e5e9f0;
+       color: ${colors.css.foreground};
        font-weight: bold;
        background: rgba(76, 86, 106, 0.4);
        padding: 0 12px;

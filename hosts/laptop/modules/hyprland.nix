@@ -4,6 +4,10 @@
 { config, pkgs, lib, ... }:
 
 let
+  colors = (import ../../../shared/colors/deep-nord.nix).colors;
+in
+
+let
   wallpaperPath = "/etc/nixos/hosts/laptop/modules/assets/wallpapers/nord-mountains.jpg";
   workspaceOverview = pkgs.writeScriptBin "workspace-overview" ''
     #!/usr/bin/env bash
@@ -175,8 +179,8 @@ in
         gaps_in = 6;
         gaps_out = 12;
         border_size = 2;
-        "col.active_border" = "rgba(88c0d0ff) rgba(5e81acff) 45deg";
-        "col.inactive_border" = "rgba(4c566aaa)";
+        "col.active_border" = "rgba(88c0d0ff) rgba(5e81acff) 45deg"; # Nord frost colors
+        "col.inactive_border" = "rgba(4c566aaa)"; # Nord darker gray
         layout = "dwindle";
         resize_on_border = true;
       };

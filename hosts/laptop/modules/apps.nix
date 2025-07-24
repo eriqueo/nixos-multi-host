@@ -1,5 +1,9 @@
 { config, pkgs, lib, ... }:
 
+let
+  colors = (import ../../../shared/colors/deep-nord.nix).colors;
+in
+
 {
   # BROWSERS
   programs.firefox = {
@@ -17,42 +21,42 @@
     enable = true;
     settings = {
       font_family = "CaskaydiaCove Nerd Font";
-      font_size = 12;
+      font_size = 14;
       enable_audio_bell = false;
       window_padding_width = 4;
       
       # Deep Nord color scheme (darker + creamier)
-      foreground = "#f2f0e8";
-      background = "#1f2329";
-      selection_foreground = "#1f2329";
-      selection_background = "#88c0d0";
+      foreground = "colors.foreground";
+      background = "colors.background";
+      selection_foreground = "colors.background";
+      selection_background = "colors.selection_bg";
       
       # Cursor
-      cursor = "#f2f0e8";
-      cursor_text_color = "#1f2329";
+      cursor = "colors.foreground";
+      cursor_text_color = "colors.background";
       
       # URL color
-      url_color = "#88c0d0";
+      url_color = "colors.selection_bg";
       
       # Normal colors
-      color0 = "#3b4252";  # black
-      color1 = "#bf616a";  # red
-      color2 = "#a3be8c";  # green
-      color3 = "#ebcb8b";  # yellow
-      color4 = "#81a1c1";  # blue
-      color5 = "#b48ead";  # magenta
-      color6 = "#88c0d0";  # cyan
-      color7 = "#f2f0e8";  # white
+      color0 = colors.color0;  # black
+      color1 = colors.color1;  # red
+      color2 = colors.color2;  # green
+      color3 = colors.color3;  # yellow
+      color4 = colors.color4;  # blue
+      color5 = colors.color5;  # magenta
+      color6 = "colors.selection_bg";  # cyan
+      color7 = "colors.foreground";  # white
       
       # Bright colors
-      color8 = "#4c566a";   # bright black
-      color9 = "#bf616a";   # bright red
-      color10 = "#a3be8c";  # bright green
-      color11 = "#ebcb8b";  # bright yellow
-      color12 = "#81a1c1";  # bright blue
-      color13 = "#b48ead";  # bright magenta
-      color14 = "#8fbcbb";  # bright cyan
-      color15 = "#f2f0e8";  # bright white
+      color8 = colors.color8;   # bright black
+      color9 = colors.color9;   # bright red
+      color10 = colors.color10;  # bright green
+      color11 = colors.color11;  # bright yellow
+      color12 = colors.color12;  # bright blue
+      color13 = colors.color13;  # bright magenta
+      color14 = colors.color14;  # bright cyan
+      color15 = "colors.foreground";  # bright white
       
       # Window styling to match Hyprland
       background_opacity = "0.95";

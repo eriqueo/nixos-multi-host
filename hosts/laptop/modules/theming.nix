@@ -1,5 +1,9 @@
 { config, pkgs, lib, ... }:
 
+let
+  colors = (import ../../../shared/colors/deep-nord.nix).colors;
+in
+
 {
   # Cursor theme
   home.pointerCursor = {
