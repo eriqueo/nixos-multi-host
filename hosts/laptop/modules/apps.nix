@@ -1,5 +1,4 @@
-{ config, pkgs, lib, ... }
-:
+{ config, pkgs, lib, ... }:
 
 let
   colors = (import ../../../shared/colors/deep-nord.nix).colors;
@@ -10,14 +9,12 @@ in
   programs.firefox = {
     enable = true;
     package = pkgs.librewolf;
-  }
-;
+  };
   
   programs.chromium = {
     enable = true;
     package = pkgs.ungoogled-chromium;
-  }
-;
+  };
 
   # TERMINAL
   programs.kitty = {
@@ -63,17 +60,34 @@ in
       
       # Window styling to match Hyprland
       background_opacity = "0.95";
-    }
-;
-   }
-; 
-   programs.neovim = {
-      enable = true;
-      defaultEditor = true;
-      viAlias = true;
-      vimAlias = true;
-   }
-;
+    };
+  }; 
+
+  # NEOVIM with enhanced Gruvbox Material theme
+  programs.neovim = {
+    enable = true;
+    defaultEditor = true;
+    viAlias = true;
+    vimAlias = true;
+    
+    extraConfig = ''
+      " Gruvbox Material colorscheme for Neovim
+      set termguicolors
+      
+      " Base colors
+      hi Normal guifg=#d4be98 guibg=#282828
+      hi Comment guifg=#a89984 gui=italic
+      hi Keyword guifg=#ea6962 gui=bold
+      hi Function guifg=#d8a657 gui=bold
+      hi String guifg=#a9b665
+      hi Number guifg=#d3869b
+      hi Type guifg=#7daea3 gui=bold
+      hi Visual guibg=#45403d
+      hi CursorLine guibg=#32302f
+      hi LineNr guifg=#665c54
+      hi StatusLine guifg=#d4be98 guibg=#45403d gui=bold
+    '';
+  };
 
   # ALL OTHER APPLICATIONS
   home.packages = with pkgs; [
@@ -116,9 +130,6 @@ in
     noto-fonts
     noto-fonts-emoji
   ];
-}
-
-
 
   # ================================================================
   # THEME FILES - Consistent Gruvbox Material across all apps
@@ -138,7 +149,6 @@ in
       --interactive-accent: #7daea3;
       --interactive-accent-hover: #89b482;
     }
-
   '';
 
   # qBittorrent Qt stylesheet
@@ -149,13 +159,11 @@ in
       color: #d4be98;
       font-family: "CaskaydiaCove Nerd Font";
     }
-
     
     QMainWindow {
       background-color: #282828;
       color: #d4be98;
     }
-
     
     QTableView {
       background-color: #32302f;
@@ -164,7 +172,6 @@ in
       selection-color: #282828;
       gridline-color: #45403d;
     }
-
     
     QHeaderView::section {
       background-color: #45403d;
@@ -172,52 +179,27 @@ in
       border: 1px solid #282828;
       padding: 4px;
     }
-
     
     QMenuBar {
       background-color: #282828;
       color: #d4be98;
     }
-
     
     QMenuBar::item:selected {
       background-color: #7daea3;
       color: #282828;
     }
-
     
     QMenu {
       background-color: #32302f;
       color: #d4be98;
       border: 1px solid #45403d;
     }
-
     
     QMenu::item:selected {
       background-color: #7daea3;
       color: #282828;
     }
-
-  '';
-
-  # Chromium/Ungoogled-Chromium theme CSS
-  home.file.".config/chromium/Default/User StyleSheets/Custom.css".text = ''
-    /* Gruvbox Material theme for Chromium */
-    :root {
-      --background-primary: #282828 \!important;
-      --background-secondary: #32302f \!important;
-      --text-primary: #d4be98 \!important;
-      --text-secondary: #a89984 \!important;
-      --accent-color: #7daea3 \!important;
-      --border-color: #45403d \!important;
-    }
-
-    
-    body, html {
-      background-color: var(--background-primary) \!important;
-      color: var(--text-primary) \!important;
-    }
-
   '';
 
   # LibreOffice dark theme configuration
@@ -231,4 +213,4 @@ in
       </item>
     </oor:items>
   '';
-EOF < /dev/null}
+}
