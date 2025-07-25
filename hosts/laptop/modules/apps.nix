@@ -83,7 +83,13 @@ in
     gimp
     inkscape
     blender
-    kdePackages.okular 
+    kdePackages.okular
+    
+    # SECURITY PACKAGES    
+    gnupg
+    gnupg-pkcs11-scd
+    pinentry-gtk2    
+
     # MEDIA & ENTERTAINMENT
     vlc
     mpv
