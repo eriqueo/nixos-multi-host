@@ -83,7 +83,7 @@ in
     gimp
     inkscape
     blender
-    
+    kdePackages.okular 
     # MEDIA & ENTERTAINMENT
     vlc
     mpv
