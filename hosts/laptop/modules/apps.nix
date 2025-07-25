@@ -63,31 +63,7 @@ in
     };
   }; 
 
-  # NEOVIM with enhanced Gruvbox Material theme
-  programs.neovim = {
-    enable = true;
-    defaultEditor = true;
-    viAlias = true;
-    vimAlias = true;
-    
-    extraConfig = ''
-      " Gruvbox Material colorscheme for Neovim
-      set termguicolors
-      
-      " Base colors
-      hi Normal guifg=#d4be98 guibg=#282828
-      hi Comment guifg=#a89984 gui=italic
-      hi Keyword guifg=#ea6962 gui=bold
-      hi Function guifg=#d8a657 gui=bold
-      hi String guifg=#a9b665
-      hi Number guifg=#d3869b
-      hi Type guifg=#7daea3 gui=bold
-      hi Visual guibg=#45403d
-      hi CursorLine guibg=#32302f
-      hi LineNr guifg=#665c54
-      hi StatusLine guifg=#d4be98 guibg=#45403d gui=bold
-    '';
-  };
+
 
   # ALL OTHER APPLICATIONS
   home.packages = with pkgs; [

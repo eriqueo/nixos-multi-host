@@ -35,7 +35,7 @@ in
     
     # SSH authentication
     openssh.authorizedKeys.keys = [
-      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILQFHXbcZCYrqyJoRPJddpEpnEquRJUxtopQkZsZdGhl hwc@laptop"
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICubgcmg6aBisQC+MWRC4RWOY8zIHEl42O7bTbzyCiGB eriqueo@proton.me"
     ];
     
     # Initial password - TODO: Consider moving to SOPS secrets
@@ -234,7 +234,7 @@ in
     
     # Local server connection
     Host local-server
-      HostName 192.168.1.100
+      HostName 192.168.1.151
       User eric
       IdentityFile ~/.ssh/id_ed25519
   '';

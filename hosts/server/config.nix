@@ -111,7 +111,10 @@
   ####################################################################
   services.openssh = {
     enable = true;
-    settings.X11Forwarding = true;
+    settings = {
+      X11Forwarding = true;
+      PasswordAuthentication = true;  # Temporary - for SSH key update
+    };
   };
   
   # Enable basic X11 services (minimal for forwarding)

@@ -65,7 +65,7 @@
 
     # Business applications
     obsidian      # Note-taking for business documentation
-
+    okular 
     # Productivity tools
     espanso       # Text expansion for ADHD-friendly workflows
   ];
