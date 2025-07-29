@@ -1,32 +1,42 @@
+# AI Services Configuration
+# 
+# NOTE: Heavy AI/ML packages commented out for faster initial builds.
+# Uncomment these packages after initial system setup is complete:
+#   - python3Packages.torch (~25 min build time)
+#   - python3Packages.transformers (~15 min build time)
+#   - python3Packages.sentence-transformers
+#   - python3Packages.chromadb
+#   - python3Packages.langchain
+# 
+# GPU acceleration and ollama service are kept enabled for Frigate integration.
+
 { config, pkgs, ... }:
 
 {
   # AI and ML packages
   environment.systemPackages = with pkgs; [
-    # AI/ML tools
+    # Essential AI tools (keep enabled)
     ollama
-    python3Packages.torch
-    python3Packages.transformers
-    python3Packages.sentence-transformers
-    python3Packages.chromadb  # Vector database for RAG
-    python3Packages.langchain
-    python3Packages.openai  # For API compatibility
     
-    # Additional ML libraries
+    # Heavy AI/ML packages (commented out for faster builds)
+    # Uncomment after initial system setup:
+    # python3Packages.torch
+    # python3Packages.transformers
+    # python3Packages.sentence-transformers
+    # python3Packages.chromadb  # Vector database for RAG
+    # python3Packages.langchain
+    # python3Packages.openai  # For API compatibility
+    
+    # Lightweight ML libraries (keep enabled)
     python3Packages.numpy
     python3Packages.scikit-learn
     python3Packages.matplotlib
     python3Packages.seaborn
   ];
   
-services.ollama = {
-  enable = true;
-  acceleration = "cuda";  # Enable CUDA acceleration
-  host = "127.0.0.1";
-  port = 11434;
-  # Move models to hot storage for faster loading
-  home = "/mnt/hot/ai";
-};
+# NOTE: ollama service configuration removed from here to avoid duplicate
+# service definition. Service is configured in hosts/server/config.nix
+# This prevents NixOS evaluation errors from conflicting service definitions.
   
   # Create AI workspace directories
   # AI services directories now created by modules/filesystem/business-directories.nix
