@@ -79,7 +79,56 @@
   # 8. GRAPHICS & AUDIO (laptop-specific hardware)
   ####################################################################
   services.xserver.enable = true;
-  hardware.graphics.enable = true;
+  services.xserver.videoDrivers = [ "nvidia" ];
+  
+  hardware.graphics = {
+    enable = true;
+    enable32Bit = true;  # For 32-bit apps
+  };
+  
+  hardware.nvidia = {
+    # Use open-source kernel modules (recommended for RTX 2000 Ada)
+    open = true;
+    
+    # Modesetting is required
+    modesetting.enable = true;
+    
+    # Power management (helps with stability)
+    powerManagement.enable = true;
+    powerManagement.finegrained = false;
+    
+    # Enable nvidia-settings
+    nvidiaSettings = true;
+    
+    # Use stable driver
+    package = config.boot.kernelPackages.nvidiaPackages.stable;
+    
+    # PRIME configuration - OFFLOAD MODE (recommended)
+    prime = {
+      offload = {
+        enable = true;
+        enableOffloadCmd = true;  # Enables nvidia-offload command
+      };
+      
+      # Your specific bus IDs
+      intelBusId = "PCI:0:2:0";
+      nvidiaBusId = "PCI:1:0:0";
+    };
+  };
+  
+  # Specializations for different modes
+  specialisation = {
+    nvidia-sync.configuration = {
+      hardware.nvidia.prime = {
+        offload = {
+          enable = lib.mkForce false;
+          enableOffloadCmd = lib.mkForce false;
+        };
+        sync.enable = true;  # For gaming/high performance
+      };
+    };
+  };
+  
   xdg.portal.enable = true;
   xdg.portal.wlr.enable = true;
   
