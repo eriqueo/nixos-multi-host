@@ -247,6 +247,9 @@
     diffutils
     less
     which
+    
+    # Graphics testing tools
+    glxinfo
   ];
 
   ####################################################################
