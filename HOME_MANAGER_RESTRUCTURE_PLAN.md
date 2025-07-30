@@ -184,4 +184,138 @@ If issues arise:
 5. Update this file with progress and any discovered issues
 
 ---
-**Next Action**: Create shared/home-manager/core-cli.nix module
+
+## **✅ IMPLEMENTATION COMPLETED - 2025-07-30**
+
+### **Successfully Implemented Architecture**
+
+**Phase 1 Complete**: ✅ Shared modules created and server updated
+- ✅ `shared/home-manager/core-cli.nix` - Essential CLI tools with configured programs
+- ✅ `shared/home-manager/development.nix` - Git, Python, Node.js, development workflow  
+- ✅ `shared/home-manager/productivity.nix` - Obsidian, pandoc, espanso, directory structure
+- ✅ Server configuration updated to use shared modules
+- ✅ Tested and committed with `grebuild`
+
+**Phase 2 Complete**: ✅ Laptop restructured with modular architecture
+- ✅ `hosts/laptop/modules/desktop-apps.nix` - GUI applications (browsers, file managers, office)
+- ✅ `hosts/laptop/modules/media.nix` - Audio/video apps with MPV configuration
+- ✅ `hosts/laptop/modules/graphics.nix` - Creative tools with theming
+- ✅ Updated laptop home.nix to import shared + specific modules
+- ✅ Removed old monolithic apps.nix
+- ✅ Application theming moved to appropriate modules
+- ✅ Tested and committed with `grebuild`
+
+### **Final Architecture Achieved**
+
+```
+/etc/nixos/
+├── shared/home-manager/              # ← SHARED ACROSS BOTH HOSTS
+│   ├── core-cli.nix                 # Essential CLI (bat, eza, fzf, ripgrep, btop, tmux, micro)
+│   ├── development.nix              # Git config, Python, Node.js, development tools
+│   ├── productivity.nix             # Obsidian, pandoc, espanso, directory structure
+│   └── zsh.nix                      # Shell configuration with aliases/functions
+├── hosts/laptop/modules/             # ← LAPTOP-SPECIFIC GUI APPS
+│   ├── desktop-apps.nix             # Browsers, file managers, office suite
+│   ├── media.nix                    # VLC, MPV, qBittorrent with configurations
+│   ├── graphics.nix                 # GIMP, Inkscape, Blender with theming
+│   ├── hyprland.nix                 # Window manager (existing)
+│   ├── waybar.nix                   # Status bar (existing)
+│   ├── theming.nix                  # Visual themes + Obsidian CSS
+│   └── startup.nix                  # Session startup (existing)
+└── hosts/server/
+    └── home.nix                     # ← SERVER: Only shared modules + server-specific configs
+```
+
+### **Benefits Realized**
+
+✅ **Clean Separation**: System packages vs user packages clearly defined  
+✅ **Reusable Modules**: Common tools configured once, used on both hosts
+✅ **Host Appropriateness**: GUI apps only on laptop, CLI focus on server  
+✅ **Maintainable Structure**: Easy to modify individual components
+✅ **Consistent Experience**: Same CLI tools and configs across environments
+✅ **Proper Program Modules**: Using Home Manager's structured configurations
+✅ **Integrated Theming**: Gruvbox Material theme applied consistently
+
+### **Commits Made**
+- `b4da3f9` - Phase 1: Create shared Home Manager modules and update server config
+- `e45eded` - Phase 2: Restructure laptop Home Manager with modular architecture
+
+---
+
+## **📚 HOW TO USE HOME MANAGER GOING FORWARD**
+
+### **Mental Model: Think in Layers**
+
+**Layer 1: System (NixOS config)**
+- Hardware drivers, system services, boot configuration
+- Things that require root privileges or affect the whole system
+- Example: `config.nix` handles nvidia drivers, networking, printing
+
+**Layer 2: Shared User Environment** 
+- Tools and configs you want on every host
+- CLI utilities, development setup, productivity workflows
+- Example: All `shared/home-manager/*.nix` modules
+
+**Layer 3: Host-Specific User Environment**
+- Applications and configs unique to that machine's purpose
+- Example: GUI apps on laptop, server management tools on server
+
+### **Adding New Software - Decision Tree**
+
+**🤔 "Where should this package go?"**
+
+1. **Is it a system service or hardware driver?** → System config
+2. **Do I want it on both laptop AND server?** → Shared module
+3. **GUI app only for laptop?** → Laptop-specific module  
+4. **CLI tool for both hosts?** → Shared core-cli.nix
+5. **Development tool?** → Shared development.nix
+6. **Productivity app?** → Shared productivity.nix
+
+### **Common Operations**
+
+**Adding a new CLI tool for both hosts:**
+```nix
+# Edit: shared/home-manager/core-cli.nix
+home.packages = with pkgs; [
+  # existing tools...
+  newtool  # Add here
+];
+```
+
+**Adding a GUI app for laptop only:**
+```nix  
+# Edit: hosts/laptop/modules/desktop-apps.nix
+home.packages = with pkgs; [
+  # existing apps...
+  newguiapp  # Add here
+];
+```
+
+**Configuring a program properly:**
+```nix
+# Instead of just adding to packages, use program modules:
+programs.git = {        # ← Better than just adding 'git' to packages
+  enable = true;
+  userName = "...";
+  # ... structured configuration
+};
+```
+
+### **Best Practices Going Forward**
+
+1. **Always use `grebuild "message"`** - Tests before committing
+2. **Use program modules when available** - More structured than just packages
+3. **Keep shared modules focused** - Don't put laptop-specific things in shared
+4. **Think about the other host** - Will this work on both laptop and server?
+5. **Use appropriate modules** - Don't put media apps in graphics.nix
+
+### **Future Expansion Ideas**
+
+- Create `shared/home-manager/server-tools.nix` for server-specific CLI tools
+- Add `hosts/laptop/modules/gaming.nix` for gaming applications
+- Create host-specific theming modules for different visual preferences
+- Add systemd user services for personal automation
+
+---
+
+**Status**: ✅ **COMPLETE** - Home Manager is now properly structured and ready for production use!
