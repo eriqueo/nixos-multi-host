@@ -11,20 +11,20 @@ let
   wallpaperPath = "/etc/nixos/hosts/laptop/modules/assets/wallpapers/nord-mountains.jpg";
   workspaceOverview = pkgs.writeScriptBin "workspace-overview" ''
     #!/usr/bin/env bash
-    
+
     # Get all workspaces with their contents
     WORKSPACES=$(hyprctl workspaces -j | ${pkgs.jq}/bin/jq -r '
-      .[] | 
+      .[] |
       if .windows > 0 then
         "\(.id): \(.windows) windows - \(.lastwindowtitle // "empty")"
       else
         "\(.id): empty"
       end
     ' | sort -n)
-    
+
     # Use wofi to select workspace
     SELECTED=$(echo "$WORKSPACES" | ${pkgs.wofi}/bin/wofi --dmenu --prompt "Go to workspace:" --lines 10)
-    
+
     if [[ -n "$SELECTED" ]]; then
       WORKSPACE_ID=$(echo "$SELECTED" | cut -d: -f1)
       ${pkgs.hyprsome}/bin/hyprsome workspace "$WORKSPACE_ID"
@@ -33,34 +33,34 @@ let
   # Monitor toggle script
   monitorToggle = pkgs.writeScriptBin "monitor-toggle" ''
     #!/usr/bin/env bash
-    
+
     # Get list of connected monitors
     MONITORS=$(hyprctl monitors -j | ${pkgs.jq}/bin/jq -r '.[].name')
     LAPTOP=$(echo "$MONITORS" | grep -E "(eDP|LVDS)" | head -1)
     EXTERNAL=$(echo "$MONITORS" | grep -v -E "(eDP|LVDS)" | head -1)
-    
+
     if [[ -z "$EXTERNAL" ]]; then
         echo "No external monitor detected"
         exit 1
     fi
-    
+
     # Get current positions
     LAPTOP_POS=$(hyprctl monitors -j | ${pkgs.jq}/bin/jq -r ".[] | select(.name==\"$LAPTOP\") | .x")
     EXTERNAL_POS=$(hyprctl monitors -j | ${pkgs.jq}/bin/jq -r ".[] | select(.name==\"$EXTERNAL\") | .x")
-    
+
     # Get monitor specs
     LAPTOP_SPEC=$(hyprctl monitors -j | ${pkgs.jq}/bin/jq -r ".[] | select(.name==\"$LAPTOP\") | \"\(.width)x\(.height)@\(.refreshRate)\"")
     EXTERNAL_SPEC=$(hyprctl monitors -j | ${pkgs.jq}/bin/jq -r ".[] | select(.name==\"$EXTERNAL\") | \"\(.width)x\(.height)@\(.refreshRate)\"")
     LAPTOP_WIDTH=$(echo "$LAPTOP_SPEC" | cut -d'x' -f1)
     EXTERNAL_WIDTH=$(echo "$EXTERNAL_SPEC" | cut -d'x' -f1)
-    
+
     if [[ $LAPTOP_POS -eq 0 ]]; then
         # Laptop is on left, move external to left
         echo "Moving external monitor to left"
         hyprctl keyword monitor "$EXTERNAL,$EXTERNAL_SPEC,0x0,1"
         hyprctl keyword monitor "$LAPTOP,$LAPTOP_SPEC,''${EXTERNAL_WIDTH}x0,1"
     else
-        # Laptop is on right, move external to right  
+        # Laptop is on right, move external to right
         echo "Moving external monitor to right"
         hyprctl keyword monitor "$LAPTOP,$LAPTOP_SPEC,0x0,1"
         hyprctl keyword monitor "$EXTERNAL,$EXTERNAL_SPEC,''${LAPTOP_WIDTH}x0,1"
@@ -79,12 +79,12 @@ in
     # Clipboard management
     cliphist
     wl-clipboard
-    
+
     # System tools for Hyprland
     brightnessctl
     networkmanager
     wirelesstools
-    
+
     # Custom scripts
     monitorToggle
   ];
@@ -92,25 +92,25 @@ in
   # Hyprland configuration
   wayland.windowManager.hyprland = {
     enable = true;
-    
+
     settings = {
       # Monitor setup
       monitor = [
         "eDP-1,2560x1600@165,0x0,1"      # Laptop at 0,0 (left)
-        "DP-1,1920x1080@60,2560x0,1"     # External at 2560,0 (right) 
+        "DP-1,1920x1080@60,2560x0,1"     # External at 2560,0 (right)
       ];
       workspace = [
           # Monitor ID 0 (eDP-1) gets workspaces 1-8
           "1,monitor:eDP-1"
-          "2,monitor:eDP-1" 
+          "2,monitor:eDP-1"
           "3,monitor:eDP-1"
           "4,monitor:eDP-1"
           "5,monitor:eDP-1"
           "6,monitor:eDP-1"
           "7,monitor:eDP-1"
           "8,monitor:eDP-1"
-          
-          # Monitor ID 1 (DP-1) gets workspaces 11-18  
+
+          # Monitor ID 1 (DP-1) gets workspaces 11-18
           "11,monitor:DP-1"
           "12,monitor:DP-1"
           "13,monitor:DP-1"
@@ -213,16 +213,16 @@ in
         "tile,class:^(Chromium-browser)$,title:^.*JobTread.*$"
         "workspace 3,class:^(Chromium-browser)$,title:^.*JobTread.*$"
         "tile,class:^(chromium-.*|Chromium-.*)$"
-        
+
         # Floating windows
         "float,class:^(pavucontrol)$"
         "float,class:^(blueman-manager)$"
         "size 800 600,class:^(pavucontrol)$"
-        
+
         # Opacity rules
         "opacity 0.95,class:^(kitty)$"
         "opacity 0.90,class:^(thunar)$"
-        
+
         # Workspace assignments
      #   "workspace 1,class:^(thunar)$"
      #   "workspace 2,class:^(chromium-.*|Chromium-.*)$"
@@ -231,22 +231,22 @@ in
      #   "workspace 8,class:^(btop|htop|pavucontrol)$"
      #   "workspace 4,class:^(obsidian)$"
      #   "workspace 5,class:^(electron-mail)$"
-        
+
         # Picture-in-picture
         "float,title:^(Picture-in-Picture)$"
         "pin,title:^(Picture-in-Picture)$"
         "size 640 360,title:^(Picture-in-Picture)$"
-        
+
         # No shadows for certain windows
         "noshadow,floating:0"
-        
+
         # Inhibit idle for media
         "idleinhibit focus,class:^(mpv|vlc|youtube)$"
         "idleinhibit fullscreen,class:^(firefox|chromium)$"
-        
+
         # Immediate focus for important apps
         "immediate,class:^(kitty|thunar)$"
-        
+
         # Gaming optimizations
         "fullscreen,class:^(steam_app_).*"
         "immediate,class:^(steam_app_).*"
@@ -275,7 +275,7 @@ in
         "$mod, 1, exec, thunar"
         "$mod, O, exec, gpu-launch obsidian"
         "$mod, E, exec, gpu-launch electron-mail"
-        "$mod, N, exec, sudo kitty sudo nvim"
+        "$mod, N, exec, kitty sudo nvim"
         "$mod, T, exec, thunar"
         "$mod, G, exec, gpu-toggle"  # GPU mode toggle
         "$mod SHIFT, M, exec, monitor-toggle"
@@ -310,7 +310,7 @@ in
         "$mod CTRL, 6, exec, hyprsome move 6"
         "$mod CTRL, 7, exec, hyprsome move 7"
         "$mod CTRL, 8, exec, hyprsome move 8"
-        
+
         # Letter mappings for moving windows
         "$mod CTRL, T, exec, hyprsome move 1"
         "$mod CTRL, C, exec, hyprsome move 2"
@@ -330,7 +330,7 @@ in
         "$mod CTRL ALT, 6, exec, hyprsome workspace 6"
         "$mod CTRL ALT, 7, exec, hyprsome workspace 7"
         "$mod CTRL ALT, 8, exec, hyprsome workspace 8"
-        
+
         # Letter mappings for workspace switching
         "$mod CTRL ALT, T, exec, hyprsome workspace 1"
         "$mod CTRL ALT, C, exec, hyprsome workspace 2"
@@ -342,17 +342,17 @@ in
         "$mod CTRL ALT, M, exec, hyprsome workspace 8"
         "$mod CTRL ALT, left, workspace, e-1"
         "$mod CTRL ALT, right, workspace, e+1"
-        
+
         # Volume controls
         ", XF86AudioRaiseVolume, exec, wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+"
         ", XF86AudioLowerVolume, exec, wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"
         ", XF86AudioMute, exec, wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"
         ", XF86AudioMicMute, exec, wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"
-        
+
         # Brightness controls
         ", XF86MonBrightnessUp, exec, brightnessctl set 10%+"
         ", XF86MonBrightnessDown, exec, brightnessctl set 10%-"
-        
+
         # Window management
         "$mod, S, pseudo"
         "$mod, P, pin"
@@ -360,18 +360,18 @@ in
         "$mod SHIFT, Q, exit"
         "$mod, L, exec, hyprlock"
         "$mod SHIFT, R, exec, hyprctl reload"
-        
+
         # Quick launchers
         "$mod SHIFT, Space, exec, wofi --show run"
-        
+
         # Window resizing
         "$mod, R, submap, resize"
-        
+
         # Group management
         "$mod, U, togglegroup"
         "$mod, Tab, changegroupactive, f"
         "$mod SHIFT, Tab, changegroupactive, b"
-        
+
         # Clipboard history
         "$mod, V, exec, cliphist list | wofi --dmenu | cliphist decode | wl-copy"
       ];
