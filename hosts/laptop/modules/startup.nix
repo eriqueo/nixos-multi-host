@@ -21,18 +21,21 @@ let
     waybar >/dev/null 2>&1 &
     sleep 2
     
-    # Launch apps directly to specific workspaces (silent mode)
- hyprctl dispatch exec '[workspace 1 silent] librewolf' &      # External
+    # Initialize GPU mode to Intel (default)
+    echo "intel" > /tmp/gpu-mode
+    
+    # Launch apps directly to specific workspaces (silent mode) with GPU wrapper
+    hyprctl dispatch exec '[workspace 1 silent] gpu-launch librewolf' &      # External
     sleep 1
-    hyprctl dispatch exec '[workspace 2 silent] electron-mail' &  # External  
+    hyprctl dispatch exec '[workspace 2 silent] gpu-launch electron-mail' &  # External  
     sleep 1
-    hyprctl dispatch exec '[workspace 3 silent] chromium --app=https://jobtread.com' &  # External
+    hyprctl dispatch exec '[workspace 3 silent] gpu-launch chromium --app=https://jobtread.com' &  # External
     sleep 1
     
     # Laptop monitor workspaces (11-18)
-    hyprctl dispatch exec '[workspace 4 silent] obsidian' &      # Laptop
+    hyprctl dispatch exec '[workspace 4 silent] gpu-launch obsidian' &      # Laptop
     sleep 1
-    hyprctl dispatch exec '[workspace 5 silent] neovim' &         # Laptop
+    hyprctl dispatch exec '[workspace 5 silent] neovim' &         # Laptop (no GPU wrapper for terminal apps)
     sleep 1
     hyprctl dispatch exec '[workspace 6 silent] kitty' &        # Laptop
     sleep 1

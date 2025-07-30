@@ -202,10 +202,6 @@ in
         vrr = 1;
         enable_swallow = true;
         swallow_regex = "^(kitty)$";
-        animate_manual_resizes = true;
-        animate_mouse_windowdragging = true;
-        focus_on_activate = true;
-        new_window_takes_over_fullscreen = 2;
       };
 
       windowrulev2 = [
@@ -235,17 +231,6 @@ in
         
         # No shadows for certain windows
         "noshadow,floating:0"
-        
-        # Inhibit idle for media
-        "idleinhibit focus,class:^(mpv|vlc|youtube)$"
-        "idleinhibit fullscreen,class:^(firefox|chromium)$"
-        
-        # Immediate focus for important apps
-        "immediate,class:^(kitty|thunar)$"
-        
-        # Gaming optimizations
-        "fullscreen,class:^(steam_app_).*"
-        "immediate,class:^(steam_app_).*"
       ];
       # Variables
       "$mod" = "SUPER";
@@ -260,8 +245,8 @@ in
         "$mod, B, exec, gpu-launch chromium"
         "$mod, O, exec, gpu-launch obsidian"
         "$mod, E, exec, gpu-launch electron-mail"
-        "$mod, N, exec, kitty nvim"
-        "$mod, T, exec, thunar"
+        "$mod, N, exec, kitty nvim
+        "$mod, T, exec, thunar""
         "$mod, G, exec, gpu-toggle"  # GPU mode toggle
         "$mod SHIFT, M, exec, monitor-toggle"
         "$mod, TAB, exec, workspace-overview"
@@ -338,39 +323,8 @@ in
         ", XF86MonBrightnessUp, exec, brightnessctl set 10%+"
         ", XF86MonBrightnessDown, exec, brightnessctl set 10%-"
         
-        # Window management
-        "$mod, S, pseudo"
-        "$mod, P, pin"
-        "$mod, C, centerwindow"
-        "$mod SHIFT, Q, exit"
-        "$mod, L, exec, hyprlock"
-        "$mod SHIFT, R, exec, hyprctl reload"
-        
-        # Quick launchers
-        "$mod SHIFT, Space, exec, wofi --show run"
-        
-        # Window resizing
-        "$mod, R, submap, resize"
-        
-        # Group management
-        "$mod, U, togglegroup"
-        "$mod, Tab, changegroupactive, f"
-        "$mod SHIFT, Tab, changegroupactive, b"
-        
         # Clipboard history
         "$mod, V, exec, cliphist list | wofi --dmenu | cliphist decode | wl-copy"
-      ];
-      
-      # Resize submap
-      submap = "resize";
-      
-      # When in resize mode
-      binde = [
-        ", right, resizeactive, 30 0"
-        ", left, resizeactive, -30 0"
-        ", up, resizeactive, 0 -30"
-        ", down, resizeactive, 0 30"
-        ", escape, submap, reset"
       ];
     };
   };
