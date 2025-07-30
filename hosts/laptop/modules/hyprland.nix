@@ -224,13 +224,13 @@ in
         "opacity 0.90,class:^(thunar)$"
         
         # Workspace assignments
-        "workspace 1,class:^(thunar)$"
-        "workspace 2,class:^(chromium-.*|Chromium-.*)$"
-        "workspace 6,class:^(nvim)$"
-        "workspace 7,class:^(kitty)$"
-        "workspace 8,class:^(btop|htop|pavucontrol)$"
-        "workspace 4,class:^(obsidian)$"
-        "workspace 5,class:^(electron-mail)$"
+     #   "workspace 1,class:^(thunar)$"
+     #   "workspace 2,class:^(chromium-.*|Chromium-.*)$"
+     #   "workspace 6,class:^(nvim)$"
+     #   "workspace 7,class:^(kitty)$"
+     #   "workspace 8,class:^(btop|htop|pavucontrol)$"
+     #   "workspace 4,class:^(obsidian)$"
+     #   "workspace 5,class:^(electron-mail)$"
         
         # Picture-in-picture
         "float,title:^(Picture-in-Picture)$"
@@ -267,7 +267,7 @@ in
         "$mod, 3, exec, gpu-launch chromium --new-window https://jobtread.com"
         "$mod, 4, exec, gpu-launch electron-mail"
         "$mod, 5, exec, gpu-launch obsidian"
-        "$mod, 6, exec, kitty nvim"
+        "$mod, 6, exec, kitty sudo nvim"
         "$mod, K, exec, kitty"
         "$mod, 7, exec, kitty"
         "$mod, M, exec, kitty btop"
@@ -275,7 +275,7 @@ in
         "$mod, 1, exec, thunar"
         "$mod, O, exec, gpu-launch obsidian"
         "$mod, E, exec, gpu-launch electron-mail"
-        "$mod, N, exec, kitty nvim"
+        "$mod, N, exec, sudo kitty sudo nvim"
         "$mod, T, exec, thunar"
         "$mod, G, exec, gpu-toggle"  # GPU mode toggle
         "$mod SHIFT, M, exec, monitor-toggle"
