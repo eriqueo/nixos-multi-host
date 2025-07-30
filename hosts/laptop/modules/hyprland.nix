@@ -360,18 +360,6 @@ in
         # Clipboard history
         "$mod, V, exec, cliphist list | wofi --dmenu | cliphist decode | wl-copy"
       ];
-      
-      # Resize submap
-      submap = "resize";
-      
-      # When in resize mode
-      binde = [
-        ", right, resizeactive, 30 0"
-        ", left, resizeactive, -30 0"
-        ", up, resizeactive, 0 -30"
-        ", down, resizeactive, 0 30"
-        ", escape, submap, reset"
-      ];
     };
   };
 
