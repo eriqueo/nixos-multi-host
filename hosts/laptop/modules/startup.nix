@@ -24,20 +24,22 @@ let
     # Initialize GPU mode to Intel (default)
     echo "intel" > /tmp/gpu-mode
     
-    # Launch apps directly to specific workspaces (silent mode) with GPU wrapper
-    hyprctl dispatch exec '[workspace 1 silent] gpu-launch librewolf' &      # External
+    # Launch apps to workspaces matching keybinding configuration
+    hyprctl dispatch exec '[workspace 1 silent] gpu-launch thunar' &        # Workspace 1 - File manager
     sleep 1
-    hyprctl dispatch exec '[workspace 2 silent] gpu-launch electron-mail' &  # External  
+    hyprctl dispatch exec '[workspace 2 silent] gpu-launch chromium ' &     # Workspace 2 - Browser
     sleep 1
-    hyprctl dispatch exec '[workspace 3 silent] gpu-launch chromium --app=https://jobtread.com' &  # External
+    hyprctl dispatch exec '[workspace 3 silent] gpu-launch chromium --new-window https://jobtread.com' &  # Workspace 3 - JobTread
     sleep 1
-    
-    # Laptop monitor workspaces (11-18)
-    hyprctl dispatch exec '[workspace 4 silent] gpu-launch obsidian' &      # Laptop
+    hyprctl dispatch exec '[workspace 4 silent] gpu-launch electron-mail' & # Workspace 4 - Email
     sleep 1
-    hyprctl dispatch exec '[workspace 5 silent] neovim' &         # Laptop (no GPU wrapper for terminal apps)
+    hyprctl dispatch exec '[workspace 5 silent] gpu-launch obsidian' &      # Workspace 5 - Notes
     sleep 1
-    hyprctl dispatch exec '[workspace 6 silent] kitty' &        # Laptop
+    hyprctl dispatch exec '[workspace 6 silent] nvim' &                     # Workspace 6 - Editor
+    sleep 1
+    hyprctl dispatch exec '[workspace 7 silent] kitty' &                    # Workspace 7 - Terminal
+    sleep 1
+    hyprctl dispatch exec '[workspace 8 silent] kitty btop' &               # Workspace 8 - Monitoring
     sleep 1
     
     # Stay on workspace 1
@@ -48,22 +50,4 @@ in
 {
   # Install startup script
   home.packages = [ hyprStartup ];
-  
-  # Session services can be added here
-  systemd.user.services = {
-    # Example: Auto-start clipboard history
-    cliphist = {
-      Unit = {
-        Description = "Clipboard history daemon";
-        After = [ "graphical-session.target" ];
-      };
-      Service = {
-        ExecStart = "${pkgs.wl-clipboard}/bin/wl-paste --type text --watch ${pkgs.cliphist}/bin/cliphist store";
-        Restart = "always";
-      };
-      Install = {
-        WantedBy = [ "graphical-session.target" ];
-      };
-    };
-  };
 }
