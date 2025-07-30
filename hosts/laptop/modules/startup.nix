@@ -30,13 +30,12 @@ let
     sleep 1
     
     # Laptop monitor workspaces (11-18)
-    hyprctl dispatch exec '[workspace 11 silent] obsidian' &      # Laptop
+    hyprctl dispatch exec '[workspace 4 silent] obsidian' &      # Laptop
     sleep 1
-    hyprctl dispatch exec '[workspace 12 silent] kitty' &         # Laptop
+    hyprctl dispatch exec '[workspace 5 silent] neovim' &         # Laptop
     sleep 1
-    hyprctl dispatch exec '[workspace 13 silent] codium' &        # Laptop
+    hyprctl dispatch exec '[workspace 6 silent] kitty' &        # Laptop
     sleep 1
-    hyprctl dispatch exec '[workspace 14 silent] qbittorrent' &   # Laptop
     
     # Stay on workspace 1
     hyprctl dispatch workspace 1

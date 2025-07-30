@@ -242,7 +242,7 @@ in
         "$mod, Q, killactive"
         "$mod, F, fullscreen"
         "$mod, Space, exec, wofi --show drun"
-        "$mod, B, exec, librewolf"
+        "$mod, B, exec, chromium"
         "$mod, O, exec, obsidian"
         "$mod, E, exec, electron-mail"
         "$mod, N, exec, kitty nvim"
