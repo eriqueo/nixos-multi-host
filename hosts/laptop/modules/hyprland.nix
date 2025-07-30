@@ -267,7 +267,7 @@ in
         "$mod, 3, exec, gpu-launch chromium --new-window https://jobtread.com"
         "$mod, 4, exec, gpu-launch electron-mail"
         "$mod, 5, exec, gpu-launch obsidian"
-        "$mod, 6, exec, nvim"
+        "$mod, 6, exec, kitty nvim"
         "$mod, K, exec, kitty"
         "$mod, 7, exec, kitty"
         "$mod, M, exec, kitty btop"
@@ -275,7 +275,7 @@ in
         "$mod, 1, exec, thunar"
         "$mod, O, exec, gpu-launch obsidian"
         "$mod, E, exec, gpu-launch electron-mail"
-        "$mod, N, exec, nvim"
+        "$mod, N, exec, kitty nvim"
         "$mod, T, exec, thunar"
         "$mod, G, exec, gpu-toggle"  # GPU mode toggle
         "$mod SHIFT, M, exec, monitor-toggle"

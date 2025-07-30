@@ -19,7 +19,7 @@
     enable = true;
     settings = {
       font_family = "CaskaydiaCove Nerd Font";
-      font_size = 14;
+      font_size = 16;
       enable_audio_bell = false;
       window_padding_width = 4;
       
