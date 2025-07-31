@@ -4,7 +4,7 @@
 
 {
   ####################################################################
-  # 1. IMPORTS - Updated with new modules
+
   ####################################################################
   imports = [
     ./hardware-configuration.nix
@@ -15,6 +15,9 @@
     # Shared configuration
     ../../shared/secrets.nix
     
+    # VPN credentials and .env setup
+    ./modules/vpn.nix    
+   
     # Consolidated filesystem structure
     ../../modules/filesystem
     
