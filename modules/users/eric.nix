@@ -135,6 +135,13 @@ in
     pciutils
     dmidecode
     
+    # Disk and filesystem tools
+    parted        # Disk partitioning tool
+    gptfdisk      # GPT partition management (gdisk/sgdisk)
+    dosfstools    # FAT32/VFAT filesystem tools
+    e2fsprogs     # ext2/3/4 filesystem tools
+    ntfs3g        # NTFS filesystem support
+    
     # Version control
     gh           # GitHub CLI
   ] ++ [
