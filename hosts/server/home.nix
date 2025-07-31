@@ -27,7 +27,7 @@
   ####################################################################
   home.packages = with pkgs; [
     # Server-specific tools
-    okular        # PDF viewer (for X11 forwarding)
+        #    okular        # PDF viewer (for X11 forwarding)
     
     # Additional server utilities can be added here
   ];

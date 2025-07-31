@@ -58,7 +58,7 @@
   # Helpful aliases for rescue operations
   environment.shellAliases = {
     ll = "ls -la";
-    rebuild-server = "nixos-rebuild switch --flake /etc/nixos#server";
+    rebuild-server = "nixos-rebuild switch --flake /etc/nixos#homeserver";
     mount-server = "mount /dev/disk/by-uuid/42d7ef27-5af7-4929-b0f4-f6247d4b1551 /mnt && mount /dev/disk/by-uuid/01C8-BA8F /mnt/boot";
   };
 
