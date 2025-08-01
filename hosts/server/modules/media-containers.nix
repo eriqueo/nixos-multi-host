@@ -157,6 +157,54 @@ EOF
     '';
   };
 
+  # Systemd service to configure *arr URL bases for reverse proxy
+  systemd.services.arr-urlbase-setup = {
+    description = "Configure *arr applications URL base for reverse proxy";
+    after = [ "podman-sonarr.service" "podman-radarr.service" "podman-lidarr.service" "podman-prowlarr.service" ];
+    wantedBy = [ "multi-user.target" ];
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+      User = "root";
+    };
+    script = ''
+      # Wait for containers to start and create config files
+      echo "Waiting for *arr containers to initialize..."
+      sleep 30
+      
+      # Function to update URL base in config.xml
+      update_urlbase() {
+        local app="$1"
+        local urlbase="/$1"
+        local config_file="/opt/downloads/$app/config.xml"
+        
+        if [ -f "$config_file" ]; then
+          echo "Updating $app URL base to $urlbase"
+          # Use sed to replace empty UrlBase with the correct path
+          sed -i "s|<UrlBase></UrlBase>|<UrlBase>$urlbase</UrlBase>|g" "$config_file"
+          echo "Updated $app config"
+        else
+          echo "Warning: $config_file not found"
+        fi
+      }
+      
+      # Update each *arr application
+      update_urlbase "sonarr"
+      update_urlbase "radarr" 
+      update_urlbase "lidarr"
+      update_urlbase "prowlarr"
+      
+      # Restart containers to apply config changes
+      echo "Restarting *arr containers to apply URL base changes..."
+      systemctl restart podman-sonarr.service
+      systemctl restart podman-radarr.service  
+      systemctl restart podman-lidarr.service
+      systemctl restart podman-prowlarr.service
+      
+      echo "*arr URL base configuration complete"
+    '';
+  };
+
   ####################################################################
   # 1. CONTAINER ORCHESTRATION WITH GPU SUPPORT
   ####################################################################

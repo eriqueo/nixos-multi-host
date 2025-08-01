@@ -3,7 +3,7 @@
   # Caddy reverse proxy for all services
   services.caddy = {
     enable = true;
-    virtualHosts."heartwood.ocelot-wahoo.ts.net".extraConfig = ''
+    virtualHosts."homeserver.ocelot-wahoo.ts.net".extraConfig = ''
       # Obsidian LiveSync proxy: strip /sync prefix and forward to CouchDB
       @sync path /sync*
       handle @sync {
