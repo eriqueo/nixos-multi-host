@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+# fix_numbers.sh
+# Renames:
+#   (NN) Something => NN_Something
+#   [NN] Something => NN_Something
+# in two separate if/elif checks.
+
+for item in *; do
+  # 1) If it starts with (NN), rename to NN_
+  if [[ "$item" =~ ^\([0-9]+\)\s? ]]; then
+    newname="$(echo "$item" | sed -E 's/^\(([0-9]+)\)\s?/\1_/')"
+    if [[ "$item" != "$newname" ]]; then
+      echo "Renaming '$item' -> '$newname'"
+      mv "$item" "$newname"
+    fi
+
+  # 2) Else if it starts with [NN], rename to NN_
+  elif [[ "$item" =~ ^\[([0-9]+)\]\s? ]]; then
+    newname="$(echo "$item" | sed -E 's/^\[([0-9]+)\]\s?/\1_/')"
+    if [[ "$item" != "$newname" ]]; then
+      echo "Renaming '$item' -> '$newname'"
+      mv "$item" "$newname"
+    fi
+
+  else
+    # Doesn't match either pattern, so skip
+    continue
+  fi
+done

@@ -1,0 +1,37 @@
+#!/bin/bash
+# move_job.sh <folder_to_move>
+
+# 1) The source folder to move:
+FOLDER_PATH="$1"
+
+# 2) Where you want to move it (Completed Jobs folder):
+DESTINATION_PATH="/home/eric/02_Completed Jobs"
+
+# Extract just the folder name, e.g. "02_job"
+JOB_FOLDER="$(basename "$FOLDER_PATH")"
+
+# Gather existing numeric prefixes in the destination
+cd "$DESTINATION_PATH" || exit 1
+
+existing_numbers=()
+for d in */; do
+  prefix="${d%%_*}"
+  if [[ "$prefix" =~ ^[0-9]+$ ]]; then
+    existing_numbers+=("$prefix")
+  fi
+done
+
+if [ ${#existing_numbers[@]} -eq 0 ]; then
+  new_number="01"
+else
+  IFS=$'\n' sorted=($(sort -n <<<"${existing_numbers[*]}"))
+  highest="${sorted[-1]}"
+  new_number=$(printf "%02d" $((10#$highest + 1)))
+fi
+
+old_prefix="${JOB_FOLDER%%_*}"
+suffix="${JOB_FOLDER#*_}"
+new_folder_name="${new_number}_${suffix}"
+
+mv "$FOLDER_PATH" "${DESTINATION_PATH}/${new_folder_name}"
+echo "Moved '$JOB_FOLDER' to '${new_folder_name}' in $DESTINATION_PATH"

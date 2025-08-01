@@ -1,0 +1,122 @@
+#!/bin/bash
+# This script creates a template folder structure for projects
+
+# Create the top-level Projects folder if it doesn't exist.
+mkdir -p ~/Projects
+
+# Create the common folder with shared resources.
+mkdir -p ~/Projects/common
+
+# Create a sample shared API file and helper module.
+touch ~/Projects/common/apis.env
+cat << 'EOF' > ~/Projects/common/helper.py
+#!/usr/bin/env python
+"""
+Helper functions to load secrets from the shared apis.env file.
+"""
+
+import os
+from pathlib import Path
+from dotenv import dotenv_values
+
+def get_secret(key: str, env_path: str = None) -> str:
+    """
+    Load a secret value by key. If no env_path is provided,
+    use the shared apis.env in the common folder.
+    """
+    if env_path is None:
+        # Assuming the common folder is at ~/Projects/common
+        env_path = Path.home() / "Projects" / "common" / "apis.env"
+    else:
+        env_path = Path(env_path)
+
+    if not env_path.exists():
+        raise FileNotFoundError(f"Environment file '{env_path}' not found.")
+
+    config = dotenv_values(env_path)
+    value = config.get(key)
+    if value is None:
+        raise ValueError(f"Key '{key}' not found in {env_path}.")
+    return value
+
+if __name__ == "__main__":
+    # Quick test: print out a key if it exists.
+    try:
+        print("YOUTUBE_API_KEY:", get_secret("YOUTUBE_API_KEY"))
+    except Exception as e:
+        print(e)
+EOF
+
+# Create the example project folder: youtube_transcript_fetcher.
+mkdir -p ~/Projects/youtube_transcript_fetcher
+
+# Create the main files for the project.
+touch ~/Projects/youtube_transcript_fetcher/README.md
+touch ~/Projects/youtube_transcript_fetcher/requirements.txt
+touch ~/Projects/youtube_transcript_fetcher/main.py
+touch ~/Projects/youtube_transcript_fetcher/.env
+
+# Write a simple README file.
+cat << 'EOF' > ~/Projects/youtube_transcript_fetcher/README.md
+# YouTube Transcript Fetcher
+
+This project fetches YouTube video transcripts from a given playlist.
+It uses a shared helper module (located in ../common) to load API keys and other secrets.
+
+## Setup
+
+1. Create and activate a virtual environment:
+   \`\`\`bash
+   python -m venv venv
+   source venv/bin/activate
+   \`\`\`
+
+2. Install the dependencies:
+   \`\`\`bash
+   pip install -r requirements.txt
+   \`\`\`
+
+3. Populate the API keys in the shared file at \`~/Projects/common/apis.env\`.
+
+4. Run the script:
+   \`\`\`bash
+   python main.py
+   \`\`\`
+EOF
+
+# Write a basic placeholder for requirements.txt.
+cat << 'EOF' > ~/Projects/youtube_transcript_fetcher/requirements.txt
+# Add your project dependencies here
+python-dotenv
+google-api-python-client
+youtube-transcript-api
+EOF
+
+# Write a placeholder main.py that imports the helper module.
+cat << 'EOF' > ~/Projects/youtube_transcript_fetcher/main.py
+#!/usr/bin/env python
+"""
+Main script for the YouTube Transcript Fetcher project.
+"""
+
+from common.helper import get_secret
+
+def main():
+    try:
+        # Retrieve the YouTube API key using the shared helper.
+        api_key = get_secret("YOUTUBE_API_KEY")
+        print("Successfully loaded YOUTUBE_API_KEY:", api_key)
+        # Add your YouTube API logic here.
+    except Exception as e:
+        print("Error loading API key:", e)
+
+if __name__ == "__main__":
+    main()
+EOF
+
+# Make the main.py and helper.py executable (optional).
+chmod +x ~/Projects/youtube_transcript_fetcher/main.py
+chmod +x ~/Projects/common/helper.py
+
+echo "Project template created in ~/Projects!"
+
