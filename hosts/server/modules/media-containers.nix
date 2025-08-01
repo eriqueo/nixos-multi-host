@@ -85,8 +85,22 @@ let
 in
 
 {
-  # For now, let's skip SOPS and hardcode the credentials to get it working
-  # We can add SOPS back once the container setup is verified
+  # SOPS secrets configuration for VPN credentials
+  sops.secrets.vpn_username = {
+    sopsFile = ../../../secrets/admin.yaml;
+    key = "vpn/protonvpn/username";
+    mode = "0400";
+    owner = "root";
+    group = "root";
+  };
+
+  sops.secrets.vpn_password = {
+    sopsFile = ../../../secrets/admin.yaml;
+    key = "vpn/protonvpn/password";
+    mode = "0400";
+    owner = "root";
+    group = "root";
+  };
   
   ####################################################################
   # 0. NETWORK SETUP
@@ -108,25 +122,36 @@ in
     '';
   };
 
-  # Systemd service to generate Gluetun environment file with hardcoded credentials
+  # Systemd service to generate Gluetun environment file from SOPS secrets
   systemd.services.gluetun-env-setup = {
-    description = "Generate Gluetun environment file";
+    description = "Generate Gluetun environment file from SOPS secrets";
     before = [ "podman-gluetun.service" ];
     wantedBy = [ "podman-gluetun.service" ];
+    wants = [ "sops-install-secrets.service" ];
+    after = [ "sops-install-secrets.service" ];
     serviceConfig = {
       Type = "oneshot";
       User = "root";
     };
     script = ''
+      # Ensure downloads directory exists
       mkdir -p /opt/downloads
+      
+      # Read VPN credentials from SOPS secrets
+      VPN_USERNAME=$(cat ${config.sops.secrets.vpn_username.path})
+      VPN_PASSWORD=$(cat ${config.sops.secrets.vpn_password.path})
+      
+      # Generate Gluetun environment file
       cat > /opt/downloads/.env << EOF
 VPN_SERVICE_PROVIDER=protonvpn
 VPN_TYPE=openvpn
-OPENVPN_USER=VohhVd45cTWfeAI8
-OPENVPN_PASSWORD=RPSb517Y93oZf3sFUL6riuCixBRQBD4D
+OPENVPN_USER=$VPN_USERNAME
+OPENVPN_PASSWORD=$VPN_PASSWORD
 SERVER_COUNTRIES=Netherlands
 HEALTH_VPN_DURATION_INITIAL=30s
 EOF
+      
+      # Set proper permissions
       chmod 600 /opt/downloads/.env
       chown root:root /opt/downloads/.env
     '';

@@ -21,7 +21,7 @@
     # New modules for GPU and SSD integration
     ./modules/gpu-acceleration.nix       # NVIDIA Quadro P1000 support
     ./modules/hot-storage.nix           # SSD hot storage tier
-    ./modules/media-containers-v2.nix   # Updated containers with GPU and hot/cold storage
+    ./modules/media-containers.nix      # Media containers with VPN, GPU and hot/cold storage
     
     # Monitoring stack
     ./modules/monitoring.nix              # Comprehensive monitoring with Grafana/Prometheus
