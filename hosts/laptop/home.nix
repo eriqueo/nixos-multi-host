@@ -19,6 +19,7 @@
     ./modules/theming.nix
     ./modules/startup.nix
     ./modules/virtualization.nix
+    ./modules/betterbird.nix    
   ];
 
   # IDENTITY
