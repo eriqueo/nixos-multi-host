@@ -35,8 +35,12 @@
     ./modules/business-api.nix
     ./modules/ai-services.nix
     ./modules/adhd-tools.nix
-    ./modules/obsidian-sync.nix
     ./modules/hardware-tools.nix
+    
+    # Refactored Obsidian/CouchDB/Caddy modules
+    ./modules/couchdb-setup.nix          # CouchDB with SOPS integration
+    ./modules/caddy-config.nix           # Caddy reverse proxy configuration
+    ./modules/obsidian-livesync.nix      # Obsidian-specific monitoring
   ];
 
   ####################################################################
