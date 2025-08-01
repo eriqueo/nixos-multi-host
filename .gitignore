@@ -1,0 +1,15 @@
+# NixOS build outputs
+result
+result-*
+
+# Temporary files
+*.tmp
+*.swp
+*.swo
+*~
+
+# OS-specific files
+.DS_Store
+Thumbs.dbnixos-minimal-25.11pre-git-x86_64-linux.iso
+nixos-minimal-25.11pre-git-x86_64-linux.iso
+nixos-minimal-25.11pre-git-x86_64-linux.iso
