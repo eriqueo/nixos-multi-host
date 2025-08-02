@@ -49,8 +49,7 @@ in
       image = "grafana/grafana:latest";
       autoStart = true;
       extraOptions = mediaNetworkOptions;
-      environment = {
-        TZ = "America/Denver";
+      environment = mediaServiceEnv // {
         GF_SECURITY_ADMIN_PASSWORD = "admin123";
         GF_USERS_ALLOW_SIGN_UP = "false";
         GF_INSTALL_PLUGINS = "grafana-piechart-panel,grafana-worldmap-panel,grafana-clock-panel";

@@ -5,7 +5,12 @@
       "Bash(podman ps:*)",
       "Bash(rg:*)",
       "Bash(find:*)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(podman pod:*)",
+      "Bash(sudo podman ps:*)",
+      "Bash(sudo journalctl:*)",
+      "Bash(sudo netstat:*)",
+      "Bash(sudo ss:*)"
     ],
     "deny": []
   }
