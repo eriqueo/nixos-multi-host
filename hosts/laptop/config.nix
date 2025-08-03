@@ -20,7 +20,7 @@
   ####################################################################
   # 2. HOST IDENTITY
   ####################################################################
-  networking.hostName = "heartwood-laptop";
+  networking.hostName = "hwc-laptop";
   # File ownership rules now handled in modules/users/eric.nix
 
   ####################################################################

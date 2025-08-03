@@ -64,7 +64,7 @@
   ####################################################################
   # 4. HOST IDENTITY & NETWORKING
   ####################################################################
-  networking.hostName = "homeserver";
+  networking.hostName = "hwc-server";
   networking.networkmanager.enable = true;
   
   # Set your time zone

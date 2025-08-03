@@ -216,10 +216,18 @@
         # IMPROVED FLOW: Test BEFORE committing
         echo "🧪 Testing configuration before committing..."
         local hostname=$(hostname)
+        # Map hostname to flake name
+        case "$hostname" in
+          "homeserver") local flake_name="hwc-server" ;;
+          "hwc-server") local flake_name="hwc-server" ;;
+          "hwc-laptop") local flake_name="hwc-laptop" ;;
+          "heartwood-laptop") local flake_name="hwc-laptop" ;;
+          *) local flake_name="$hostname" ;;
+        esac
         local test_success=false
         
         if [[ -f flake.nix ]]; then
-          if sudo nixos-rebuild test --flake .#"$hostname"; then
+          if sudo nixos-rebuild test --flake .#"$flake_name"; then
             test_success=true
           fi
         else
@@ -291,7 +299,15 @@
         }
         echo “🔄 Rebuilding system with fresh container images…”
         local hostname=$(hostname)
-        if ! sudo nixos-rebuild switch –flake .#”$hostname”; then
+        # Map hostname to flake name
+        case "$hostname" in
+          "homeserver") local flake_name="hwc-server" ;;
+          "hwc-server") local flake_name="hwc-server" ;;
+          "hwc-laptop") local flake_name="hwc-laptop" ;;
+          "heartwood-laptop") local flake_name="hwc-laptop" ;;
+          *) local flake_name="$hostname" ;;
+        esac
+        if ! sudo nixos-rebuild switch –flake .#”$flake_name”; then
         echo “❌ NixOS rebuild failed”
         cd “$original_dir”
         return 1

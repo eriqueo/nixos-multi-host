@@ -16,7 +16,7 @@
   outputs = inputs@{ self, nixpkgs, home-manager, sops-nix, ... }: {
     nixosConfigurations = {
       # Laptop configuration (existing)
-      heartwood-laptop = nixpkgs.lib.nixosSystem {
+      hwc-laptop = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         modules = [
           ./hosts/laptop/config.nix
@@ -31,7 +31,7 @@
       };
 
       # Server configuration (new)
-      homeserver = nixpkgs.lib.nixosSystem {
+      hwc-server = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
         modules = [
           ./hosts/server/config.nix
