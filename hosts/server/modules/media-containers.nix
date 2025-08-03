@@ -5,47 +5,47 @@
 let
   # Helper function for config volumes
   configVol = service: "/opt/downloads/${service}:/config";
-  
+
   # Standard environment for media services
   mediaServiceEnv = {
     PUID = "1000";
     PGID = "1000";
     TZ = "America/Denver";
   };
-  
+
   # Network options
   mediaNetworkOptions = [ "--network=media-network" ];
   vpnNetworkOptions = [ "--network=container:gluetun" ];
-  
+
   # GPU options - Direct device access without runtime
-  nvidiaGpuOptions = [ 
+  nvidiaGpuOptions = [
     "--device=/dev/nvidia0:/dev/nvidia0:rwm"
-    "--device=/dev/nvidiactl:/dev/nvidiactl:rwm" 
+    "--device=/dev/nvidiactl:/dev/nvidiactl:rwm"
     "--device=/dev/nvidia-modeset:/dev/nvidia-modeset:rwm"
     "--device=/dev/nvidia-uvm:/dev/nvidia-uvm:rwm"
     "--device=/dev/nvidia-uvm-tools:/dev/nvidia-uvm-tools:rwm"
     "--device=/dev/dri:/dev/dri:rwm"
   ];
   intelGpuOptions = [ "--device=/dev/dri:/dev/dri" ];
-  
+
   # GPU environment
   nvidiaEnv = {
     NVIDIA_VISIBLE_DEVICES = "all";
     NVIDIA_DRIVER_CAPABILITIES = "compute,video,utility";
   };
-  
+
   intelEnv = {
     LIBVA_DRIVER_NAME = "nvidia";
     VDPAU_DRIVER = "nvidia";
   };
-  
+
   # Volume patterns
   hotCache = service: "/mnt/hot/cache/${service}:/cache";
   torrentDownloads = "/mnt/hot/downloads:/downloads";
   usenetDownloads = "/mnt/hot/downloads:/downloads";
   coldMedia = "/mnt/media:/cold-media";
   localtime = "/etc/localtime:/etc/localtime:ro";
-  
+
   # Container builders
   buildMediaServiceContainer = { name, image, mediaType, extraVolumes ? [], extraOptions ? [], environment ? {} }: {
     inherit image;
@@ -70,7 +70,7 @@ let
       "/mnt/hot/processing/${name}-temp:/processing"
     ] ++ extraVolumes;
   };
-  
+
   buildDownloadContainer = { name, image, downloadPath, network ? "vpn", extraVolumes ? [], extraOptions ? [], environment ? {} }: {
     inherit image;
     autoStart = true;
@@ -109,11 +109,11 @@ in
     owner = "root";
     group = "root";
   };
-  
+
   ####################################################################
   # 0. NETWORK SETUP
   ####################################################################
-  
+
   # Create media-network for container communication
   systemd.services.init-media-network = {
     description = "Create media-network";
@@ -144,11 +144,11 @@ in
     script = ''
       # Ensure downloads directory exists
       mkdir -p /opt/downloads
-      
+
       # Read VPN credentials from SOPS secrets
       VPN_USERNAME=$(cat ${config.sops.secrets.vpn_username.path})
       VPN_PASSWORD=$(cat ${config.sops.secrets.vpn_password.path})
-      
+
       # Generate Gluetun environment file
       cat > /opt/downloads/.env << EOF
 VPN_SERVICE_PROVIDER=protonvpn
@@ -158,7 +158,7 @@ OPENVPN_PASSWORD=$VPN_PASSWORD
 SERVER_COUNTRIES=Netherlands
 HEALTH_VPN_DURATION_INITIAL=30s
 EOF
-      
+
       # Set proper permissions
       chmod 600 /opt/downloads/.env
       chown root:root /opt/downloads/.env
@@ -166,52 +166,75 @@ EOF
   };
 
   # Systemd service to configure *arr URL bases for reverse proxy
-  systemd.services.arr-urlbase-setup = {
-    description = "Configure *arr applications URL base for reverse proxy";
-    after = [ "podman-sonarr.service" "podman-radarr.service" "podman-lidarr.service" "podman-prowlarr.service" ];
-    wantedBy = [ "multi-user.target" ];
-    serviceConfig = {
-      Type = "oneshot";
-      RemainAfterExit = true;
-      User = "root";
-    };
-    script = ''
-      # Wait for containers to start and create config files
-      echo "Waiting for *arr containers to initialize..."
-      sleep 30
-      
-      # Function to update URL base in config.xml
-      update_urlbase() {
-        local app="$1"
-        local urlbase="/$1"
-        local config_file="/opt/downloads/$app/config.xml"
-        
-        if [ -f "$config_file" ]; then
-          echo "Updating $app URL base to $urlbase"
-          # Use sed to replace empty UrlBase with the correct path
-          sed -i "s|<UrlBase></UrlBase>|<UrlBase>$urlbase</UrlBase>|g" "$config_file"
-          echo "Updated $app config"
-        else
-          echo "Warning: $config_file not found"
-        fi
-      }
-      
-      # Update each *arr application
-      update_urlbase "sonarr"
-      update_urlbase "radarr" 
-      update_urlbase "lidarr"
-      update_urlbase "prowlarr"
-      
-      # Restart containers to apply config changes
-      echo "Restarting *arr containers to apply URL base changes..."
-      systemctl restart podman-sonarr.service
-      systemctl restart podman-radarr.service  
-      systemctl restart podman-lidarr.service
-      systemctl restart podman-prowlarr.service
-      
-      echo "*arr URL base configuration complete"
-    '';
-  };
+  # Temporarily disabled while debugging container issues
+  # systemd.services.arr-urlbase-setup = {
+  #   description = "Configure *arr applications URL base for reverse proxy";
+  #   after = [ "podman-sonarr.service" "podman-radarr.service" "podman-lidarr.service" "podman-prowlarr.service" ];
+  #   wantedBy = [ "multi-user.target" ];
+  #   serviceConfig = {
+  #     Type = "oneshot";
+  #     RemainAfterExit = true;
+  #     User = "root";
+  #     Restart = "no";
+  #   };
+  #   script = ''
+  #     # Wait for containers to start and create config files
+  #     echo "Waiting for *arr containers to initialize..."
+  #     sleep 30
+  #
+  #     # Function to check if container is running
+  #     container_running() {
+  #       local container="$1"
+  #       ${pkgs.podman}/bin/podman ps --format "table {{.Names}}" | grep -q "^$container$"
+  #     }
+  #
+  #     # Function to update URL base in config.xml
+  #     update_urlbase() {
+  #       local app="$1"
+  #       local urlbase="/$1"
+  #       local config_file="/opt/downloads/$app/config.xml"
+  #
+  #       if [ -f "$config_file" ]; then
+  #         echo "Updating $app URL base to $urlbase"
+  #         # Use sed to replace empty UrlBase with the correct path
+  #         ${pkgs.gnused}/bin/sed -i "s|<UrlBase></UrlBase>|<UrlBase>$urlbase</UrlBase>|g" "$config_file"
+  #         echo "Updated $app config"
+  #       else
+  #         echo "Warning: $config_file not found"
+  #       fi
+  #     }
+  #
+  #     # Function to safely restart container
+  #     safe_restart_container() {
+  #       local service="$1"
+  #       echo "Attempting to restart $service..."
+  #       if ${pkgs.systemd}/bin/systemctl is-active --quiet "$service"; then
+  #         if ${pkgs.systemd}/bin/systemctl restart "$service"; then
+  #           echo "Successfully restarted $service"
+  #         else
+  #           echo "Warning: Failed to restart $service, but continuing..."
+  #         fi
+  #       else
+  #         echo "Warning: $service is not active, skipping restart"
+  #       fi
+  #     }
+  #
+  #     # Update each *arr application
+  #     update_urlbase "sonarr"
+  #     update_urlbase "radarr"
+  #     update_urlbase "lidarr"
+  #     update_urlbase "prowlarr"
+  #
+  #     # Restart containers to apply config changes (with error handling)
+  #     echo "Restarting *arr containers to apply URL base changes..."
+  #     safe_restart_container "podman-sonarr.service"
+  #     safe_restart_container "podman-radarr.service"
+  #     safe_restart_container "podman-lidarr.service"
+  #     safe_restart_container "podman-prowlarr.service"
+  #
+  #     echo "*arr URL base configuration complete"
+  #   '';
+  # };
 
   ####################################################################
   # 1. CONTAINER ORCHESTRATION WITH GPU SUPPORT
@@ -219,7 +242,7 @@ EOF
   virtualisation.oci-containers = {
     backend = "podman";
     containers = {
-      
+
       # VPN Gateway (removed dependsOn to fix startup)
       gluetun = {
         image = "qmcgaw/gluetun";
@@ -230,7 +253,7 @@ EOF
           "--network=media-network"
         ];
         environmentFiles = [ "/opt/downloads/.env" ];
-        ports = [ 
+        ports = [
           "8080:8080"  # qBittorrent
           "8081:8081"  # SABnzbd
         ];
@@ -301,7 +324,7 @@ EOF
         environment = mediaServiceEnv // {
           SLSKD_USERNAME = "eriqueok";
           SLSKD_PASSWORD = "il0wwlm?";
-	  SLSKD_SLSK_USERNAME = "eriqueok";              # Add this
+          SLSKD_SLSK_USERNAME = "eriqueok";
           SLSKD_SLSK_PASSWORD = "il0wwlm?";
         };
         ports = [ "5030:5030" ];
@@ -365,106 +388,104 @@ EOF
           "/mnt/media/music:/music:ro"
         ];
       };
-
-
     };
   };
 
   ####################################################################
   # 2. STORAGE AUTOMATION AND CLEANUP
   ####################################################################
-  
+
   # Automated cleanup service
   systemd.services.media-cleanup = {
     description = "Clean up old downloads and temporary files";
     startAt = "daily";
     script = ''
       echo "Starting media cleanup..."
-      
+
       # Clean old downloads (>30 days)
-      /run/current-system/sw/bin/find /mnt/hot/downloads -type f -mtime +30 -delete 2>/dev/null || true
-      
+      ${pkgs.findutils}/bin/find /mnt/hot/downloads -type f -mtime +30 -delete 2>/dev/null || true
+
       # Clean quarantine (>7 days)
-      /run/current-system/sw/bin/find /mnt/hot/quarantine -type f -mtime +7 -delete 2>/dev/null || true
-      
+      ${pkgs.findutils}/bin/find /mnt/hot/quarantine -type f -mtime +7 -delete 2>/dev/null || true
+
       # Clean processing temp files (>1 day)
-      /run/current-system/sw/bin/find /mnt/hot/processing -type f -mtime +1 -delete 2>/dev/null || true
-      
+      ${pkgs.findutils}/bin/find /mnt/hot/processing -type f -mtime +1 -delete 2>/dev/null || true
+
       # Clean empty directories
-      /run/current-system/sw/bin/find /mnt/hot/downloads -type d -empty -delete 2>/dev/null || true
-      /run/current-system/sw/bin/find /mnt/hot/quarantine -type d -empty -delete 2>/dev/null || true
-      /run/current-system/sw/bin/find /mnt/hot/processing -type d -empty -delete 2>/dev/null || true
-      
+      ${pkgs.findutils}/bin/find /mnt/hot/downloads -type d -empty -delete 2>/dev/null || true
+      ${pkgs.findutils}/bin/find /mnt/hot/quarantine -type d -empty -delete 2>/dev/null || true
+      ${pkgs.findutils}/bin/find /mnt/hot/processing -type d -empty -delete 2>/dev/null || true
+
       # Alert if hot storage >80% full
-      USAGE=$(/run/current-system/sw/bin/df /mnt/hot | tail -1 | ${pkgs.gawk}/bin/awk '{print $5}' | sed 's/%//')
-      if [ $USAGE -gt 80 ]; then
-        echo "WARNING: Hot storage is $USAGE% full" | logger -t media-cleanup
+      USAGE=$(${pkgs.coreutils}/bin/df /mnt/hot | ${pkgs.coreutils}/bin/tail -1 | ${pkgs.gawk}/bin/awk '{print $5}' | ${pkgs.gnused}/bin/sed 's/%//')
+      if [ "$USAGE" -gt 80 ]; then
+        echo "WARNING: Hot storage is ''${USAGE}% full" | ${pkgs.util-linux}/bin/logger -t media-cleanup
       fi
-      
+
       echo "Media cleanup completed"
     '';
   };
-  
+
   # Automated media migration from hot to cold storage
   systemd.services.media-migration = {
     description = "Migrate completed media from hot to cold storage";
     startAt = "hourly";
     script = ''
       echo "Starting media migration..."
-      
+
       # Function to safely move files
       safe_move() {
         local src="$1"
         local dest="$2"
-        
-        if [ -d "$src" ] && [ "$(ls -A $src 2>/dev/null)" ]; then
+
+        if [ -d "$src" ] && [ "$(${pkgs.coreutils}/bin/ls -A "$src" 2>/dev/null)" ]; then
           echo "Migrating from $src to $dest"
-          mkdir -p "$dest"
-          rsync -av --remove-source-files "$src/" "$dest/"
+          ${pkgs.coreutils}/bin/mkdir -p "$dest"
+          ${pkgs.rsync}/bin/rsync -av --remove-source-files "$src/" "$dest/"
           # Remove empty source directories
-          /run/current-system/sw/bin/find "$src" -type d -empty -delete 2>/dev/null || true
+          ${pkgs.findutils}/bin/find "$src" -type d -empty -delete 2>/dev/null || true
         fi
       }
-      
+
       # Move completed downloads to cold storage
       safe_move "/mnt/hot/downloads/tv/complete" "/mnt/media/tv"
       safe_move "/mnt/hot/downloads/movies/complete" "/mnt/media/movies"
       safe_move "/mnt/hot/downloads/music/complete" "/mnt/media/music"
-      
+
       # Move processed files
       safe_move "/mnt/hot/processing/sonarr-temp/complete" "/mnt/media/tv"
       safe_move "/mnt/hot/processing/radarr-temp/complete" "/mnt/media/movies"
       safe_move "/mnt/hot/processing/lidarr-temp/complete" "/mnt/media/music"
-      
+
       echo "Media migration completed"
     '';
   };
-  
+
   # Storage monitoring service
   systemd.services.storage-monitor = {
     description = "Monitor storage usage and performance";
     startAt = "*:*:0/30";  # Every 30 seconds
     script = ''
       # Collect storage metrics for Prometheus
-      mkdir -p /var/lib/node_exporter/textfile_collector
-      
+      ${pkgs.coreutils}/bin/mkdir -p /var/lib/node_exporter/textfile_collector
+
       # Hot storage metrics
-      HOT_USAGE=$(/run/current-system/sw/bin/df /mnt/hot | tail -1 | ${pkgs.gawk}/bin/awk '{print $5}' | sed 's/%//')
-      HOT_FREE=$(/run/current-system/sw/bin/df /mnt/hot | tail -1 | ${pkgs.gawk}/bin/awk '{print $4}')
-      HOT_TOTAL=$(/run/current-system/sw/bin/df /mnt/hot | tail -1 | ${pkgs.gawk}/bin/awk '{print $2}')
-      
+      HOT_USAGE=$(${pkgs.coreutils}/bin/df /mnt/hot | ${pkgs.coreutils}/bin/tail -1 | ${pkgs.gawk}/bin/awk '{print $5}' | ${pkgs.gnused}/bin/sed 's/%//')
+      HOT_FREE=$(${pkgs.coreutils}/bin/df /mnt/hot | ${pkgs.coreutils}/bin/tail -1 | ${pkgs.gawk}/bin/awk '{print $4}')
+      HOT_TOTAL=$(${pkgs.coreutils}/bin/df /mnt/hot | ${pkgs.coreutils}/bin/tail -1 | ${pkgs.gawk}/bin/awk '{print $2}')
+
       # Cold storage metrics
-      COLD_USAGE=$(/run/current-system/sw/bin/df /mnt/media | tail -1 | ${pkgs.gawk}/bin/awk '{print $5}' | sed 's/%//')
-      COLD_FREE=$(/run/current-system/sw/bin/df /mnt/media | tail -1 | ${pkgs.gawk}/bin/awk '{print $4}')
-      COLD_TOTAL=$(/run/current-system/sw/bin/df /mnt/media | tail -1 | ${pkgs.gawk}/bin/awk '{print $2}')
-      
+      COLD_USAGE=$(${pkgs.coreutils}/bin/df /mnt/media | ${pkgs.coreutils}/bin/tail -1 | ${pkgs.gawk}/bin/awk '{print $5}' | ${pkgs.gnused}/bin/sed 's/%//')
+      COLD_FREE=$(${pkgs.coreutils}/bin/df /mnt/media | ${pkgs.coreutils}/bin/tail -1 | ${pkgs.gawk}/bin/awk '{print $4}')
+      COLD_TOTAL=$(${pkgs.coreutils}/bin/df /mnt/media | ${pkgs.coreutils}/bin/tail -1 | ${pkgs.gawk}/bin/awk '{print $2}')
+
       # Download queue metrics
-      DOWNLOAD_COUNT=$(/run/current-system/sw/bin/find /mnt/hot/downloads -name "*.part" -o -name "*.!qB" | wc -l)
-      PROCESSING_COUNT=$(/run/current-system/sw/bin/find /mnt/hot/processing -type f | wc -l)
-      QUARANTINE_COUNT=$(/run/current-system/sw/bin/find /mnt/hot/quarantine -type f | wc -l)
-      
+      DOWNLOAD_COUNT=$(${pkgs.findutils}/bin/find /mnt/hot/downloads -name "*.part" -o -name "*.!qB" | ${pkgs.coreutils}/bin/wc -l)
+      PROCESSING_COUNT=$(${pkgs.findutils}/bin/find /mnt/hot/processing -type f | ${pkgs.coreutils}/bin/wc -l)
+      QUARANTINE_COUNT=$(${pkgs.findutils}/bin/find /mnt/hot/quarantine -type f | ${pkgs.coreutils}/bin/wc -l)
+
       # Write metrics
-      cat > /var/lib/node_exporter/textfile_collector/media_storage.prom << EOF
+      ${pkgs.coreutils}/bin/cat > /var/lib/node_exporter/textfile_collector/media_storage.prom << EOF
 # HELP media_storage_usage_percentage Storage usage percentage
 # TYPE media_storage_usage_percentage gauge
 media_storage_usage_percentage{tier="hot"} $HOT_USAGE
@@ -483,31 +504,31 @@ media_queue_files_total{queue="quarantine"} $QUARANTINE_COUNT
 EOF
     '';
   };
-  
+
   ####################################################################
   # 3. APPLICATION HEALTH MONITORING
   ####################################################################
-  
+
   # Health check service for *arr applications
   systemd.services.arr-health-monitor = {
     description = "Monitor *arr application health";
     startAt = "*:*:0/60";  # Every minute
     script = ''
-      mkdir -p /var/lib/node_exporter/textfile_collector
-      
+      ${pkgs.coreutils}/bin/mkdir -p /var/lib/node_exporter/textfile_collector
+
       # Function to check service health
       check_service() {
         local service="$1"
         local port="$2"
         local endpoint="$3"
-        
-        if /run/current-system/sw/bin/curl -s -f "http://localhost:$port$endpoint" >/dev/null 2>&1; then
-          echo "media_service_up{service="$service"} 1"
+
+        if ${pkgs.curl}/bin/curl -s -f "http://localhost:$port$endpoint" >/dev/null 2>&1; then
+          echo "media_service_up{service=\"$service\"} 1"
         else
-          echo "media_service_up{service="$service"} 0"
+          echo "media_service_up{service=\"$service\"} 0"
         fi
       }
-      
+
       # Check each service
       {
         echo "# HELP media_service_up Service availability (1=up, 0=down)"
