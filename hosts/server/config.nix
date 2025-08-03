@@ -20,6 +20,7 @@
     
     # New modules for GPU and SSD integration
     ./modules/gpu-acceleration.nix       # NVIDIA Quadro P1000 support
+    ./modules/jellyfin-gpu.nix          # Jellyfin hardware acceleration configuration
     ./modules/hot-storage.nix           # SSD hot storage tier
     ./modules/media-containers.nix      # Media containers with VPN, GPU and hot/cold storage
     
@@ -173,28 +174,7 @@
     };
   };
   
-  # Override Jellyfin service to enable GPU access
-  systemd.services.jellyfin = {
-    serviceConfig = {
-      # Add GPU device access
-      DeviceAllow = [
-        "/dev/dri/card1 rw"
-        "/dev/dri/card2 rw"
-        "/dev/dri/renderD128 rw"
-        "/dev/dri/renderD129 rw"
-        "/dev/nvidia0 rw"
-        "/dev/nvidiactl rw"
-        "/dev/nvidia-modeset rw"
-        "/dev/nvidia-uvm rw"
-        "/dev/nvidia-uvm-tools rw"
-      ];
-    };
-    environment = {
-      # NVIDIA GPU acceleration
-      NVIDIA_VISIBLE_DEVICES = "all";
-      NVIDIA_DRIVER_CAPABILITIES = "compute,video,utility";
-    };
-  };
+  # Jellyfin GPU configuration now handled by ./modules/jellyfin-gpu.nix
 
   # Override Immich services to enable GPU access
   systemd.services.immich-server = {
