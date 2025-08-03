@@ -135,7 +135,7 @@ in
 
     # NVIDIA GPU Exporter
      nvidia-gpu-exporter = {
-       image = "utkuozdemir/nvidia_gpu_exporter:latest";
+       image = "utkuozdemir/nvidia_gpu_exporter:1.3.2";
        autoStart = true;
        extraOptions = [
          "--network=host"
