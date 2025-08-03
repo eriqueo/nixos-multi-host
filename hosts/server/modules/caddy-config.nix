@@ -20,7 +20,7 @@
       handle_path /qbt/* {
         reverse_proxy localhost:8080
       }
-      handle /sab/* {
+      handle_path /sab/* {
         reverse_proxy localhost:8081
       }
 
@@ -44,14 +44,6 @@
       }
       handle /prowlarr/* {
         reverse_proxy localhost:9696
-      }
-
-      # Home Assistant
-      handle_path /home/* {
-        reverse_proxy localhost:8123 {
-          header_up Upgrade {http.request.header.Upgrade}
-          header_up Connection {http.request.header.Connection}
-        }
       }
 
       # Business services

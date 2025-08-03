@@ -256,22 +256,10 @@ EOF
       ];
     };
 
-    home-assistant = {
-      image = "ghcr.io/home-assistant/home-assistant:stable";
-      autoStart = true;
-      extraOptions = [ "--network=host" ];
-      environment = {
-        TZ = "America/Denver";
-      };
-      volumes = [
-        "${homeAssistantPath}/config:/config"
-        localtime
-      ];
-    };
   };
 
   networking.firewall.interfaces."tailscale0" = {
-    allowedTCPPorts = [ 5000 8123 8554 8555 1883 ];
+    allowedTCPPorts = [ 5000 8554 8555 1883 ];
     allowedUDPPorts = [ 8555 ];
   };
 }
