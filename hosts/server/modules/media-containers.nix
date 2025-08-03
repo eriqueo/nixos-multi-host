@@ -50,8 +50,12 @@ let
   buildMediaServiceContainer = { name, image, mediaType, extraVolumes ? [], extraOptions ? [], environment ? {} }: {
     inherit image;
     autoStart = true;
-    extraOptions = mediaNetworkOptions ++ extraOptions;
-    environment = mediaServiceEnv // environment;
+    extraOptions = mediaNetworkOptions ++ nvidiaGpuOptions ++ extraOptions ++ [
+      "--memory=2g"
+      "--cpus=1.0"
+      "--memory-swap=4g"
+    ];
+    environment = mediaServiceEnv // nvidiaEnv // environment;
     ports = {
       "sonarr" = [ "8989:8989" ];
       "radarr" = [ "7878:7878" ];
@@ -71,8 +75,12 @@ let
     inherit image;
     autoStart = true;
     dependsOn = if network == "vpn" then [ "gluetun" ] else [];
-    extraOptions = (if network == "vpn" then vpnNetworkOptions else mediaNetworkOptions) ++ extraOptions;
-    environment = mediaServiceEnv // environment;
+    extraOptions = (if network == "vpn" then vpnNetworkOptions else mediaNetworkOptions) ++ nvidiaGpuOptions ++ extraOptions ++ [
+      "--memory=2g"
+      "--cpus=1.0"
+      "--memory-swap=4g"
+    ];
+    environment = mediaServiceEnv // nvidiaEnv // environment;
     ports = {
       "qbittorrent" = [ "8080:8080" ];
       "sabnzbd" = [ "8081:8081" ];
@@ -274,8 +282,11 @@ EOF
       prowlarr = {
         image = "lscr.io/linuxserver/prowlarr:latest";
         autoStart = true;
-        extraOptions = mediaNetworkOptions;
-        environment = mediaServiceEnv;
+        extraOptions = mediaNetworkOptions ++ nvidiaGpuOptions ++ [
+          "--memory=1g"
+          "--cpus=0.5"
+        ];
+        environment = mediaServiceEnv // nvidiaEnv;
         ports = [ "9696:9696" ];
         volumes = [
           (configVol "prowlarr")
@@ -307,7 +318,10 @@ EOF
       soularr = {
         image = "mrusse08/soularr:latest";
         autoStart = true;
-        extraOptions = mediaNetworkOptions;
+        extraOptions = mediaNetworkOptions ++ [
+          "--memory=1g"
+          "--cpus=0.5"
+        ];
         ports = [ "9898:8989" ];
         environment = mediaServiceEnv // {
           SCRIPT_INTERVAL = "300";
@@ -354,6 +368,158 @@ EOF
 
 
     };
+  };
+
+  ####################################################################
+  # 2. STORAGE AUTOMATION AND CLEANUP
+  ####################################################################
+  
+  # Automated cleanup service
+  systemd.services.media-cleanup = {
+    description = "Clean up old downloads and temporary files";
+    startAt = "daily";
+    script = ''
+      echo "Starting media cleanup..."
+      
+      # Clean old downloads (>30 days)
+      /run/current-system/sw/bin/find /mnt/hot/downloads -type f -mtime +30 -delete 2>/dev/null || true
+      
+      # Clean quarantine (>7 days)
+      /run/current-system/sw/bin/find /mnt/hot/quarantine -type f -mtime +7 -delete 2>/dev/null || true
+      
+      # Clean processing temp files (>1 day)
+      /run/current-system/sw/bin/find /mnt/hot/processing -type f -mtime +1 -delete 2>/dev/null || true
+      
+      # Clean empty directories
+      /run/current-system/sw/bin/find /mnt/hot/downloads -type d -empty -delete 2>/dev/null || true
+      /run/current-system/sw/bin/find /mnt/hot/quarantine -type d -empty -delete 2>/dev/null || true
+      /run/current-system/sw/bin/find /mnt/hot/processing -type d -empty -delete 2>/dev/null || true
+      
+      # Alert if hot storage >80% full
+      USAGE=$(/run/current-system/sw/bin/df /mnt/hot | tail -1 | ${pkgs.gawk}/bin/awk '{print $5}' | sed 's/%//')
+      if [ $USAGE -gt 80 ]; then
+        echo "WARNING: Hot storage is $USAGE% full" | logger -t media-cleanup
+      fi
+      
+      echo "Media cleanup completed"
+    '';
+  };
+  
+  # Automated media migration from hot to cold storage
+  systemd.services.media-migration = {
+    description = "Migrate completed media from hot to cold storage";
+    startAt = "hourly";
+    script = ''
+      echo "Starting media migration..."
+      
+      # Function to safely move files
+      safe_move() {
+        local src="$1"
+        local dest="$2"
+        
+        if [ -d "$src" ] && [ "$(ls -A $src 2>/dev/null)" ]; then
+          echo "Migrating from $src to $dest"
+          mkdir -p "$dest"
+          rsync -av --remove-source-files "$src/" "$dest/"
+          # Remove empty source directories
+          /run/current-system/sw/bin/find "$src" -type d -empty -delete 2>/dev/null || true
+        fi
+      }
+      
+      # Move completed downloads to cold storage
+      safe_move "/mnt/hot/downloads/tv/complete" "/mnt/media/tv"
+      safe_move "/mnt/hot/downloads/movies/complete" "/mnt/media/movies"
+      safe_move "/mnt/hot/downloads/music/complete" "/mnt/media/music"
+      
+      # Move processed files
+      safe_move "/mnt/hot/processing/sonarr-temp/complete" "/mnt/media/tv"
+      safe_move "/mnt/hot/processing/radarr-temp/complete" "/mnt/media/movies"
+      safe_move "/mnt/hot/processing/lidarr-temp/complete" "/mnt/media/music"
+      
+      echo "Media migration completed"
+    '';
+  };
+  
+  # Storage monitoring service
+  systemd.services.storage-monitor = {
+    description = "Monitor storage usage and performance";
+    startAt = "*:*:0/30";  # Every 30 seconds
+    script = ''
+      # Collect storage metrics for Prometheus
+      mkdir -p /var/lib/node_exporter/textfile_collector
+      
+      # Hot storage metrics
+      HOT_USAGE=$(/run/current-system/sw/bin/df /mnt/hot | tail -1 | ${pkgs.gawk}/bin/awk '{print $5}' | sed 's/%//')
+      HOT_FREE=$(/run/current-system/sw/bin/df /mnt/hot | tail -1 | ${pkgs.gawk}/bin/awk '{print $4}')
+      HOT_TOTAL=$(/run/current-system/sw/bin/df /mnt/hot | tail -1 | ${pkgs.gawk}/bin/awk '{print $2}')
+      
+      # Cold storage metrics
+      COLD_USAGE=$(/run/current-system/sw/bin/df /mnt/media | tail -1 | ${pkgs.gawk}/bin/awk '{print $5}' | sed 's/%//')
+      COLD_FREE=$(/run/current-system/sw/bin/df /mnt/media | tail -1 | ${pkgs.gawk}/bin/awk '{print $4}')
+      COLD_TOTAL=$(/run/current-system/sw/bin/df /mnt/media | tail -1 | ${pkgs.gawk}/bin/awk '{print $2}')
+      
+      # Download queue metrics
+      DOWNLOAD_COUNT=$(/run/current-system/sw/bin/find /mnt/hot/downloads -name "*.part" -o -name "*.!qB" | wc -l)
+      PROCESSING_COUNT=$(/run/current-system/sw/bin/find /mnt/hot/processing -type f | wc -l)
+      QUARANTINE_COUNT=$(/run/current-system/sw/bin/find /mnt/hot/quarantine -type f | wc -l)
+      
+      # Write metrics
+      cat > /var/lib/node_exporter/textfile_collector/media_storage.prom << EOF
+# HELP media_storage_usage_percentage Storage usage percentage
+# TYPE media_storage_usage_percentage gauge
+media_storage_usage_percentage{tier="hot"} $HOT_USAGE
+media_storage_usage_percentage{tier="cold"} $COLD_USAGE
+
+# HELP media_storage_free_bytes Storage free space in bytes
+# TYPE media_storage_free_bytes gauge
+media_storage_free_bytes{tier="hot"} $(($HOT_FREE * 1024))
+media_storage_free_bytes{tier="cold"} $(($COLD_FREE * 1024))
+
+# HELP media_queue_files_total Number of files in various queues
+# TYPE media_queue_files_total gauge
+media_queue_files_total{queue="download"} $DOWNLOAD_COUNT
+media_queue_files_total{queue="processing"} $PROCESSING_COUNT
+media_queue_files_total{queue="quarantine"} $QUARANTINE_COUNT
+EOF
+    '';
+  };
+  
+  ####################################################################
+  # 3. APPLICATION HEALTH MONITORING
+  ####################################################################
+  
+  # Health check service for *arr applications
+  systemd.services.arr-health-monitor = {
+    description = "Monitor *arr application health";
+    startAt = "*:*:0/60";  # Every minute
+    script = ''
+      mkdir -p /var/lib/node_exporter/textfile_collector
+      
+      # Function to check service health
+      check_service() {
+        local service="$1"
+        local port="$2"
+        local endpoint="$3"
+        
+        if /run/current-system/sw/bin/curl -s -f "http://localhost:$port$endpoint" >/dev/null 2>&1; then
+          echo "media_service_up{service="$service"} 1"
+        else
+          echo "media_service_up{service="$service"} 0"
+        fi
+      }
+      
+      # Check each service
+      {
+        echo "# HELP media_service_up Service availability (1=up, 0=down)"
+        echo "# TYPE media_service_up gauge"
+        check_service "sonarr" "8989" "/api/v3/system/status"
+        check_service "radarr" "7878" "/api/v3/system/status"
+        check_service "lidarr" "8686" "/api/v1/system/status"
+        check_service "prowlarr" "9696" "/api/v1/system/status"
+        check_service "qbittorrent" "8080" "/api/v2/app/version"
+        check_service "navidrome" "4533" "/ping"
+      } > /var/lib/node_exporter/textfile_collector/media_services.prom
+    '';
   };
 
   # Network setup is now handled by the common module

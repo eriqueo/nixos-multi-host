@@ -83,12 +83,14 @@ ffmpeg: &ffmpeg_defaults
 
 cameras:
   cobra_cam_1:
-    enabled: true  # Re-enabled after fixing input roles
+    enabled: false  # Temporarily disabled - camera stream issues
     ffmpeg:
       <<: *ffmpeg_defaults
       inputs:
         - path: rtsp://admin:il0wwlm%3F@192.168.1.101:554/ch01/0
           roles: [ detect, record ]
+        - path: rtsp://admin:il0wwlm%3F@192.168.1.101:554/ch01/1  
+          roles: [ record ]
     detect:
       enabled: true
       width: 640  # Reduced from 1280 
@@ -107,7 +109,7 @@ cameras:
       <<: *ffmpeg_defaults
       inputs:
         - path: rtsp://admin:il0wwlm%3F@192.168.1.102:554/ch01/0
-          roles: [ detect, record ]
+          roles: [ record ]
     detect:
       enabled: true
       width: 640  # Reduced resolution
@@ -157,8 +159,8 @@ cameras:
     ffmpeg:
       <<: *ffmpeg_defaults
       inputs:
-        - path: rtsp://admin:il0wwlm%3F@192.168.1.104:554/ch01/0
-          roles: [ detect, record ]
+        - path: rtsp://192.168.1.104:554/ch01/0
+          roles: [ record ]
     detect:
       enabled: false
     record:
@@ -175,7 +177,7 @@ go2rtc:
     cobra_cam_1: [ "rtsp://admin:il0wwlm%3F@192.168.1.101:554/ch01/0" ]
     cobra_cam_2: [ "rtsp://admin:il0wwlm%3F@192.168.1.102:554/ch01/0" ]
     cobra_cam_3: [ "rtsp://admin:il0wwlm%3F@192.168.1.103:554/ch01/0" ]
-    cobra_cam_4: [ "rtsp://admin:il0wwlm%3F@192.168.1.104:554/ch01/0" ]
+    cobra_cam_4: [ "rtsp://192.168.1.104:554/ch01/0" ]
 
 ui:
   live_mode: mse

@@ -134,23 +134,23 @@ in
     };
 
     # NVIDIA GPU Exporter
-#     nvidia-gpu-exporter = {
-#       image = "utkuozdemir/nvidia_gpu_exporter:latest";
-#       autoStart = true;
-#       extraOptions = [
-#         "--network=host"
-#         # Direct GPU device access (same as Frigate)
-#         "--device=/dev/nvidia0:/dev/nvidia0:rwm"
-#         "--device=/dev/nvidiactl:/dev/nvidiactl:rwm" 
-#         "--device=/dev/nvidia-modeset:/dev/nvidia-modeset:rwm"
-#         "--device=/dev/nvidia-uvm:/dev/nvidia-uvm:rwm"
-#         "--device=/dev/nvidia-uvm-tools:/dev/nvidia-uvm-tools:rwm"
-#       ];
-#       environment = {
-#         NVIDIA_VISIBLE_DEVICES = "all";
-#         NVIDIA_DRIVER_CAPABILITIES = "compute,utility";
-#       };
-#    };
+     nvidia-gpu-exporter = {
+       image = "utkuozdemir/nvidia_gpu_exporter:latest";
+       autoStart = true;
+       extraOptions = [
+         "--network=host"
+         # Direct GPU device access (same as Frigate)
+         "--device=/dev/nvidia0:/dev/nvidia0:rwm"
+         "--device=/dev/nvidiactl:/dev/nvidiactl:rwm" 
+         "--device=/dev/nvidia-modeset:/dev/nvidia-modeset:rwm"
+         "--device=/dev/nvidia-uvm:/dev/nvidia-uvm:rwm"
+         "--device=/dev/nvidia-uvm-tools:/dev/nvidia-uvm-tools:rwm"
+       ];
+       environment = {
+         NVIDIA_VISIBLE_DEVICES = "all";
+         NVIDIA_DRIVER_CAPABILITIES = "compute,utility";
+       };
+    };
 
     # Custom Media Pipeline Monitor
     media-pipeline-monitor = {
