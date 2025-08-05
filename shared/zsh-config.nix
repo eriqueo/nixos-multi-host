@@ -269,7 +269,7 @@
         # Switch to new configuration (already tested)
         echo "🔄 Switching to new configuration..."
         if [[ -f flake.nix ]]; then
-          if ! sudo nixos-rebuild switch --flake .#"$hostname"; then
+          if ! sudo nixos-rebuild switch --flake .#"$flake_name"; then
             echo "❌ NixOS switch failed (but changes are committed)"
             cd "$original_dir"
             return 1
