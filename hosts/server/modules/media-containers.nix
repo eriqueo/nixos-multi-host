@@ -255,7 +255,7 @@ EOF
         environmentFiles = [ "/opt/downloads/.env" ];
         ports = [
           "8080:8080"  # qBittorrent
-          "8081:8081"  # SABnzbd
+          "8081:8085"  # SABnzbd (container uses port 8085 internally)
         ];
         volumes = [ "/opt/downloads/gluetun:/gluetun" ];
       };

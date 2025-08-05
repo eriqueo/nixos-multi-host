@@ -115,11 +115,11 @@ systemd.tmpfiles.rules = [
 
 ### 7. Reverse Proxy *arr Applications Configuration
 **Status:** IN PROGRESS - Permanent Solution Implemented  
-**Domain:** `https://homeserver.ocelot-wahoo.ts.net/`
+**Domain:** `https://hwc.ocelot-wahoo.ts.net/`
 
 #### Domain Resolution Fixed:
 - **Previous Issue:** `heartwood.ocelot-wahoo.ts.net` resolved to wrong machine (`100.110.68.48`)
-- **Solution:** Changed to `homeserver.ocelot-wahoo.ts.net` which correctly resolves to this server (`100.115.126.41`)
+- **Solution:** Changed to `hwc.ocelot-wahoo.ts.net` which correctly resolves to this server (`100.115.126.41`)
 - **Benefit:** Will work consistently regardless of network location (uses hostname, not hardcoded IP)
 
 #### Services Status:
@@ -268,7 +268,7 @@ tailscale.service   ✅ active (running)
 systemctl list-units --type=service --state=running | grep podman
 
 # Check reverse proxy
-curl -I https://homeserver.ocelot-wahoo.ts.net/SERVICE_PATH/
+curl -I https://hwc.ocelot-wahoo.ts.net/SERVICE_PATH/
 
 # Check SOPS functionality
 sudo sops -d /etc/nixos/secrets/admin.yaml
@@ -315,7 +315,7 @@ sudo journalctl -u SERVICE_NAME --no-pager -n 20
 - Automated configuration management prevents manual errors
 
 ### Network Architecture:
-- **Tailscale Domain:** `homeserver.ocelot-wahoo.ts.net` (location-independent)
+- **Tailscale Domain:** `hwc.ocelot-wahoo.ts.net` (location-independent)
 - **Reverse Proxy:** Caddy with automatic HTTPS
 - **VPN Gateway:** Gluetun for download clients
 - **Container Network:** Isolated media-network for internal communication

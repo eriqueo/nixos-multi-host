@@ -83,7 +83,7 @@ All changes tested with:
 
 #### 1. Caddy Reverse Proxy Status Assessment ✅ COMPLETED
 **Service Status**: ✅ Active and running with HTTPS/TLS automation
-**Base Domain**: `https://homeserver.ocelot-wahoo.ts.net` responding properly
+**Base Domain**: `https://hwc.ocelot-wahoo.ts.net` responding properly
 **SSL Configuration**: Automatic certificate management working
 
 #### 2. Service Endpoint Testing Results ✅ COMPLETED
