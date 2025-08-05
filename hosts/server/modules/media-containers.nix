@@ -281,6 +281,7 @@ EOF
         extraVolumes = [
           "/mnt/hot/cache:/incomplete-downloads"
         ];
+        # Note: HOST_WHITELIST env var doesn't work with LinuxServer container
       };
 
       # Media Management - Updated for Hot/Cold Storage Split
@@ -540,6 +541,49 @@ EOF
         check_service "qbittorrent" "8080" "/api/v2/app/version"
         check_service "navidrome" "4533" "/ping"
       } > /var/lib/node_exporter/textfile_collector/media_services.prom
+    '';
+  };
+
+  # Systemd service to configure SABnzbd hostname whitelist for reverse proxy
+  systemd.services.sabnzbd-hostname-setup = {
+    description = "Configure SABnzbd hostname whitelist for reverse proxy access";
+    after = [ "podman-sabnzbd.service" ];
+    wantedBy = [ "multi-user.target" ];
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+      User = "root";
+    };
+    script = ''
+      # Wait for SABnzbd to start and create config
+      echo "Waiting for SABnzbd to initialize..."
+      sleep 30
+      
+      CONFIG_FILE="/opt/downloads/sabnzbd/sabnzbd.ini"
+      
+      if [ -f "$CONFIG_FILE" ]; then
+        echo "Configuring SABnzbd hostname whitelist..."
+        
+        # Add or update host_whitelist in [misc] section
+        if grep -q "^host_whitelist" "$CONFIG_FILE"; then
+          # Update existing line
+          sed -i 's/^host_whitelist.*/host_whitelist = sabnzbd,localhost,127.0.0.1,gluetun,hwc.ocelot-wahoo.ts.net,192.168.1.13/' "$CONFIG_FILE"
+        else
+          # Add to [misc] section or create it
+          if grep -q "^\[misc\]" "$CONFIG_FILE"; then
+            sed -i '/^\[misc\]/a host_whitelist = sabnzbd,localhost,127.0.0.1,gluetun,hwc.ocelot-wahoo.ts.net,192.168.1.13' "$CONFIG_FILE"
+          else
+            echo -e "\n[misc]\nhost_whitelist = sabnzbd,localhost,127.0.0.1,gluetun,hwc.ocelot-wahoo.ts.net,192.168.1.13" >> "$CONFIG_FILE"
+          fi
+        fi
+        
+        echo "Hostname whitelist configured. Restarting SABnzbd..."
+        systemctl restart podman-sabnzbd.service
+        
+        echo "SABnzbd hostname configuration completed."
+      else
+        echo "Warning: SABnzbd config file not found at $CONFIG_FILE"
+      fi
     '';
   };
 
