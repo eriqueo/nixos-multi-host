@@ -15,6 +15,7 @@
     
     # Shared configuration
     ../../shared/secrets.nix         # Shared secrets management
+    ../../shared/networking.nix      # Shared networking configuration
     # REMOVED: UI modules are now in Home Manager
   ];
 
@@ -148,7 +149,7 @@
   ####################################################################
   # 9. NETWORKING & BLUETOOTH (laptop mobility features)
   ####################################################################
-  networking.networkmanager.enable = true;
+  # NetworkManager and DNS configuration now handled by shared/networking.nix
   hardware.bluetooth = {
     enable = true;
     powerOnBoot = true;
@@ -176,14 +177,7 @@
   ####################################################################
   # 11. SSH & SECURITY
   ####################################################################
-  services.openssh = {
-    enable = true;
-    settings = {
-      PasswordAuthentication = false;
-      KbdInteractiveAuthentication = false;
-    };
-  };
-  services.tailscale.enable = true;
+  # SSH and Tailscale base configuration from shared/networking.nix
 
   ####################################################################
   # 12. CONTAINERS

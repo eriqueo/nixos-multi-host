@@ -10,7 +10,8 @@
       "Bash(sudo podman ps:*)",
       "Bash(sudo journalctl:*)",
       "Bash(sudo netstat:*)",
-      "Bash(sudo ss:*)"
+      "Bash(sudo ss:*)",
+      "Bash(cat:*)"
     ],
     "deny": []
   }

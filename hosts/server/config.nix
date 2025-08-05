@@ -14,6 +14,7 @@
 
     # Shared configuration
     ../../shared/secrets.nix
+    ../../shared/networking.nix        # Shared networking configuration
 
     # Consolidated filesystem structure
     ../../modules/filesystem
@@ -69,14 +70,7 @@
   ####################################################################
 
   networking.hostName = "hwc-server";
-  networking.networkmanager.enable = true;
-
-  networking.networkmanager.settings = {
-    main = {
-      plugins        = "keyfile";
-      "hostname-mode" = "none";
-    };
-  };
+  # NetworkManager configuration now handled by shared/networking.nix
   # Set your time zone
   time.timeZone = "America/Denver";
 
@@ -124,19 +118,17 @@
   ####################################################################
   # 8. SSH & X11 SERVICES
   ####################################################################
-  services.openssh = {
-    enable = true;
-    settings = {
-      X11Forwarding = true;
-      PasswordAuthentication = true;  # Temporary - for SSH key update
-    };
+  # SSH base configuration from shared/networking.nix, add server-specific settings
+  services.openssh.settings = {
+    X11Forwarding = true;
+    PasswordAuthentication = true;  # Temporary - for SSH key update
   };
 
   # Enable basic X11 services (minimal for forwarding)
   services.xserver.enable = true;
 
-  # Tailscale for secure remote access
-  services.tailscale.enable = true;
+  # Tailscale base configuration from shared/networking.nix, add server-specific settings
+  services.tailscale.permitCertUid = "caddy";  # Allow Caddy to access Tailscale certificates
 
   ####################################################################
   # 9. MEDIA SERVICES - Updated for GPU acceleration
@@ -244,8 +236,7 @@
     home = "/mnt/hot/ai";
   };
 
-# Allow Caddy to access Tailscale certificates
-services.tailscale.permitCertUid = "caddy";
+# Tailscale permitCertUid configuration moved above to services.tailscale section
   ####################################################################
   # 11. FIREWALL CONFIGURATION - Updated ports
   ####################################################################
