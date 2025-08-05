@@ -67,13 +67,16 @@
   ####################################################################
   # 4. HOST IDENTITY & NETWORKING
   ####################################################################
+
   networking.hostName = "hwc-server";
   networking.networkmanager.enable = true;
-  networking.networkmanager.extraConfig = ''
-      [main]
-      plugins=keyfile
-      hostname-mode=none
-    '';
+
+  networking.networkmanager.settings = {
+    main = {
+      plugins        = "keyfile";
+      "hostname-mode" = "none";
+    };
+  };
   # Set your time zone
   time.timeZone = "America/Denver";
 
