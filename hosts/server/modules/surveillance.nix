@@ -44,10 +44,6 @@ mqtt:
   host: 127.0.0.1
   port: 1883
 
-telemetry:
-  enabled: true
-  port: 5000
-
 detectors:
   tensorrt:
     type: tensorrt
