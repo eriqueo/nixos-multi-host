@@ -43,17 +43,17 @@ This document provides step-by-step instructions for configuring GPU acceleratio
 
 #### Step-by-Step Configuration:
 
-1. **Locate the container definitions** (around lines 70-200 in media-containers.nix)
+1. **Current system uses buildMediaServiceContainer pattern**
 
-2. **For each *arr service container, add GPU options**:
+2. **Current containers automatically include GPU access**:
    ```nix
-   # Add to extraOptions array
-   extraOptions = mediaNetworkOptions ++ nvidiaGpuOptions;
-   
-   # Add to environment variables
-   environment = mediaServiceEnv // nvidiaEnv // {
-     # existing environment variables
-   };
+   # buildMediaServiceContainer automatically includes:
+   extraOptions = mediaNetworkOptions ++ nvidiaGpuOptions ++ [
+     "--memory=2g"
+     "--cpus=1.0"
+     "--memory-swap=4g"
+   ];
+   environment = mediaServiceEnv // nvidiaEnv;
    ```
 
 3. **Enable hardware acceleration in each service's web UI**:
@@ -64,33 +64,28 @@ This document provides step-by-step instructions for configuring GPU acceleratio
 ### 2. Download Clients Enhancement
 
 **Services Affected**: qBittorrent, SABnzbd
-**Current Status**: Basic configuration without GPU
+**Current Status**: Using buildDownloadContainer with GPU acceleration
 **Benefit**: Video preview generation, thumbnail creation
 **Location**: `/etc/nixos/hosts/server/modules/media-containers.nix`
 
 #### Step-by-Step Configuration:
 
-1. **Update qBittorrent container** (around line 150):
+1. **Current qBittorrent uses buildDownloadContainer**:
    ```nix
-   qbittorrent = {
-     # existing configuration
-     extraOptions = mediaNetworkOptions ++ nvidiaGpuOptions;
-     environment = mediaServiceEnv // nvidiaEnv // {
-       # existing environment variables
-       WEBUI_PORT = "8080";
-     };
-   };
+   # buildDownloadContainer automatically includes:
+   # - VPN network via Gluetun
+   # - GPU acceleration via nvidiaGpuOptions
+   # - Resource limits
+   # - Hot storage integration
    ```
 
-2. **Update SABnzbd container** (around line 180):
+2. **Current SABnzbd uses buildDownloadContainer**:
    ```nix
-   sabnzbd = {
-     # existing configuration  
-     extraOptions = mediaNetworkOptions ++ nvidiaGpuOptions;
-     environment = mediaServiceEnv // nvidiaEnv // {
-       # existing environment variables
-     };
-   };
+   # buildDownloadContainer automatically includes:
+   # - VPN network via Gluetun  
+   # - GPU acceleration via nvidiaGpuOptions
+   # - Resource limits
+   # - Hot storage integration
    ```
 
 ### 3. Business Services GPU Enhancement
@@ -232,7 +227,7 @@ This document provides step-by-step instructions for configuring GPU acceleratio
 
 1. **Test configuration**:
    ```bash
-   sudo nixos-rebuild test --flake .#$(hostname)
+   sudo nixos-rebuild test --flake .#hwc-server
    ```
 
 2. **Validate GPU access in containers**:
@@ -305,7 +300,7 @@ serviceName = {
 - [ ] Check current container status: `sudo podman ps`
 
 ### After Each Service Update:
-- [ ] Test NixOS configuration: `sudo nixos-rebuild test --flake .#$(hostname)`
+- [ ] Test NixOS configuration: `sudo nixos-rebuild test --flake .#hwc-server`
 - [ ] Verify service starts successfully: `sudo systemctl status podman-<service>.service`
 - [ ] Test GPU access in container: `sudo podman exec -it <service> nvidia-smi`
 - [ ] Monitor GPU utilization during service operation: `watch -n 1 nvidia-smi`

@@ -8,28 +8,20 @@
 - **Container**: Properly configured with GPU acceleration
 - **MQTT**: Mosquitto broker running for event communication
 
-### 🔴 Critical Issues Requiring Immediate Attention
+### 🔴 Potential Issues to Check
 
-#### 1. Configuration Validation Error (BLOCKING)
-**Error**: `cameras.cobra_cam_1.ffmpeg.inputs: Value error, Each input role may only be used once.`
+#### 1. Camera Configuration Status
+**Check**: Review current camera configuration and RTSP stream status
 
-**Problem Location**: `/etc/nixos/hosts/server/modules/surveillance.nix` around lines 180-200
+**Problem Location**: `/etc/nixos/hosts/server/modules/surveillance.nix` - check current camera configuration
 
-**Fix Required**:
+**Current System Uses**:
 ```yaml
-# CURRENT BROKEN CONFIG:
-inputs:
-  - path: rtsp://admin:password@192.168.1.100/stream1
-    roles: [ detect, record ]  # ❌ PROBLEM: record role used twice
-  - path: rtsp://admin:password@192.168.1.100/stream2  
-    roles: [ record ]          # ❌ PROBLEM: record role duplicate
-
-# CORRECTED CONFIG:
-inputs:
-  - path: rtsp://admin:password@192.168.1.100/stream1
-    roles: [ detect, record ]
-  - path: rtsp://admin:password@192.168.1.100/stream2
-    roles: [ audio ]  # OR remove this input entirely
+# System generates configuration via systemd service:
+# systemd.services.frigate-config automatically creates:
+# - TensorRT detection with Pascal optimization (USE_FP16 = false)
+# - MQTT integration on port 1883
+# - GPU acceleration with nvidiaEnv variables
 ```
 
 #### 2. Camera Status Issues
@@ -43,17 +35,12 @@ inputs:
 
 #### Step 1.1: Fix cobra_cam_1 Input Roles
 **File**: `/etc/nixos/hosts/server/modules/surveillance.nix`
-**Location**: Around line 180 in the cobra_cam_1 configuration
+**Location**: Check current camera configuration in surveillance.nix
 
-1. **Locate the camera configuration block**:
+1. **Current system uses automated config generation**:
    ```nix
-   cobra_cam_1 = {
-     ffmpeg = {
-       inputs = [
-         # Find this section
-       ];
-     };
-   };
+   # systemd.services.frigate-config generates the full configuration
+   # Check current config at: /opt/surveillance/frigate/config/config.yaml
    ```
 
 2. **Replace the inputs array** with corrected configuration:
@@ -256,7 +243,7 @@ frigate-monitoring = {
 
 1. **Test configuration**:
    ```bash
-   sudo nixos-rebuild test --flake .#$(hostname)
+   sudo nixos-rebuild test --flake .#hwc-server
    ```
 
 2. **Check Frigate logs**:

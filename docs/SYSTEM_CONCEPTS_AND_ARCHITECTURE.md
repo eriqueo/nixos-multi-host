@@ -16,7 +16,7 @@ This document consolidates all conceptual information about the NixOS multi-host
 ## System Architecture
 
 ### Hardware Foundation
-**Primary Server**: Homeserver with NVIDIA Quadro P1000 (Pascal architecture)
+**Primary Server**: hwc-server with NVIDIA Quadro P1000 (Pascal architecture)
 - **GPU Capabilities**: CUDA compute capability 6.1, 4GB VRAM
 - **Storage**: Two-tier architecture (SSD hot storage + HDD cold storage)
 - **Network**: Tailscale mesh networking with local LAN access

@@ -27,15 +27,18 @@
       "grep" = "rg";
       "open" = "xdg-open";
       
-      # Git workflow shortcuts
-      "gs" = "git status -sb";
-      "ga" = "git add .";
-      "gc" = "git commit -m";
-      "gp" = "git push";
-      "gl" = "git log --oneline --graph --decorate --all";
-      "gpl" = "git pull";
+      # Universal git = sudo git (consistent everywhere)
+      "git" = "sudo git";
       
-      # Git sync aliases
+      # Git workflow shortcuts (all use sudo for consistency)
+      "gs" = "sudo git status -sb";
+      "ga" = "sudo git add .";
+      "gc" = "sudo git commit -m";
+      "gp" = "sudo git push";
+      "gl" = "sudo git log --oneline --graph --decorate --all";
+      "gpl" = "sudo git pull";
+      
+      # NixOS-specific git sync aliases
       "gresync" = "cd /etc/nixos && sudo git fetch origin && sudo git pull origin master && echo '✅ Git sync complete!'";
       "gstatus" = "cd /etc/nixos && sudo git status";
       "glog" = "cd /etc/nixos && sudo git log --oneline -10";
@@ -82,14 +85,14 @@
       "work-stats" = "python3 /opt/adhd-tools/scripts/productivity-analysis.py";
       
       # Surveillance system shortcuts
-      "cameras" = "echo 'Frigate: http://100.110.68.48:5000'";
-      "home-assistant" = "echo 'Home Assistant: http://100.110.68.48:8123'";
+      "cameras" = "echo 'Frigate: http://100.115.126.41:5000'";
+      "home-assistant" = "echo 'Home Assistant: http://100.115.126.41:8123'";
       "frigate-logs" = "sudo podman logs -f frigate";
       "ha-logs" = "sudo podman logs -f home-assistant";
       
       # SSH shortcuts
-      "homeserver" = "ssh eric@100.110.68.48";
-      "server" = "ssh eric@100.110.68.48";
+      "homeserver" = "ssh eric@100.115.126.41";
+      "server" = "ssh eric@100.115.126.41";
     };
     
     # Universal shell functions with enhanced grebuild  

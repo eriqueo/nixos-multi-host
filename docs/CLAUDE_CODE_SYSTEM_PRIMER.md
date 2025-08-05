@@ -14,7 +14,7 @@ This document provides essential context for Claude Code instances working on th
 
 ### **Operating System**
 - **OS**: NixOS with Flakes enabled
-- **Hostname**: `homeserver`
+- **Hostname**: `hwc-server`
 - **User**: `eric` (main user)
 - **Architecture**: Declarative configuration via `/etc/nixos/`
 
@@ -66,7 +66,7 @@ grebuild "Description of changes made"
 sudo git add .
 sudo git commit -m "Changes description"
 sudo git push
-sudo nixos-rebuild switch --flake .#homeserver
+sudo nixos-rebuild switch --flake .#hwc-server
 ```
 
 ## 🐋 Container Architecture
@@ -160,11 +160,12 @@ curl -I http://192.168.1.13:8081                      # Test direct access
 ## 🎯 **Current Optimization Status**
 
 ### **Recently Completed** ✅
-- *arr applications optimized with GPU acceleration
+- *arr applications with sophisticated container builders and GPU acceleration
 - Comprehensive monitoring stack with Grafana dashboards
 - Automated storage management (hot/cold tier migration)
-- Frigate camera system with 4K object detection
-- **SABnzbd port mapping fix** - Direct access working on port 8081
+- Frigate camera system with TensorRT object detection
+- All services running on hwc-server with proper resource management
+- Container builders with memory/CPU limits and hot storage caching
 
 ### **Known Issues** ⚠️
 - Frigate camera authentication needs periodic fixes
@@ -226,7 +227,7 @@ sudo systemctl restart podman-container-name.service
 # Revert to previous git commit
 sudo git log --oneline -n 10  # See recent commits
 sudo git checkout COMMIT_HASH
-sudo nixos-rebuild switch --flake .#homeserver
+sudo nixos-rebuild switch --flake .#hwc-server
 ```
 
 ### **Storage Issues**

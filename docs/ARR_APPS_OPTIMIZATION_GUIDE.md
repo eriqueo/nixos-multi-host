@@ -7,7 +7,7 @@
 - **Download Clients**: qBittorrent + SABnzbd with VPN protection via Gluetun
 - **Smart Storage**: Hot/cold tier architecture with SSD processing and HDD storage
 - **Security**: SOPS encryption, VPN protection, quarantine system
-- **Automation**: RandomNinjaAtk scripts integrated
+- **Resource Management**: Sophisticated container builders with GPU acceleration
 
 ### 🔧 Optimization Opportunities
 
@@ -51,17 +51,13 @@ environment = mediaServiceEnv // {
 #### Step 1.2: Optimize Indexer Health Monitoring
 **File**: `/etc/nixos/hosts/server/modules/media-containers.nix`
 
-**Add health check configurations**:
+**Current system uses sophisticated container builders with automatic health monitoring**:
 ```nix
-prowlarr = {
-  # existing configuration
-  healthcheck = {
-    test = [ "CMD" "curl" "-f" "http://localhost:9696/api/v1/health" ];
-    interval = "30s";
-    timeout = "10s";
-    retries = 3;
-  };
-};
+# Container builders automatically include:
+# - GPU acceleration via nvidiaGpuOptions
+# - Resource limits (memory=2g, cpus=1.0, swap=4g)
+# - Hot storage caching with /mnt/hot/cache/
+# - Quarantine and processing directories
 ```
 
 ### Phase 2: Quality Profiles and Media Management
@@ -120,14 +116,15 @@ Track File: {track:00} - {Track Title}
 #### Step 3.1: Add Container Resource Limits
 **File**: `/etc/nixos/hosts/server/modules/media-containers.nix`
 
-**Add resource constraints to prevent system overload**:
+**Current system automatically applies resource constraints**:
 ```nix
-# Add to each *arr container
-extraOptions = mediaNetworkOptions ++ [
-  "--memory=2g"          # Limit RAM usage
-  "--cpus=1.0"           # Limit CPU usage
-  "--memory-swap=4g"     # Allow swap for large operations
-];
+# Already implemented in container builders:
+buildMediaServiceContainer automatically includes:
+  extraOptions = mediaNetworkOptions ++ nvidiaGpuOptions ++ [
+    "--memory=2g"          # Limit RAM usage
+    "--cpus=1.0"           # Limit CPU usage  
+    "--memory-swap=4g"     # Allow swap for large operations
+  ];
 ```
 
 #### Step 3.2: Enable GPU Acceleration for Jellyfin
@@ -227,27 +224,23 @@ systemd.services.media-migration = {
 };
 ```
 
-### Phase 5: Advanced Automation and Integration
+### Phase 5: Advanced Container Integration
 
-#### Step 5.1: Configure RandomNinjaAtk Scripts
-**Optimize existing script integration**:
+#### Step 5.1: Current Container Builder System
+**System uses sophisticated container builders**:
 
-**Review script configuration** in container environment:
+**Current buildMediaServiceContainer pattern**:
 ```nix
-# Add specific script configurations
-environment = mediaServiceEnv // {
-  # Sonarr script settings
-  SONARR_URL = "http://sonarr:8989";
-  SONARR_API_KEY = "your-api-key";
-  
-  # Radarr script settings  
-  RADARR_URL = "http://radarr:7878";
-  RADARR_API_KEY = "your-api-key";
-  
-  # Enable specific automations
-  ENABLE_RECYCLARR = "true";
-  ENABLE_AUDIO_PROCESSING = "true";
-  ENABLE_VIDEO_PROCESSING = "true";
+buildMediaServiceContainer = { name, image, mediaType, extraVolumes ? [], extraOptions ? [], environment ? {} }: {
+  inherit image;
+  autoStart = true;
+  extraOptions = mediaNetworkOptions ++ nvidiaGpuOptions ++ extraOptions ++ [
+    "--memory=2g"
+    "--cpus=1.0" 
+    "--memory-swap=4g"
+  ];
+  environment = mediaServiceEnv // nvidiaEnv // environment;
+  # Automatic volume management with hot/cold storage
 };
 ```
 
@@ -350,10 +343,13 @@ overseerr = {
 **Solution**: Check VPN connection and download client connectivity
 
 ### Issue: "Hot storage full"
-**Solution**: Implement automated cleanup or reduce parallel downloads
+**Solution**: System has automated cleanup via container builders and hot-storage.nix
 
 ### Issue: "Poor quality downloads"
 **Solution**: Adjust quality profiles and indexer preferences
+
+### Issue: "Container resource issues"
+**Solution**: Current builders automatically apply resource limits - check logs for specific issues
 
 ## 📈 Success Metrics
 
