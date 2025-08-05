@@ -261,10 +261,10 @@ in
         "$mod, Q, killactive"
         "$mod, F, fullscreen"
         "$mod, Space, exec, wofi --show drun"
-        "$mod, B, exec, chromium"
-        "$mod, 2, exec, chromium"
-        "$mod, J, exec, chromium --new-window https://jobtread.com"
-        "$mod, 3, exec, chromium --new-window https://jobtread.com"
+        "$mod, B, exec, gpu-launch chromium"
+        "$mod, 2, exec, gpu-launch chromium"
+        "$mod, J, exec, gpu-launch chromium --new-window https://jobtread.com"
+        "$mod, 3, exec, gpu-launch chromium --new-window https://jobtread.com"
         "$mod, 4, exec, gpu-launch electron-mail"
         "$mod, 5, exec, gpu-launch obsidian"
         "$mod, 6, exec, kitty nvim"
@@ -302,8 +302,8 @@ in
         "$mod ALT, V, layoutmsg, orientationtop"
 
          # MOVE WINDOWS with hyprsome
-        
-        
+
+
         "$mod CTRL, 1, exec, hyprsome move 1"
         "$mod CTRL, 2, exec, hyprsome move 2"
         "$mod CTRL, 3, exec, hyprsome move 3"
