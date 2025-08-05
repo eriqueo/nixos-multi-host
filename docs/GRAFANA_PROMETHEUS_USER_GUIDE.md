@@ -99,7 +99,7 @@ Container Status: Which containers are running
 ### **First Login & Setup**
 
 1. **Open Grafana**: `http://192.168.1.13:3000`
-2. **Login**: admin / admin123
+2. **Login**: admin / il0wwlm?
 3. **Change Password**: Click on user icon → Profile → Change Password
 4. **Explore Dashboards**: Left sidebar → Dashboards
 
