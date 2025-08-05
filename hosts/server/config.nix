@@ -18,6 +18,9 @@
     # Consolidated filesystem structure
     ../../modules/filesystem
     
+    # NixOS vault sync system
+    ../../modules/vault-sync-system.nix
+    
     # New modules for GPU and SSD integration
     ./modules/gpu-acceleration.nix       # NVIDIA Quadro P1000 support
     ./modules/jellyfin-gpu.nix          # Jellyfin hardware acceleration configuration

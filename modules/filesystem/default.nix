@@ -13,6 +13,8 @@ in
   ####################################################################
   imports = [
     ./user-directories.nix        # User home directory structure and ADHD organization
+    ./xdg-directories.nix         # XDG user directories configured for PARA method
+    ./compatibility-links.nix     # Traditional directory symlinks and app compatibility
     ./business-directories.nix    # Business applications, AI, and productivity tools
     ./media-directories.nix       # Media storage with hot/cold storage tiers
     ./service-directories.nix     # Service configuration directories (*ARR, surveillance)

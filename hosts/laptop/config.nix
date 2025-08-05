@@ -11,6 +11,7 @@
     ./hardware-configuration.nix
     ../../modules/users/eric.nix     # Consolidated user configuration
     ../../modules/filesystem         # Consolidated filesystem structure
+    ../../modules/vault-sync-system.nix  # NixOS vault sync system
     
     # Shared configuration
     ../../shared/secrets.nix         # Shared secrets management

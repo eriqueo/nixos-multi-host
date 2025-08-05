@@ -18,10 +18,32 @@
     "d /home/eric/00-inbox 0755 eric users -"          # Unsorted incoming items
     "d /home/eric/01-projects 0755 eric users -"       # Active projects with deadlines
     "d /home/eric/02-areas 0755 eric users -"          # Ongoing responsibilities
-    "d /home/eric/03-resources 0755 eric users -"      # Reference materials
     "d /home/eric/04-archive 0755 eric users -"        # Completed/inactive items
-    "d /home/eric/05-templates 0755 eric users -"      # Reusable templates
     "d /home/eric/99-temp 0755 eric users -"           # Temporary workspace
+    
+    # Document management structure 
+    "d /home/eric/01-documents 0755 eric users -"              # All documents
+    "d /home/eric/01-documents/01-vaults 0755 eric users -"    # Obsidian vaults
+    
+    # Media management structure
+    "d /home/eric/02-media 0755 eric users -"                  # All media files
+    "d /home/eric/02-media/01-pictures 0755 eric users -"      # Pictures and screenshots
+    "d /home/eric/02-media/02-music 0755 eric users -"         # Music files
+    "d /home/eric/02-media/03-videos 0755 eric users -"        # Video files
+    
+    # PARA subdirectories - Areas (ongoing responsibilities)
+    "d /home/eric/02-areas/01-business 0755 eric users -"      # Business files
+    "d /home/eric/02-areas/02-personal 0755 eric users -"      # Personal files  
+    "d /home/eric/02-areas/03-tech 0755 eric users -"          # Technology files
+    "d /home/eric/02-areas/05-templates 0755 eric users -"     # Reusable templates
+    
+    # Resources at top level
+    "d /home/eric/03-resources-adhd-course 0755 eric users -"  # ADHD course materials
+    
+    # Projects subdirectories
+    "d /home/eric/01-projects/Business 0755 eric users -"      # Business projects
+    "d /home/eric/01-projects/workspace 0755 eric users -"     # Development workspace
+    "d /home/eric/01-projects/nixos-md 0755 eric users -"      # NixOS configuration
     
     # Standard user configuration directories
     "d /home/eric/.config 0755 eric users -"
@@ -30,12 +52,6 @@
     
     # Secure SSH directory
     "d /home/eric/.ssh 0700 eric users -"              # SSH keys and config (secure)
-    
-    # Development workspace
-    "d /home/eric/dev 0755 eric users -"
-    "d /home/eric/dev/heartwood-craft 0755 eric users -"
-    "d /home/eric/dev/scripts 0755 eric users -"
-    "d /home/eric/dev/experiments 0755 eric users -"
   ];
   
   ####################################################################
@@ -64,36 +80,66 @@
     - **Usage**: Maintenance activities, continuous learning
     - **Examples**: Health, finances, home maintenance, skills
     
-    ### 📚 03-resources/
-    - **Purpose**: Reference materials for future use
-    - **Usage**: Documentation, tutorials, research materials
-    - **Examples**: Code snippets, design assets, technical docs
-    
     ### 📦 04-archive/
     - **Purpose**: Completed or inactive items
     - **Usage**: Finished projects, old versions, historical data
     - **Rule**: Move here when projects are complete
-    
-    ### 📋 05-templates/
-    - **Purpose**: Reusable templates and boilerplates
-    - **Usage**: Project templates, code boilerplates, forms
-    - **Examples**: Project structures, email templates, configs
     
     ### 🔄 99-temp/
     - **Purpose**: Temporary workspace for active tasks
     - **Usage**: Work-in-progress, scratch files, experiments
     - **Rule**: Clean regularly, move to appropriate locations
     
-    ## Development Workspace (/home/eric/dev/)
+    ## Document Management (/home/eric/01-documents/)
     
-    ### heartwood-craft/
-    - Main business and personal projects
+    ### 📑 01-vaults/
+    - **Purpose**: Obsidian knowledge vaults  
+    - **Location**: `/home/eric/01-documents/01-vaults/`
+    - **Contents**: 00_tech, 01_hwc, 02_personal vaults
     
-    ### scripts/
-    - Utility scripts and automation tools
+    ## Media Management (/home/eric/02-media/)
     
-    ### experiments/
-    - Testing new technologies and ideas
+    ### 📸 01-pictures/
+    - **Purpose**: Photo collections and screenshots
+    - **Location**: `/home/eric/02-media/01-pictures/`
+    - **Contents**: Project photos, screenshots, reference images
+    
+    ### 🎵 02-music/
+    - **Purpose**: Music library and audio files
+    - **Location**: `/home/eric/02-media/02-music/`
+    - **Contents**: Music collection, podcasts, audio recordings
+    
+    ### 🎬 03-videos/
+    - **Purpose**: Video files and recordings
+    - **Location**: `/home/eric/02-media/03-videos/`
+    - **Contents**: Personal videos, recordings, video projects
+    
+    ## Areas Organization (/home/eric/02-areas/)
+
+    ### 💼 01-business/
+    - **Purpose**: Business-related files and documents
+    - **Location**: `/home/eric/02-areas/01-business/`
+    
+    ### 👤 02-personal/
+    - **Purpose**: Personal files and documents  
+    - **Location**: `/home/eric/02-areas/02-personal/`
+    
+    ### 💻 03-tech/
+    - **Purpose**: Technology files and resources
+    - **Location**: `/home/eric/02-areas/03-tech/`
+    
+    ### 📋 05-templates/
+    - **Purpose**: Reusable templates and boilerplates
+    - **Location**: `/home/eric/02-areas/05-templates/`
+    - **Usage**: Project templates, code boilerplates, forms
+    - **Examples**: Project structures, email templates, configs
+    
+    ## Resources (/home/eric/)
+    
+    ### 📚 03-resources-adhd-course/
+    - **Purpose**: ADHD management course materials
+    - **Location**: `/home/eric/03-resources-adhd-course/`
+    - **Contents**: Video courses, PDFs, and learning materials
     
     ## Tips for ADHD Management
     
