@@ -43,7 +43,6 @@
     # Projects subdirectories
     "d /home/eric/01-projects/Business 0755 eric users -"      # Business projects
     "d /home/eric/01-projects/workspace 0755 eric users -"     # Development workspace
-    "d /home/eric/01-projects/nixos-md 0755 eric users -"      # NixOS configuration
     
     # Standard user configuration directories
     "d /home/eric/.config 0755 eric users -"
