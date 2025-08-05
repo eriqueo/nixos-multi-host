@@ -30,8 +30,7 @@
     "L /home/eric/Projects - - - - /home/eric/01-projects"               # Projects → projects
     "L /home/eric/Workspace - - - - /home/eric/01-projects/workspace"    # Workspace → projects/workspace
     
-    # Media application shortcuts
-    "L /home/eric/Photos - - - - /home/eric/02-media/01-pictures"        # Photos → media/pictures
+    # Media application shortcuts (Photos symlink already created above)
     "L /home/eric/Screenshots - - - - /home/eric/02-media/01-pictures/01-screenshots" # Screenshots
     "L /home/eric/Camera - - - - /home/eric/02-media/01-pictures/99-inbox" # Camera imports
     
