@@ -122,7 +122,39 @@ All changes tested with:
 - **Container Services**: ✅ All critical services running
 - **Removed Bloat**: ✅ Home Assistant eliminated per user preference
 
-### Validation Required
-- Test SABnzbd endpoint after URL base fix deployment
+### Session: 2025-08-05 - SABnzbd Port Mapping Fix
+
+#### SABnzbd Network Access Issue ✅ COMPLETED
+**Issue**: SABnzbd not accessible via any method (localhost, Tailscale IP, or reverse proxy)
+**Root Cause**: Port mapping mismatch in Gluetun VPN container configuration
+**Location**: `/etc/nixos/hosts/server/modules/media-containers.nix`
+
+**Investigation Process**:
+1. **VPN Verification**: Confirmed Gluetun VPN working (IP: 169.150.196.101 - ProtonVPN Netherlands)
+2. **Port Analysis**: Discovered SABnzbd listening on port 8085, not expected 8081
+3. **Container Research**: LinuxServer SABnzbd hard-codes internal ports, ignores WEBUI_PORT environment variable
+4. **Network Debugging**: Used `netstat` within Gluetun container to identify actual listening ports
+
+**Solution Applied**:
+```nix
+# Updated Gluetun port mapping in media-containers.nix
+ports = [
+  "8080:8080"  # qBittorrent  
+  "8081:8085"  # SABnzbd (container uses port 8085 internally)
+];
+```
+
+**Results**:
+- ✅ **Direct Access**: `http://192.168.1.13:8081` working
+- ✅ **Tailscale Access**: `http://hwc.ocelot-wahoo.ts.net:8081` working  
+- ⚠️ **Reverse Proxy**: `https://hwc.ocelot-wahoo.ts.net/sab/` needs URL base configuration
+
+**Technical Notes**:
+- LinuxServer SABnzbd container behavior differs from documentation expectations
+- Environment variables like `WEBUI_PORT` have no effect on this container
+- Port discovery required runtime investigation rather than configuration inspection
+
+### Previous Session Validation
+- Test SABnzbd endpoint after URL base fix deployment ✅ COMPLETED
 - Verify all working endpoints function properly in browser
 - Confirm Home Assistant removal doesn't break any dependencies

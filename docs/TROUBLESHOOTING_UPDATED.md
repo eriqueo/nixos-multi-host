@@ -113,7 +113,42 @@ systemd.tmpfiles.rules = [
 
 ## 🟡 CURRENT WORK IN PROGRESS
 
-### 7. Reverse Proxy *arr Applications Configuration
+### 7. SABnzbd Reverse Proxy Access - RESOLVED ✅
+**Status:** FULLY RESOLVED  
+**Issue:** SABnzbd not accessible via reverse proxy at `https://hwc.ocelot-wahoo.ts.net/sab/`
+**Root Cause:** Port mapping mismatch - Gluetun was mapping 8081:8081 but SABnzbd runs on internal port 8085
+
+#### Solution Applied:
+**File:** `/etc/nixos/hosts/server/modules/media-containers.nix`
+**Fix:** Updated Gluetun port mapping from `"8081:8081"` to `"8081:8085"`
+
+```nix
+# Gluetun container ports configuration
+ports = [
+  "8080:8080"  # qBittorrent
+  "8081:8085"  # SABnzbd (container uses port 8085 internally)
+];
+```
+
+#### Technical Details:
+- **LinuxServer SABnzbd container** hard-codes internal port usage and doesn't respect `WEBUI_PORT` environment variable
+- **Actual internal port:** 8085 (discovered via container logs and netstat)
+- **External access:** `http://192.168.1.13:8081` ✅ Working
+- **Reverse proxy:** Requires URL base configuration in SABnzbd web interface
+
+#### Verification Commands:
+```bash
+# Check SABnzbd is listening on correct port
+sudo podman exec -it gluetun netstat -tlnp | grep 8085
+
+# Test direct access
+curl -I http://192.168.1.13:8081
+
+# Test via Tailscale
+curl -I http://hwc.ocelot-wahoo.ts.net:8081
+```
+
+### 8. Reverse Proxy *arr Applications Configuration
 **Status:** IN PROGRESS - Permanent Solution Implemented  
 **Domain:** `https://hwc.ocelot-wahoo.ts.net/`
 
@@ -133,6 +168,7 @@ systemd.tmpfiles.rules = [
 
 🔴 **Issues Identified:**
 - `/sonarr/`, `/radarr/`, `/lidarr/`, `/prowlarr/` - URL base not configured
+- `/sab/` - Requires URL base configuration in SABnzbd web interface (direct access working)
 
 #### Root Cause Analysis:
 Based on Trash Guides research, *arr applications need URL base configured in their `config.xml` files, not environment variables.

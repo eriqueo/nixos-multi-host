@@ -151,6 +151,10 @@ nvidia-smi
 
 # Monitor storage usage
 df -h /mnt/hot /mnt/media
+
+# SABnzbd specific debugging
+sudo podman exec -it gluetun netstat -tlnp | grep 808  # Check ports
+curl -I http://192.168.1.13:8081                      # Test direct access
 ```
 
 ## 🎯 **Current Optimization Status**
@@ -160,6 +164,7 @@ df -h /mnt/hot /mnt/media
 - Comprehensive monitoring stack with Grafana dashboards
 - Automated storage management (hot/cold tier migration)
 - Frigate camera system with 4K object detection
+- **SABnzbd port mapping fix** - Direct access working on port 8081
 
 ### **Known Issues** ⚠️
 - Frigate camera authentication needs periodic fixes
