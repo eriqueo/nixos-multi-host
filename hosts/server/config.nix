@@ -121,7 +121,7 @@
   # SSH base configuration from shared/networking.nix, add server-specific settings
   services.openssh.settings = {
     X11Forwarding = true;
-    PasswordAuthentication = true;  # Temporary - for SSH key update
+    PasswordAuthentication = lib.mkForce true;  # Temporary - for SSH key update
   };
 
   # Enable basic X11 services (minimal for forwarding)
