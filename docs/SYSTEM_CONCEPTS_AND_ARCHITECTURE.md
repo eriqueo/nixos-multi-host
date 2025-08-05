@@ -24,15 +24,17 @@ This document consolidates all conceptual information about the NixOS multi-host
 ### Service Containerization Strategy
 **Container Runtime**: Podman with systemd integration
 **Network Architecture**: Custom container networks with media-network for inter-service communication
-**GPU Sharing**: Direct device access pattern for consistent GPU acceleration
+**GPU Sharing**: Direct device access pattern with sophisticated container builders
+**Resource Management**: Automatic memory/CPU limits and hot storage integration
 
 ### Core Service Categories
-1. **Media Management**: *arr applications (Sonarr, Radarr, Lidarr, Prowlarr)
-2. **Media Streaming**: Jellyfin, Navidrome, Immich
-3. **Surveillance**: Frigate + Home Assistant integration
-4. **AI/ML**: Ollama for local inference
-5. **Monitoring**: Prometheus + Grafana + AlertManager stack
-6. **Download Management**: qBittorrent + SABnzbd with VPN integration
+1. **Media Management**: *arr applications with buildMediaServiceContainer
+2. **Media Streaming**: Jellyfin (native), Navidrome, Immich (native with GPU)
+3. **Surveillance**: Frigate with TensorRT + Home Assistant integration
+4. **AI/ML**: Ollama with CUDA acceleration
+5. **Monitoring**: Comprehensive Prometheus + Grafana stack with GPU metrics
+6. **Download Management**: qBittorrent + SABnzbd via buildDownloadContainer with VPN
+7. **Business Intelligence**: Custom Python dashboards with GPU acceleration
 
 ---
 

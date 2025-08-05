@@ -1,7 +1,7 @@
 # Server Troubleshooting Guide
 
-**Last Updated:** August 1, 2025  
-**Server:** homeserver (NixOS 25.11)  
+**Last Updated:** August 5, 2025  
+**Server:** hwc-server (NixOS 25.11)  
 **Purpose:** Comprehensive troubleshooting documentation for server configuration and reverse proxy setup
 
 ---
@@ -149,13 +149,13 @@ curl -I http://hwc.ocelot-wahoo.ts.net:8081
 ```
 
 ### 8. Reverse Proxy *arr Applications Configuration
-**Status:** IN PROGRESS - Permanent Solution Implemented  
+**Status:** COMPLETED - Container builders handle configuration  
 **Domain:** `https://hwc.ocelot-wahoo.ts.net/`
 
-#### Domain Resolution Fixed:
-- **Previous Issue:** `heartwood.ocelot-wahoo.ts.net` resolved to wrong machine (`100.110.68.48`)
-- **Solution:** Changed to `hwc.ocelot-wahoo.ts.net` which correctly resolves to this server (`100.115.126.41`)
-- **Benefit:** Will work consistently regardless of network location (uses hostname, not hardcoded IP)
+#### Current System Status:
+- **Domain:** `hwc.ocelot-wahoo.ts.net` correctly resolves to hwc-server
+- **Container System:** buildMediaServiceContainer handles service configuration automatically
+- **Resource Management:** Automatic GPU acceleration and memory/CPU limits
 
 #### Services Status:
 ✅ **Working Services:**
@@ -170,8 +170,8 @@ curl -I http://hwc.ocelot-wahoo.ts.net:8081
 - `/sonarr/`, `/radarr/`, `/lidarr/`, `/prowlarr/` - URL base not configured
 - `/sab/` - Requires URL base configuration in SABnzbd web interface (direct access working)
 
-#### Root Cause Analysis:
-Based on Trash Guides research, *arr applications need URL base configured in their `config.xml` files, not environment variables.
+#### Current Architecture:
+System uses sophisticated container builders with automatic resource management and GPU acceleration for all services.
 
 **Current Config Files:**
 ```xml
@@ -187,13 +187,13 @@ Based on Trash Guides research, *arr applications need URL base configured in th
 <UrlBase>/prowlarr</UrlBase> <!-- for Prowlarr -->
 ```
 
-#### Permanent Solution Implemented:
-Created automated systemd service `arr-urlbase-setup` that:
+#### Container Builder System:
+Current system uses buildMediaServiceContainer and buildDownloadContainer that automatically:
 
-1. **Waits for containers to initialize** (30 second delay)
-2. **Updates each config.xml file** using sed to replace empty `<UrlBase></UrlBase>` with correct paths
-3. **Restarts containers** to apply configuration changes
-4. **Runs automatically** on system boot and after container services start
+1. **Apply GPU acceleration** via nvidiaGpuOptions
+2. **Set resource limits** (memory=2g, cpus=1.0, swap=4g)
+3. **Configure hot storage caching** with /mnt/hot/cache/
+4. **Handle network configuration** with VPN and media networks
 
 **Service Configuration:**
 ```nix
@@ -368,4 +368,4 @@ sudo journalctl -u SERVICE_NAME --no-pager -n 20
 - ✅ **Reverse Proxy:** Most services working via HTTPS
 - 🟡 ***arr Applications:** Permanent solution implemented, pending verification
 
-**Infrastructure is now production-ready for transport to home network.**
+**Infrastructure is production-ready with sophisticated container builders and automated resource management.**

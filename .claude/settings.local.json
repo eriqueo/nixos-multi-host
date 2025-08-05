@@ -11,7 +11,8 @@
       "Bash(sudo journalctl:*)",
       "Bash(sudo netstat:*)",
       "Bash(sudo ss:*)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(sudo chmod:*)"
     ],
     "deny": []
   }

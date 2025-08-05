@@ -58,11 +58,11 @@ detectors:
 ffmpeg: &ffmpeg_defaults
   hwaccel_args:
     - -hwaccel
-    - cuda
+    - nvdec
     - -hwaccel_device
     - "0"
     - -hwaccel_output_format
-    - yuv420p
+    - nv12
   input_args:
     - -rtsp_transport
     - tcp
@@ -85,9 +85,9 @@ cameras:
           roles: [ detect, record ]
     detect:
       enabled: true
-      width: 640  # Reduced from 1280
-      height: 360 # Reduced from 720
-      fps: 2      # Reduced from 3
+      width: 1280  # Restored to match likely camera stream resolution
+      height: 720  # Restored to match likely camera stream resolution  
+      fps: 2       # Optimized for Pascal P1000 performance
     record:
       enabled: true
       retain:
@@ -233,12 +233,14 @@ EOF
         YOLO_MODELS = "yolov7-320";
         USE_FP16 = "false";  # Required for Pascal (P1000) - Tensor cores need FP16 disabled
 
-        # Reduce detection load temporarily
-        FRIGATE_DEFAULT_DETECT_FPS = "1";  # Reduce from 3 to 1 FPS
+        # Optimized detection settings for P1000
+        FRIGATE_DEFAULT_DETECT_FPS = "2";  # Increased from 1 to 2 FPS for better performance
 
-              # GPU acceleration environment
+        # GPU acceleration environment - optimized for Pascal
         LIBVA_DRIVER_NAME = "nvidia";
         VDPAU_DRIVER = "nvidia";
+        # Explicit GPU device selection for Pascal
+        CUDA_VISIBLE_DEVICES = "0";
         # Add library path for NVIDIA libraries
         LD_LIBRARY_PATH = "/run/opengl-driver/lib:/run/opengl-driver-32/lib";
       } // nvidiaEnv;
