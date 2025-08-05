@@ -8,31 +8,31 @@
   ####################################################################
   imports = [
     ./hardware-configuration.nix
-    
+
     # User configuration
     ../../modules/users/eric.nix
-    
+
     # Shared configuration
     ../../shared/secrets.nix
-    
+
     # Consolidated filesystem structure
     ../../modules/filesystem
-    
+
     # NixOS vault sync system
     ../../modules/vault-sync-system.nix
-    
+
     # New modules for GPU and SSD integration
     ./modules/gpu-acceleration.nix       # NVIDIA Quadro P1000 support
     ./modules/jellyfin-gpu.nix          # Jellyfin hardware acceleration configuration
     ./modules/hot-storage.nix           # SSD hot storage tier
     ./modules/media-containers.nix      # Media containers with VPN, GPU and hot/cold storage
-    
+
     # Monitoring stack
     ./modules/monitoring.nix              # Comprehensive monitoring with Grafana/Prometheus
     ./modules/media-monitor-setup.nix     # Media pipeline monitoring
     ./modules/grafana-dashboards.nix      # Custom dashboards
     ./modules/business-monitoring.nix     # Business intelligence monitoring
-    
+
     # Existing modules
     ./modules/surveillance.nix
     ./modules/business-services.nix
@@ -40,7 +40,7 @@
     ./modules/ai-services.nix
     ./modules/adhd-tools.nix
     ./modules/hardware-tools.nix
-    
+
     # Refactored Obsidian/CouchDB/Caddy modules
     ./modules/couchdb-setup.nix          # CouchDB with SOPS integration
     ./modules/caddy-config.nix           # Caddy reverse proxy configuration
@@ -69,7 +69,7 @@
   ####################################################################
   networking.hostName = "hwc-server";
   networking.networkmanager.enable = true;
-  
+  networking.networkmanager.dhcpHostname = false;
   # Set your time zone
   time.timeZone = "America/Denver";
 
@@ -81,7 +81,7 @@
     device = "/dev/disk/by-label/media";
     fsType = "ext4";
   };
-  
+
   # Note: Hot storage mount (/mnt/hot) is configured in modules/hot-storage.nix
 
   ####################################################################
@@ -97,7 +97,7 @@
   environment.systemPackages = with pkgs; [
     # Claude Code CLI
     claude-code
-    
+
     # GUI applications (X11 forwarding support)
     kitty                  # Terminal emulator
     xfce.thunar           # File manager
@@ -105,10 +105,10 @@
     file-roller           # Archive manager (zip/tar files)
     evince                # PDF viewer
     feh                   # Image viewer (lightweight)
-    
+
     # Media tools (server-specific)
     picard                # Music organization
-    
+
     # Additional tools for GPU and storage monitoring
    # nvtop                 # GPU monitoring (from gpu-acceleration.nix)
    # iotop                 # I/O monitoring (from hot-storage.nix)
@@ -124,10 +124,10 @@
       PasswordAuthentication = true;  # Temporary - for SSH key update
     };
   };
-  
+
   # Enable basic X11 services (minimal for forwarding)
   services.xserver.enable = true;
-  
+
   # Tailscale for secure remote access
   services.tailscale.enable = true;
 
@@ -139,14 +139,14 @@
     enable = true;
     openFirewall = false;  # We'll manage firewall manually
   };
-  
+
   # Immich Native Service - Photo management with GPU support
   services.immich = {
     enable = true;
     host = "0.0.0.0";
     port = 2283;
     mediaLocation = "/mnt/media/pictures";
-    
+
     # Database configuration on hot storage for performance
     database = {
       enable = true;
@@ -154,29 +154,29 @@
       user = "immich";
       createDB = true;
     };
-    
-    # Redis configuration for caching 
+
+    # Redis configuration for caching
     redis = {
       enable = true;
       host = "127.0.0.1";
       port = 6380;  # Use different port to avoid conflict
     };
-    
+
     environment = {
       # Hot storage paths for processing and caching
       IMMICH_UPLOAD_LOCATION = "/mnt/hot/cache/immich/upload";
       IMMICH_THUMBNAIL_LOCATION = "/mnt/hot/cache/immich/thumb";
       IMMICH_ENCODED_VIDEO_LOCATION = "/mnt/hot/cache/immich/encoded";
-      
+
       # Redis connection to Immich-specific instance
       REDIS_HOSTNAME = "127.0.0.1";
       REDIS_PORT = "6380";
-      
+
       # GPU acceleration settings
       IMMICH_MACHINE_LEARNING_ENABLED = "true";
     };
   };
-  
+
   # Jellyfin GPU configuration now handled by ./modules/jellyfin-gpu.nix
 
   # Override Immich services to enable GPU access
@@ -280,7 +280,7 @@ services.tailscale.permitCertUid = "caddy";
     defaultNetwork.settings.dns_enabled = true;
   };
   virtualisation.oci-containers.backend = "podman";
-  
+
   # NVIDIA container runtime is enabled in gpu-acceleration.nix
   ####################################################################
   # 13. FILE OWNERSHIP & PERMISSIONS
@@ -295,7 +295,7 @@ services.tailscale.permitCertUid = "caddy";
     # Use mq-deadline for SSDs (better for mixed workloads)
     ACTION=="add|change", KERNEL=="nvme*", ATTR{queue/scheduler}="mq-deadline"
     ACTION=="add|change", KERNEL=="sd*", ENV{ID_BUS}=="ata", ATTR{queue/rotational}=="0", ATTR{queue/scheduler}="mq-deadline"
-    
+
     # Use CFQ for HDDs (better for sequential workloads)
     ACTION=="add|change", KERNEL=="sd*", ENV{ID_BUS}=="ata", ATTR{queue/rotational}=="1", ATTR{queue/scheduler}="cfq"
   '';
