@@ -28,17 +28,20 @@
 - **Automated migration**: Hot → Cold via systemd services
 
 ### **Container Stack** (Podman)
-- **Media**: Sonarr/Radarr/Lidarr + Jellyfin (GPU accelerated)
-- **Downloads**: qBittorrent + SABnzbd via Gluetun VPN
-- **Surveillance**: Frigate (TensorRT) + Home Assistant  
-- **Monitoring**: Prometheus + Grafana + custom metrics
-- **AI Services**: Ollama with llama3.2:3b for documentation generation
-- **Business**: Python dashboards with analytics
+- **Media Management**: Sonarr, Radarr, Lidarr, Prowlarr (GPU-accelerated thumbnails)
+- **Media Streaming**: Jellyfin (native with GPU transcoding), Navidrome, Immich (native with GPU AI/ML)
+- **Downloads**: qBittorrent + SABnzbd via Gluetun VPN isolation
+- **Surveillance**: Frigate (TensorRT object detection) + Home Assistant integration
+- **Monitoring**: Prometheus + Grafana + GPU metrics + custom storage monitoring
+- **AI Services**: Ollama with llama3.2:3b (CUDA acceleration) for documentation generation
+- **Business Intelligence**: Custom Python dashboards with GPU acceleration and analytics
 
-### **Security**
-- **SOPS**: Age-encrypted secrets in `/etc/nixos/secrets/`
-- **VPN**: ProtonVPN for downloads, Tailscale for remote access
-- **Network**: Custom `media-network` for container isolation
+### **Security & Network**
+- **SOPS**: Age-encrypted secrets in `/etc/nixos/secrets/` with file-level permissions
+- **VPN**: ProtonVPN (downloads only) via Gluetun, Tailscale mesh for remote access
+- **Network**: Custom `media-network` for inter-service communication, container isolation
+- **Firewall**: Interface-specific rules (tailscale0, local LAN)
+- **Authentication**: Basic auth for internal services, reverse proxy planned
 
 ## 🚨 **CRITICAL DEPLOYMENT COMMANDS**
 
@@ -105,6 +108,45 @@ The system now includes an intelligent AI documentation generator that:
 | **Architecture** | `docs/SYSTEM_CONCEPTS_AND_ARCHITECTURE.md` | Service relationships |
 | **Troubleshooting** | `docs/TROUBLESHOOTING_UPDATED.md` | Common issues, solutions |
 
+## 🎮 GPU Acceleration Framework
+
+### **NVIDIA Quadro P1000 Configuration**
+- **Architecture**: Pascal (Compute Capability 6.1) with 4GB VRAM
+- **Capabilities**: CUDA compute, NVENC/NVDEC hardware encoding, limited AV1 support
+- **Shared Access**: Multiple services with proper isolation and resource management
+
+### **Service GPU Utilization Matrix**
+| Service | GPU Usage | Primary Benefit |
+|---------|-----------|-----------------|
+| **Frigate** | TensorRT object detection | Real-time video analysis |
+| **Immich** | Face recognition, ML processing | Photo organization |
+| **Jellyfin** | Hardware transcoding (NVENC/NVDEC) | Video streaming |
+| **Ollama** | CUDA inference | Local AI processing |
+| ***arr apps** | Thumbnail generation | Media preview |
+| **Download clients** | Video processing | Preview generation |
+
+### **GPU Device Access Pattern**
+```nix
+nvidiaGpuOptions = [ 
+  "--device=/dev/nvidia0:/dev/nvidia0:rwm"
+  "--device=/dev/nvidiactl:/dev/nvidiactl:rwm" 
+  "--device=/dev/nvidia-modeset:/dev/nvidia-modeset:rwm"
+  "--device=/dev/nvidia-uvm:/dev/nvidia-uvm:rwm"
+  "--device=/dev/nvidia-uvm-tools:/dev/nvidia-uvm-tools:rwm"
+  "--device=/dev/dri:/dev/dri:rwm"
+];
+
+nvidiaEnv = {
+  NVIDIA_VISIBLE_DEVICES = "all";
+  NVIDIA_DRIVER_CAPABILITIES = "compute,video,utility";
+};
+```
+
+### **Pascal Architecture Considerations**
+- **TensorRT**: Requires `USE_FP16 = "false"` for model generation on Pascal
+- **Memory Management**: 4GB VRAM requires careful resource allocation between services
+- **Codec Support**: Full H.264/H.265 encoding support, limited AV1 decode capability
+
 ## 🔧 Quick Commands
 
 ```bash
@@ -118,6 +160,12 @@ df -h /mnt/hot /mnt/media               # Storage usage
 systemctl status ollama                 # Check AI service
 ollama list                            # Available AI models
 tail /etc/nixos/docs/ai-doc-generation.log  # AI processing logs
+
+# Monitoring & Metrics
+curl http://localhost:3000              # Grafana dashboard
+curl http://localhost:9090              # Prometheus metrics
+nvidia-smi -q                          # Detailed GPU info
+sudo podman stats                       # Container resource usage
 
 # Deploy Changes
 grebuild "Descriptive commit message"   # Preferred method (includes AI docs)
@@ -150,6 +198,69 @@ The NixOS homeserver system has undergone significant transformations, solidifyi
 - Some Frigate cameras may need periodic authentication fixes
 - Storage monitoring requires proper gawk package paths
 - GPU monitoring may need occasional restarts
+
+## 📊 Monitoring & Observability Architecture
+
+### **Metrics Collection**
+- **Core Metrics**: Node Exporter for system metrics (CPU, memory, disk, network)
+- **Container Metrics**: cAdvisor for container resource usage and performance
+- **GPU Metrics**: NVIDIA GPU Exporter for GPU utilization, temperature, memory
+- **Application Metrics**: Custom exporters for media pipeline health and status
+- **Storage Metrics**: Custom scripts for hot/cold storage monitoring and alerts
+
+### **Dashboard Organization**
+1. **System Overview**: CPU, memory, disk, network status
+2. **GPU Monitoring**: Utilization, temperature, memory usage across services
+3. **Media Pipeline**: Download queues, processing status, storage tier usage
+4. **Service Health**: Container status, endpoint availability, response times
+5. **Storage Management**: Hot/cold tier usage, migration status, capacity planning
+
+### **Alert Management**
+- **Severity Levels**: Critical (immediate action), Warning (attention needed), Info (awareness)
+- **Notification Channels**: Webhook-based alerting system for real-time notifications
+- **Alert Groups**: System alerts, Storage alerts, GPU alerts, Container alerts, Service alerts
+
+## 🎬 Media Pipeline Architecture
+
+### **Two-Tier Storage Strategy**
+**Hot Storage** (`/mnt/hot` - SSD): Fast storage for active operations
+- Active downloads and real-time processing
+- Application caches and temporary files  
+- Recent media access and preview generation
+
+**Cold Storage** (`/mnt/media` - HDD): Archival storage for organized libraries
+- Final organized media libraries (movies, TV, music)
+- Long-term retention and backup storage
+- Jellyfin/Plex media serving and streaming
+
+### **Download and Processing Workflow**
+1. **Download Phase**: qBittorrent/SABnzbd → Hot storage via VPN protection
+2. **Processing Phase**: *arr applications analyze, rename, and organize content
+3. **Migration Phase**: Automated scripts move completed content to appropriate cold storage
+4. **Cleanup Phase**: Scheduled cleanup of temporary files, old downloads, and cache
+
+### **VPN Integration & Security**
+- **VPN Provider**: ProtonVPN via Gluetun container isolation
+- **VPN Scope**: Download clients only (qBittorrent, SABnzbd) - media serving remains direct
+- **Security**: SOPS-encrypted credentials, dedicated container network isolation
+- **Monitoring**: VPN connection status monitoring and automatic reconnection
+
+## 💾 Storage Tier Management Strategy
+
+### **Automated Migration System**
+- **Migration Triggers**: Completion status, file age, storage usage thresholds
+- **Migration Process**: rsync with verification, integrity checks, and cleanup
+- **Monitoring**: Real-time storage usage alerts and capacity planning automation
+
+### **Cache Management Policies**
+- **GPU Cache**: Dedicated cache directories for GPU-accelerated services
+- **Application Cache**: Service-specific cache with intelligent cleanup
+- **Cleanup Policies**: Time-based retention (7-30 days) and size-based limits
+
+### **Backup & Recovery Strategy**
+- **Configuration**: Git-based NixOS configuration backup with automatic commits
+- **Media Libraries**: Cold storage acts as primary (no additional backup needed)
+- **Surveillance**: Event-based backup to cold storage with retention policies
 
 ## 🚀 File Management (Safe Methods Only)
 

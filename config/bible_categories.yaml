@@ -1,0 +1,268 @@
+# Bible System Categories Configuration
+# Defines the structure and mapping for the 6-Bible Documentation System
+
+bible_categories:
+  hardware_gpu:
+    name: "Hardware & GPU Acceleration Bible"
+    filename: "HARDWARE_GPU_BIBLE.md"
+    description: "Physical hardware, GPU configuration, device access, performance optimization"
+    scope:
+      - NVIDIA Quadro P1000 configuration and Pascal architecture
+      - Container GPU device access patterns
+      - Service-specific GPU utilization
+      - Performance monitoring and troubleshooting
+      - VM GPU passthrough
+    
+    source_files:
+      primary:
+        - "GPU_ACCELERATION_GUIDE.md"
+      secondary:
+        - "JELLYFIN-GPU-SETUP.md"
+        - "SKETCHUP-VM-SETUP.md"
+      sections:
+        - "SYSTEM_CONCEPTS_AND_ARCHITECTURE.md::GPU Acceleration Framework"
+        - "FRIGATE_OPTIMIZATION_GUIDE.md::GPU Configuration"
+    
+    update_threshold:
+      minor: 2
+      moderate: 4  
+      major: 8
+      reason: "Hardware changes are rare but critical"
+    
+    dependencies:
+      affects: ["container_services"]
+      affected_by: ["system_architecture"]
+
+  container_services:
+    name: "Container Services & Orchestration Bible"
+    filename: "CONTAINER_SERVICES_BIBLE.md"
+    description: "Podman containers, service configuration, networking, systemd integration"
+    scope:
+      - Media management services (*arr applications, download clients)
+      - Surveillance system (Frigate, Home Assistant)
+      - Business intelligence (dashboards, APIs, databases)
+      - Container networking and inter-service communication
+      - Service-specific optimization and troubleshooting
+    
+    source_files:
+      primary:
+        - "ARR_APPS_OPTIMIZATION_GUIDE.md"
+        - "MEDIA_PIPELINE_CONFIGURATION_GUIDE.md"
+      secondary:
+        - "BUSINESS_SERVICES_GUIDE.md"
+        - "FRIGATE_OPTIMIZATION_GUIDE.md"
+      sections:
+        - "SYSTEM_CONCEPTS_AND_ARCHITECTURE.md::Service Containerization Strategy"
+    
+    update_threshold:
+      minor: 5
+      moderate: 10
+      major: 20
+      reason: "Services change frequently with optimization and new additions"
+    
+    dependencies:
+      affects: ["storage_data", "monitoring_observability"]
+      affected_by: ["hardware_gpu", "system_architecture"]
+
+  storage_data:
+    name: "Storage & Data Pipeline Bible"  
+    filename: "STORAGE_DATA_BIBLE.md"
+    description: "Storage architecture, data flows, automation, backup strategies"
+    scope:
+      - Two-tier storage architecture (hot SSD, cold HDD)
+      - Automated data migration and retention policies
+      - Media pipeline workflows (download → process → archive)
+      - Backup strategies and disaster recovery
+      - Storage monitoring and capacity management
+    
+    source_files:
+      primary:
+        - "HOT_COLD_STORAGE_WORKFLOW.md"
+      secondary:
+        - "MEDIA_PIPELINE_CONFIGURATION_GUIDE.md"
+      sections:
+        - "SYSTEM_CONCEPTS_AND_ARCHITECTURE.md::Storage Tier Management"
+        - "ARR_APPS_OPTIMIZATION_GUIDE.md::Storage Configuration"
+    
+    update_threshold:
+      minor: 4
+      moderate: 8
+      major: 15
+      reason: "Storage changes impact multiple services"
+    
+    dependencies:
+      affects: ["monitoring_observability"]
+      affected_by: ["container_services", "system_architecture"]
+
+  monitoring_observability:
+    name: "Monitoring & Observability Bible"
+    filename: "MONITORING_OBSERVABILITY_BIBLE.md" 
+    description: "Metrics collection, dashboards, alerting, system health monitoring"
+    scope:
+      - Prometheus metrics collection and exporters
+      - Grafana dashboard design and provisioning
+      - Alert management and notification systems
+      - System health monitoring and diagnostics
+      - Performance optimization and capacity planning
+    
+    source_files:
+      primary:
+        - "MONITORING_OPTIMIZATION_GUIDE.md"
+      secondary:
+        - "GRAFANA_PROMETHEUS_USER_GUIDE.md"
+        - "MONITORING.md"
+        - "TROUBLESHOOTING.md"
+      sections:
+        - "SYSTEM_CONCEPTS_AND_ARCHITECTURE.md::Monitoring and Observability"
+    
+    update_threshold:
+      minor: 6
+      moderate: 12
+      major: 25
+      reason: "Metrics and dashboards change frequently with system evolution"
+    
+    dependencies:
+      affects: []
+      affected_by: ["container_services", "storage_data", "hardware_gpu"]
+
+  ai_documentation:
+    name: "AI Documentation & Automation Bible"
+    filename: "AI_DOCUMENTATION_BIBLE.md"
+    description: "AI documentation system, automation workflows, intelligent analysis" 
+    scope:
+      - Local Ollama AI model configuration and operation
+      - Automated documentation generation and analysis
+      - Git integration and post-build workflows
+      - AI prompt engineering and optimization
+      - Troubleshooting AI documentation failures
+    
+    source_files:
+      primary:
+        - "AI_DOCUMENTATION_SYSTEM_HOWTO.md"
+      secondary:
+        - "AI_DOCUMENTATION_IMPLEMENTATION_PLAN.md"
+      archive:
+        - "AI_DOCUMENTATION_IMPLEMENTATION_PROGRESS.md"
+    
+    update_threshold:
+      minor: 3
+      moderate: 6
+      major: 12
+      reason: "AI system changes require immediate documentation for proper operation"
+    
+    dependencies:
+      affects: ["system_architecture"]
+      affected_by: ["system_architecture"]
+
+  system_architecture:
+    name: "System Architecture & Operations Bible"
+    filename: "SYSTEM_ARCHITECTURE_BIBLE.md"
+    description: "Overall system design, deployment procedures, maintenance, troubleshooting"
+    scope:
+      - NixOS configuration management and deployment
+      - System architecture and service relationships
+      - Security configuration (SOPS, VPN, Tailscale)
+      - Operational procedures and best practices
+      - Strategic optimization and system evolution
+    
+    source_files:
+      primary:
+        - "CLAUDE_CODE_SYSTEM_PRIMER.md"
+        - "SYSTEM_CONCEPTS_AND_ARCHITECTURE.md"
+      secondary:
+        - "OPTIMIZATION_SUMMARY.md"
+        - "TROUBLESHOOTING.md"
+      sections:
+        - "Multiple files::Deployment procedures"
+        - "Multiple files::Security configurations"
+    
+    update_threshold:
+      minor: 3
+      moderate: 7
+      major: 15
+      reason: "Architectural changes are critical and affect all other systems"
+    
+    dependencies:
+      affects: ["hardware_gpu", "container_services", "storage_data", "ai_documentation"]
+      affected_by: []
+
+# Files to Archive (Historical Value Only)
+archive_files:
+  - filename: "COMPLETED_TASKS_LOG.md"
+    archive_name: "archive/completed-tasks-2025-08-06.md"
+    reason: "Historical task completion log"
+    
+  - filename: "MASTER_TODO_LIST.md"
+    archive_name: "archive/todo-snapshot-2025-08-06.md"
+    reason: "Point-in-time task snapshot"
+    
+  - filename: "AI_DOCUMENTATION_IMPLEMENTATION_PROGRESS.md"
+    archive_name: "archive/ai-implementation-progress.md"
+    reason: "Implementation progress tracking"
+    
+  - filename: "GREBUILD_AND_CADDY_URL_FIXES.md"
+    archive_name: "archive/grebuild-caddy-fixes-2025-08-06.md"
+    reason: "Duplicate of GREBUILD_AND_CADDY_FIXES_2025-08-06.md"
+
+# Duplicate Resolution
+duplicates:
+  - primary: "GREBUILD_AND_CADDY_FIXES_2025-08-06.md"
+    duplicate: "GREBUILD_AND_CADDY_URL_FIXES.md"
+    action: "archive_duplicate"
+    merge_strategy: "keep_primary"
+
+# Cross-Bible Consistency Rules
+consistency_rules:
+  gpu_device_access:
+    source_bible: "hardware_gpu"
+    dependent_bibles: ["container_services"]
+    validation: "GPU device paths and environment variables must match"
+    
+  service_names:
+    source_bible: "container_services" 
+    dependent_bibles: ["monitoring_observability", "storage_data"]
+    validation: "Service names in monitoring and storage configs must match container definitions"
+    
+  storage_paths:
+    source_bible: "storage_data"
+    dependent_bibles: ["container_services"]
+    validation: "Mount paths and storage locations must match between storage architecture and container configs"
+    
+  network_configuration:
+    source_bible: "system_architecture"
+    dependent_bibles: ["container_services", "monitoring_observability"]
+    validation: "Network names, subnets, and access rules must be consistent"
+    
+  security_configuration:
+    source_bible: "system_architecture"
+    dependent_bibles: ["container_services", "ai_documentation"]
+    validation: "SOPS secrets, VPN configs, and security policies must align"
+
+# Content Migration Priorities
+migration_priorities:
+  phase_1_critical:
+    - "hardware_gpu"
+    - "system_architecture"
+  phase_2_services:
+    - "container_services"
+    - "storage_data"
+  phase_3_monitoring:
+    - "monitoring_observability"
+    - "ai_documentation"
+
+# Update Frequency Patterns
+update_patterns:
+  high_frequency:
+    - "container_services"
+    - "monitoring_observability"
+    reason: "Services and monitoring change frequently"
+    
+  medium_frequency:
+    - "storage_data"
+    - "ai_documentation"
+    reason: "Infrastructure changes moderately"
+    
+  low_frequency:
+    - "hardware_gpu"  
+    - "system_architecture"
+    reason: "Hardware and architecture changes are infrequent but critical"

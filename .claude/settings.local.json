@@ -18,7 +18,9 @@
       "Bash(curl:*)",
       "Bash(sudo find /var /etc /run -name \"*caddy*config*\" -type f 2>/dev/null)",
       "Bash(grep:*)",
-      "Bash(sudo systemctl status:*)"
+      "Bash(sudo systemctl status:*)",
+      "Bash(sudo virsh start:*)",
+      "Bash(mkdir:*)"
     ],
     "deny": []
   }
