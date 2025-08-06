@@ -12,7 +12,12 @@
       "Bash(sudo netstat:*)",
       "Bash(sudo ss:*)",
       "Bash(cat:*)",
-      "Bash(sudo chmod:*)"
+      "Bash(sudo chmod:*)",
+      "Bash(sudo podman logs:*)",
+      "Bash(sudo podman run:*)",
+      "Bash(curl:*)",
+      "Bash(sudo find /var /etc /run -name \"*caddy*config*\" -type f 2>/dev/null)",
+      "Bash(grep:*)"
     ],
     "deny": []
   }

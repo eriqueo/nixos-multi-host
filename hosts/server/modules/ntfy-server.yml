@@ -1,0 +1,59 @@
+# Private ntfy server configuration for NixOS homeserver
+# Security-focused configuration disabling public features
+
+# Basic server settings
+base-url: "https://hwc.ocelot-wahoo.ts.net"
+listen-http: ":80"
+behind-proxy: true
+
+# Cache settings for message storage
+cache-file: "/var/cache/ntfy/cache.db"
+cache-duration: "12h"
+cache-batch-size: 0
+cache-batch-timeout: "0ms"
+
+# Disable public features for security
+enable-signup: false
+enable-login: false
+enable-reservations: false
+
+# Disable metrics and profiling for privacy
+enable-metrics: false
+metrics-listen-http: ""
+
+# Enable minimal web UI for app compatibility
+# web-root: "disable"
+
+# Message limits
+message-size-limit: "4096"
+message-delay-limit: "3d"
+
+# Rate limiting (generous for private use)
+global-topic-limit: 15000
+visitor-subscription-limit: 30
+visitor-request-limit-burst: 60
+visitor-request-limit-replenish: "5s"
+visitor-message-daily-limit: 200
+
+# Logging
+log-level: "INFO"
+log-format: "text"
+
+# Security headers
+access-control-allow-origin: "*"
+
+# No SMTP (we don't need email notifications)
+smtp-sender-addr: ""
+
+# No upstream providers
+upstream-base-url: ""
+
+# No Firebase/Android integration (private server)
+firebase-key-file: ""
+
+# No authentication database (open for internal use only)
+auth-file: ""
+auth-default-access: "read-write"
+
+# Manager interval for cleanup
+manager-interval: "1m"

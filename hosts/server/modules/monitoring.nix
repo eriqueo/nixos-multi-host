@@ -167,10 +167,92 @@ in
       ];
       cmd = [ "sh" "-c" "cd /app && pip install psutil prometheus_client requests && python media_monitor.py" ];
     };
+
+    # Private ntfy notification service
+    ntfy = {
+      image = "binwiederhier/ntfy:latest";
+      autoStart = true;
+      extraOptions = mediaNetworkOptions;
+      ports = [ "8282:80" ];
+      volumes = [
+        "/mnt/hot/cache/ntfy:/var/cache/ntfy"
+        "/etc/ntfy-server.yml:/etc/ntfy/server.yml:ro"
+        "/etc/localtime:/etc/localtime:ro"
+      ];
+      cmd = [ "serve" "--config" "/etc/ntfy/server.yml" ];
+    };
   };
 
   ####################################################################
-  # 2. DIRECTORY STRUCTURE SETUP
+  # 2. DECLARATIVE CONFIGURATION FILES
+  ####################################################################
+  environment.etc."ntfy-server.yml" = {
+    text = ''
+      # Private ntfy server configuration for NixOS homeserver
+      # Security-focused configuration disabling public features
+
+      # Basic server settings
+      base-url: "https://hwc.ocelot-wahoo.ts.net"
+      listen-http: ":80"
+      behind-proxy: true
+
+      # Cache settings for message storage
+      cache-file: "/var/cache/ntfy/cache.db"
+      cache-duration: "12h"
+      cache-batch-size: 0
+      cache-batch-timeout: "0ms"
+
+      # Disable public features for security
+      enable-signup: false
+      enable-login: false
+      enable-reservations: false
+
+      # Disable metrics and profiling for privacy
+      enable-metrics: false
+      metrics-listen-http: ""
+
+      # Enable minimal web UI for app compatibility
+      # web-root: "disable"
+
+      # Message limits
+      message-size-limit: "4096"
+      message-delay-limit: "3d"
+
+      # Rate limiting (generous for private use)
+      global-topic-limit: 15000
+      visitor-subscription-limit: 30
+      visitor-request-limit-burst: 60
+      visitor-request-limit-replenish: "5s"
+      visitor-message-daily-limit: 200
+
+      # Logging
+      log-level: "INFO"
+      log-format: "text"
+
+      # Security headers
+      access-control-allow-origin: "*"
+
+      # No SMTP (we don't need email notifications)
+      smtp-sender-addr: ""
+
+      # No upstream providers
+      upstream-base-url: ""
+
+      # No Firebase/Android integration (private server)
+      firebase-key-file: ""
+
+      # No authentication database (open for internal use only)
+      auth-file: ""
+      auth-default-access: "read-write"
+
+      # Manager interval for cleanup
+      manager-interval: "1m"
+    '';
+    mode = "0644";
+  };
+
+  ####################################################################
+  # 3. DIRECTORY STRUCTURE SETUP
   ####################################################################
   systemd.tmpfiles.rules = [
     # Monitoring base directories
@@ -198,13 +280,16 @@ in
     # Custom monitoring scripts
     "d /opt/monitoring/media-monitor 0755 eric users -"
     
+    # ntfy cache directory
+    "d /mnt/hot/cache/ntfy 0755 eric users -"
+    
     # Node exporter textfile collector
     "d /var/lib/node_exporter 0755 root root -"
     "d /var/lib/node_exporter/textfile_collector 0755 root root -"
   ];
 
   ####################################################################
-  # 3. CONFIGURATION GENERATION
+  # 4. CONFIGURATION GENERATION
   ####################################################################
   systemd.services.monitoring-config = {
     description = "Generate monitoring configuration files";
@@ -505,10 +590,10 @@ EOF
   };
 
   ####################################################################
-  # 4. FIREWALL CONFIGURATION
+  # 5. FIREWALL CONFIGURATION
   ####################################################################
   networking.firewall.interfaces."tailscale0" = {
-    allowedTCPPorts = [ 3000 9090 9093 9100 8083 9115 9445 8888 ];
+    allowedTCPPorts = [ 3000 9090 9093 9100 8083 9115 9445 8888 8282 ];
   };
 
   # Allow local network access

@@ -54,6 +54,11 @@
         reverse_proxy localhost:8501
       }
 
+      # Private notification service (bypass authentication)
+      handle_path /notify/* {
+        reverse_proxy localhost:8282
+      }
+
       # Photo management
       handle_path /immich/* {
         reverse_proxy localhost:2283
@@ -72,6 +77,6 @@
   # Firewall: only expose HTTP/S publicly, other services only on Tailscale
   networking.firewall.allowedTCPPorts = [ 80 443 ];
   networking.firewall.interfaces."tailscale0" = {
-    allowedTCPPorts = [ 5984 8000 8501 ];
+    allowedTCPPorts = [ 5984 8000 8501 8282 ];
   };
 }
