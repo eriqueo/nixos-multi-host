@@ -1,9 +1,10 @@
 # virtualization.nix
 # Virtual machines, Windows compatibility layers, and sandboxed app environments.
-# Start: Bottles/Wine/SketchUp. Extend for QEMU, podman, etc. as needed.
+# Wine/Bottles + QEMU/KVM for SketchUp VMs
 { pkgs, ... }:
 
 {
+  # Wine/Bottles compatibility layer packages (home-manager)
   home.packages = with pkgs; [
     bottles
     wineWowPackages.staging
@@ -23,7 +24,9 @@
     dbus
     expat
     libuuid
-    # Add more as needed for future VM/compat apps
+    # VM tools (user-accessible)
+    virt-manager
+    virt-viewer
   ];
 }
 

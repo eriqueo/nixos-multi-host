@@ -180,7 +180,7 @@
   # SSH and Tailscale base configuration from shared/networking.nix
 
   ####################################################################
-  # 12. CONTAINERS
+  # 12. CONTAINERS & VIRTUALIZATION
   ####################################################################
   virtualisation.podman = {
     enable = true;
@@ -188,6 +188,22 @@
     defaultNetwork.settings.dns_enabled = true;
   };
   virtualisation.oci-containers.backend = "podman";
+
+  # QEMU/KVM for SketchUp VMs
+  virtualisation.libvirtd = {
+    enable = true;
+    qemu = {
+      package = pkgs.qemu_kvm;
+      runAsRoot = false;
+      swtpm.enable = true;
+      ovmf.enable = true;
+      ovmf.packages = [ pkgs.OVMF.fd ];
+    };
+  };
+  virtualisation.spiceUSBRedirection.enable = true;
+
+  # Add user to libvirtd group for VM management
+  users.users.eric.extraGroups = [ "libvirtd" ];
 
   ####################################################################
   # 13. POWER MANAGEMENT (laptop-specific)
@@ -245,6 +261,14 @@
     
     # Graphics testing tools
     glxinfo
+    
+    # VM/QEMU tools
+    spice
+    spice-gtk
+    spice-protocol
+    win-virtio
+    win-spice
+    virtiofsd
   ];
 
   ####################################################################

@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "MONITORING_OPTIMIZATION_GUIDE.md",
+                "file": "OPTIMIZATION_SUMMARY.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "MONITORING_OPTIMIZATION_GUIDE"
+              "title": "OPTIMIZATION_SUMMARY"
             }
           }
         ]
@@ -174,11 +174,27 @@
   },
   "active": "b5a774681b1bdaa2",
   "lastOpenFiles": [
+    "MONITORING_OPTIMIZATION_GUIDE.md",
     "MONITORING.md",
+    "MEDIA_PIPELINE_CONFIGURATION_GUIDE.md",
+    "MASTER_TODO_LIST.md",
+    "JELLYFIN-GPU-SETUP.md",
     "HOT_COLD_STORAGE_WORKFLOW.md",
+    "GREBUILD_AND_CADDY_URL_FIXES.md",
+    "GREBUILD_AND_CADDY_FIXES_2025-08-06.md",
     "GRAFANA_PROMETHEUS_USER_GUIDE.md",
+    "GPU_ACCELERATION_GUIDE.md",
     "FRIGATE_OPTIMIZATION_GUIDE.md",
+    "COMPLETED_TASKS_LOG.md",
     "CLAUDE_CODE_SYSTEM_PRIMER.md",
-    "AI_DOCUMENTATION_IMPLEMENTATION_PLAN.md"
+    "BUSINESS_SERVICES_GUIDE.md",
+    "ARR_APPS_OPTIMIZATION_GUIDE.md",
+    "AI_DOCUMENTATION_SYSTEM_HOWTO.md",
+    "AI_DOCUMENTATION_IMPLEMENTATION_PROGRESS.md",
+    "AI_DOCUMENTATION_IMPLEMENTATION_PLAN.md",
+    "SYSTEM_CONCEPTS_AND_ARCHITECTURE.md",
+    "TROUBLESHOOTING.md",
+    "TROUBLESHOOTING_UPDATED.md",
+    "SKETCHUP-VM-SETUP.md"
   ]
 }
