@@ -94,4 +94,3 @@
 # 
 # On the server, run this cleanup command:
 # sudo tailscale serve reset
-EOF < /dev/null
