@@ -32,18 +32,17 @@
         reverse_proxy localhost:4533
       }
 
-      # *ARR stack - Fixed: Changed from 'handle' to 'handle_path' to strip path prefixes
-      # This prevents apps from receiving URLs like /sonarr/api/ (they expect just /api/)
-      handle_path /sonarr/* {
+      # *ARR stack
+      handle /sonarr/* {
         reverse_proxy localhost:8989
       }
-      handle_path /radarr/* {
+      handle /radarr/* {
         reverse_proxy localhost:7878
       }
-      handle_path /lidarr/* {
+      handle /lidarr/* {
         reverse_proxy localhost:8686
       }
-      handle_path /prowlarr/* {
+      handle /prowlarr/* {
         reverse_proxy localhost:9696
       }
 
@@ -55,15 +54,9 @@
         reverse_proxy localhost:8501
       }
 
-      # Private notification service - robust proxy configuration for mobile app
-      route /notify/* {
-        reverse_proxy localhost:8282 {
-          header_up Host {host}
-          header_up X-Real-IP {remote}
-          header_up X-Forwarded-For {remote}
-          header_up X-Forwarded-Proto {scheme}
-          header_up X-Forwarded-Host {host}
-        }
+      # Private notification service (bypass authentication)
+      handle_path /notify/* {
+        reverse_proxy localhost:8282
       }
 
       # Photo management
@@ -87,11 +80,3 @@
     allowedTCPPorts = [ 5984 8000 8501 8282 ];
   };
 }
-
-# IMPORTANT: Do not use Tailscale Serve with this Caddy configuration
-# ChatGPT's mistake was running: sudo tailscale serve --bg --https=8989 localhost:8989
-# This bypassed Caddy's path-based routing and broke everything
-# 
-# On the server, run this cleanup command:
-# sudo tailscale serve reset
-EOF < /dev/null
