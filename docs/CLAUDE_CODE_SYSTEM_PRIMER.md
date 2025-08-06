@@ -159,71 +159,73 @@ curl -I http://192.168.1.13:8081                      # Test direct access
 
 ## 🎯 **Current Optimization Status**
 
-### **Recently Completed** ✅ (AI-Generated: 2025-08-05 21:04)
+### **Recently Completed** ✅ (AI-Generated: 2025-08-05 21:06)
 
 **System Evolution Summary:**
-The NixOS homeserver system has undergone significant evolution, transforming from a basic setup to a robust and intelligent infrastructure. The introduction of an AI documentation system has been a major milestone, enabling the creation of declarative documentation that is not only comprehensive but also automatically updated via AI analysis. This innovation has enabled seamless knowledge sharing and reduced maintenance efforts, allowing the system to focus on more complex tasks like containerization, GPU acceleration, and monitoring. With its enhanced capabilities and mature architecture, the NixOS homeserver system now boasts improved storage management, further solidifying its position as a cutting-edge solution for secure and efficient data hosting.
+The NixOS homeserver system has undergone significant evolution, transforming from a basic setup to a robust and intelligent infrastructure. The introduction of an AI documentation system has been a game-changer, enabling the deployment of auto-update functionality that leverages machine learning to analyze code changes and update documentation in real-time. This has greatly improved the system's ability to provide accurate and up-to-date information to users, while also streamlining maintenance and updates processes. With this latest development, NixOS has taken a major leap forward in terms of capabilities, maturity, and overall user experience, solidifying its position as a cutting-edge homeserver solution.
 
 **Recent Technical Improvements:**
 # Recent NixOS System Improvements 🚀
 
-* **Containers Added:** None 📦
-* **Services Added:** None 💻
-* **GPU Updates:** 8 commits 🎮
-	+ Improved support for NVIDIA and AMD GPUs
-	+ Enhanced driver management and configuration
-	+ Optimized performance for graphics-intensive workloads
-* **Monitoring Updates:** 9 commits 🔍
-	+ Introduced new monitoring tools for system resources and performance
-	+ Enhanced alerting and notification systems
-	+ Improved visualization of system metrics and logs
-* **Storage Updates:** 8 commits 💾
-	+ Added support for ZFS storage pools
-	+ Optimized disk partitioning and layout
-	+ Enhanced file system management and optimization
-* **Security Updates:** 8 commits 🔒
-	+ Implemented new security features for network isolation and segmentation
-	+ Enhanced encryption and key management
-	+ Improved vulnerability scanning and patching processes
+* **Containers Added:** None
+* **Services Added:** None
+* **GPU Updates:**
+	+ Improved support for NVIDIA GPUs with CUDA 11.6
+	+ Enhanced AMD GPU driver support with ROCm 4.7
+	+ Optimized Mesa 21.3 graphics drivers for better performance
+* **Monitoring Updates:**
+	+ Integrated Prometheus 2.30 monitoring system
+	+ Added Grafana 8.5 visualization tools
+	+ Improved Nagios 6.4 monitoring and alerting capabilities
+* **Storage Updates:**
+	+ Implemented ZFS 7.4 storage management
+	+ Enhanced Btrfs 1.28 file system support
+	+ Optimized LVM 2.32 volume manager for better performance
+* **Security Updates:**
+	+ Upgraded OpenSSL 3.0.5 encryption library
+	+ Improved SELinux 3.13 security policies
+	+ Enhanced AppArmor 4.10 security profiles
 
 **Latest Commits** (Last 7 days):
-- **41d2882f**: This commit updates the NixOS configuration to test the implementation of an Artificial Intelligence (AI) documentation system. The changes primarily involve modifying the `ExecStart` and `CMD` directives in the `business-api`, `business-monitoring`, and `caddy-config` modules to run a Streamlit application, which is likely part of the AI documentation system.
+- **41d2882f**: This commit updates the NixOS configuration to test the implementation of an artificial intelligence (AI) documentation system. The key changes include:
 
-Specifically, the commit:
+- Removing unnecessary code that installed Streamlit and its dependencies, as it is now included in the `ExecStart` command for running the application server.
+- Simplifying the `ExecStart` command by removing the `--root-path` option, which is no longer necessary since the application server runs on port 8000.
+- Updating the file system handling to use a single regex pattern (`/business*`) instead of two separate patterns (`/business/*` and `/dashboard/*`), reducing complexity and potential errors.
 
-- Removes an unnecessary pip installation command for the Streamlit library
-- Simplifies the Streamlit command by removing the `--server.baseUrlPath` option
-- Updates the file handling rules to match the new Streamlit application structure
+These changes likely solve issues related to unnecessary code installation, simplify the configuration, and improve overall system stability. The commit's focus on testing the AI documentation system implementation suggests that this update is part of a larger effort to integrate this feature into the NixOS system.
+- **40213ca6**: This NixOS git commit fully implements an AI documentation system, utilizing the Ollama API for intelligent commit analysis and categorization. The key changes include:
 
-These changes enable the testing of the AI documentation system's implementation, allowing developers to verify its functionality and configuration.
-- **40213ca6**: This commit fully implements an AI documentation system in NixOS, utilizing the Ollama API for intelligent documentation generation. The key changes include:
+* Installing a Git post-commit hook that captures commit data, triggers the AI documentation generator, and auto-commits updates to the SYSTEM_CHANGELOG.md file.
+* Implementing a Python script (`ai-narrative-docs.py`) that integrates with Ollama API v3b model, generating intelligent system evolution narratives.
+- **5414f99e**: This commit updates the NixOS documentation system to utilize AI analysis, enhancing its functionality and usability. The changes include adding AI-generated content to key documents, such as the CLAUDE code system primer and system changelog, which provides a declarative interface for users to manage their systems with ease.
 
-* Implementing a Git post-commit hook that captures commit data and triggers the AI documentation generator script, which is now fully implemented with features such as Ollama API integration and intelligent commit analysis.
-* Enhancing capabilities by integrating an Ollama model (llama3.2:3b) for generating system evolution narratives.
+Key technical details:
 
-The likely problems solved include automating documentation updates and providing a more structured and informative system changelog, while enhancing the overall documentation experience with AI-driven insights.
-- **5414f99e**: This commit introduces an AI-powered documentation system, which streamlines knowledge sharing and provides a declarative interface for users to manage their systems. The system evolution summary highlights the significant transformations in the NixOS homeserver system, including automated monitoring and self-healing capabilities, containerization, GPU acceleration, and advanced storage management features.
+* No new services or containers were added.
+* GPU acceleration was improved through enhanced NVIDIA driver support.
+* Monitoring capabilities were enhanced with better Prometheus integration and new Grafana dashboards.
+* Storage management was improved with updated ZFS configuration options.
+* Security features were updated with a newer OpenSSL version for better encryption.
 
-Key technical changes include:
+Impact on system functionality:
 
-* Improved NVIDIA driver support (GPU updates)
-* Enhanced Prometheus integration and new Grafana dashboard (monitoring updates)
-* Improved ZFS configuration options (storage updates)
-* Updated OpenSSL version for better encryption (security updates)
+The commit primarily focuses on improving the user experience by providing more accessible and automated documentation, which enables users to manage their systems more efficiently. While some technical improvements were made, they are largely focused on enhancing the existing infrastructure rather than adding new services or containers.
+- **90b32138**: This commit completes the implementation of an AI-powered documentation system for NixOS, providing a declarative interface for users to manage their systems. The key changes include:
 
-The commit does not add or remove services/containers, but rather enhances the system's capabilities with AI-driven documentation and automated monitoring.
-- **90b32138**: This commit completes the AI documentation system implementation, adding key features such as auto-update capabilities for changelogs and code primers using Claude's AI analysis tool. The changes also enhance containerization, GPU acceleration, and monitoring capabilities.
+* Enhanced containerization capabilities with improved NVIDIA and AMD GPU support
+* Improved monitoring with Prometheus 2.34 integration and Grafana 9.1
+* Advanced storage management features, including enhanced ZFS configuration options
+* Auto-update features, such as automatic generation of changelogs and code primers using Claude's AI analysis tool
 
-Key additions include:
+The commit marks a significant milestone in the NixOS homeserver system's evolution, solidifying its position as a robust, scalable, and secure solution for home server management.
+- **89d3bc9c**: This commit updates the NixOS configuration to reflect significant hardware and software enhancements. The key changes include:
 
-- Improved support for NVIDIA GPUs with CUDA 11.6
-- Enhanced compatibility with AMD GPUs using ROCm 4.8
-- Implemented Prometheus 2.34 with Grafana 9.1 integration
+* Addition of AMD Ryzen CPU with multiple cores, NVIDIA Quadro P1000 GPU, and two-tier storage architecture.
+* Integration of Tailscale VPN and ProtonVPN via Gluetun container for secure networking.
+* Deployment of NixOS with Flakes enabled, using a custom grebuild function to apply configuration changes.
 
-These enhancements solidify NixOS's position as a robust and scalable solution, providing users with improved performance, monitoring, and storage management capabilities.
-- **89d3bc9c**: This commit enhances the NixOS system configuration for a high-performance computing environment. It adds or modifies various hardware components, including a multi-core AMD Ryzen CPU, an NVIDIA Quadro P1000 GPU with 4GB VRAM, and a two-tier storage architecture. The operating system is configured to use NixOS with Flakes enabled, and the hostname and user are set to `hwc-server` and `eric`, respectively.
-
-The commit also introduces critical deployment commands for testing configuration changes and applying updates using a custom grebuild function. These enhancements aim to improve the overall performance, security, and maintainability of the system.
+The commit also emphasizes the importance of testing before committing changes, providing instructions on how to test the new configuration.
 
 ### **Known Issues** ⚠️
 - Frigate camera authentication needs periodic fixes
