@@ -72,7 +72,7 @@
     xfce.tumbler       # Thumbnail generator
     file-roller        # Archive manager
     imv                # Image viewer
-    
+    samba   
     # Office and documents
     libreoffice        # Office suite
     zathura            # PDF viewer

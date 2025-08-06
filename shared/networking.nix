@@ -65,7 +65,7 @@
   services.openssh = {
     enable = true;
     settings = {
-      PasswordAuthentication = false;
+      PasswordAuthentication = true;  # Enabled for VM file sharing
       KbdInteractiveAuthentication = false;
     };
   };

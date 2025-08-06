@@ -95,6 +95,11 @@
       "server" = "ssh eric@100.115.126.41";
     };
     
+    # Environment variables
+    sessionVariables = {
+      LIBVIRT_DEFAULT_URI = "qemu:///system";
+    };
+    
     # Universal shell functions with enhanced grebuild  
     initContent = ''
       # Enhanced grebuild function with improved safety and multi-host sync

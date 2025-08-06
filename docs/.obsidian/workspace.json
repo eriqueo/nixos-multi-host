@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "OPTIMIZATION_SUMMARY.md",
+                "file": "SKETCHUP-VM-SETUP.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "OPTIMIZATION_SUMMARY"
+              "title": "SKETCHUP-VM-SETUP"
             }
           }
         ]
@@ -78,7 +78,8 @@
       }
     ],
     "direction": "horizontal",
-    "width": 300
+    "width": 300,
+    "collapsed": true
   },
   "right": {
     "id": "deb3553d159c1f43",
@@ -174,6 +175,8 @@
   },
   "active": "b5a774681b1bdaa2",
   "lastOpenFiles": [
+    "SYSTEM_CONCEPTS_AND_ARCHITECTURE.md",
+    "OPTIMIZATION_SUMMARY.md",
     "MONITORING_OPTIMIZATION_GUIDE.md",
     "MONITORING.md",
     "MEDIA_PIPELINE_CONFIGURATION_GUIDE.md",
@@ -192,7 +195,6 @@
     "AI_DOCUMENTATION_SYSTEM_HOWTO.md",
     "AI_DOCUMENTATION_IMPLEMENTATION_PROGRESS.md",
     "AI_DOCUMENTATION_IMPLEMENTATION_PLAN.md",
-    "SYSTEM_CONCEPTS_AND_ARCHITECTURE.md",
     "TROUBLESHOOTING.md",
     "TROUBLESHOOTING_UPDATED.md",
     "SKETCHUP-VM-SETUP.md"

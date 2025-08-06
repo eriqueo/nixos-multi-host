@@ -158,7 +158,55 @@
       AutoEnable = true;
     };
   };
+  
+services.samba = {
+  enable = true;
+  openFirewall = true;
+  settings = {
+    global = {
+      "workgroup" = "WORKGROUP";
+      "server string" = "Samba on hwc-laptop";
+      "security" = "user";
+      "map to guest" = "Bad User";
+      "guest account" = "nobody";
+      # Modern SMB compatibility settings
+      "server min protocol" = "SMB2_10";
+      "client min protocol" = "SMB2_10";
+      "server max protocol" = "SMB3";
+                
+      # SMB Signing and Encryption (CRITICAL for modern Windows)
+      "server signing" = "auto";
+      "server schannel" = "auto";
+      "encrypt passwords" = "yes";
 
+      # Disable problematic features for guest access
+      "ntlm auth" = "yes";
+      "lanman auth" = "no";
+      "client lanman auth" = "no";
+      "client ntlmv2 auth" = "yes";
+                      # Other potentially helpful settings
+      "dns proxy" = "no";
+      "strict allocate" = "yes";
+      "oplocks" = "yes";
+      "level2 oplocks" = "yes";
+      "wide links" = "yes";
+      "unix extensions" = "no"; # Often helps with Windows compatibility
+    };
+    "skpshare" = {
+      path = "/opt/sketchup/vm/shared";
+      browseable = "yes";
+      "read only" = "no";
+      "guest ok" = "yes";
+      "create mask" = "0777";
+      "directory mask" = "0777";
+      "force user" = "nobody";
+      "force group" = "nogroup";
+      "guest only" = "yes";
+    };
+  };
+};
+ 
+  
   ####################################################################
   # 10. PRINTING (laptop-specific)
   ####################################################################
@@ -198,7 +246,9 @@
       swtpm.enable = true;
       ovmf.enable = true;
       ovmf.packages = [ pkgs.OVMF.fd ];
+      vhostUserPackages = with pkgs; [ virtiofsd ];
     };
+    
   };
   virtualisation.spiceUSBRedirection.enable = true;
 
