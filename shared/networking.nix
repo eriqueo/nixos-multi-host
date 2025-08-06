@@ -8,8 +8,8 @@
   # DNS nameservers - shared across all hosts for reliability
   networking.nameservers = [ 
     "1.1.1.1"         # Cloudflare DNS (primary)
-    "8.8.8.8"         # Google DNS (secondary)  
-    "100.100.100.100" # Tailscale Magic DNS (*.ts.net domains)
+    "8.8.8.8"         # Google DNS (secondary)
+    # Note: Tailscale DNS (100.100.100.100) is managed automatically via services.tailscale.acceptDNS
   ];
   
   ####################################################################
@@ -23,6 +23,7 @@
     main = {
       plugins = "keyfile";
       "hostname-mode" = "none";  # Prevents NetworkManager from changing hostname
+      dns = "none";  # Prevent NetworkManager from overriding DNS settings
     };
   };
   
@@ -39,7 +40,13 @@
   # SHARED VPN AND SSH SERVICES
   ####################################################################
   # Tailscale VPN mesh networking
-  services.tailscale.enable = true;
+  services.tailscale = {
+    enable = true;
+    # Use extraUpFlags to accept DNS settings from Tailscale for MagicDNS
+    extraUpFlags = [
+      "--accept-dns=true"
+    ];
+  };
   
   # SSH configuration - shared settings
   services.openssh = {
