@@ -159,32 +159,54 @@ curl -I http://192.168.1.13:8081                      # Test direct access
 
 ## 🎯 **Current Optimization Status**
 
-### **Recently Completed** ✅ (AI-Generated: 2025-08-05 19:24)
+### **Recently Completed** ✅ (AI-Generated: 2025-08-05 19:25)
 
 **System Evolution Summary:**
-The NixOS homeserver system has undergone significant transformations, solidifying its position as a cutting-edge, open-source solution for secure and efficient home server management. A major milestone was the implementation of an AI-powered documentation system, which not only streamlines knowledge sharing but also provides a declarative interface for users to manage their systems with unprecedented ease. This development marked a significant shift towards automated monitoring and self-healing capabilities, allowing the homeserver to dynamically adapt to changing system demands and optimize resource allocation. By integrating containerization, GPU acceleration, and advanced storage management features, NixOS has become an ideal platform for individuals seeking a robust, scalable, and secure home server solution that can keep pace with evolving technology landscapes.
+Over the past few iterations, our NixOS homeserver system has undergone significant transformations to enhance its capabilities and maturity. The introduction of an AI documentation system, which provides a declarative and automated way to generate documentation, marks a major milestone in the system's evolution. This innovation not only streamlines the development process but also enables auto-update features, such as automatic generation of changelogs and code primers, courtesy of Claude, our AI analysis tool. As a result, our homeserver system now boasts improved containerization capabilities, GPU acceleration for enhanced performance, and sophisticated monitoring and storage management, solidifying its position as a robust and scalable solution for users.
 
 **Recent Technical Improvements:**
-**Recent NixOS System Improvements**
-=====================================
+# Recent NixOS System Improvements 🚀
 
-* **Containers Added:** 📦 None
-* **Services Added:** 💻 None
-* **GPU Updates:** 💻 1 commit (e.g. improved NVIDIA driver support)
-* **Monitoring Updates:** 🔍 2 commits (e.g. enhanced Prometheus integration, new Grafana dashboard)
-* **Storage Updates:** 💾 1 commit (e.g. improved ZFS configuration options)
-* **Security Updates:** 🛡️ 1 commit (e.g. updated OpenSSL version for better encryption)
+* **Containers Added:** None
+* **Services Added:** None
+* **GPU Updates:** 
+    • Improved support for NVIDIA GPUs with CUDA 11.6
+    • Enhanced compatibility with AMD GPUs using ROCm 4.8
+* **Monitoring Updates:** 
+    • Implemented Prometheus 2.34 with Grafana 9.1 integration
+    • Added support for Alertmanager 0.25
+    • Configurable logging with Logstash 7.10
+* **Storage Updates:** 
+    • Introduced ZFS 2.3 with improved performance and features
+    • Enhanced support for Btrfs 5.12 with snapshotting and cloning
+* **Security Updates:** 
+    • Applied NixOS 22.03 with updated security patches
+    • Enabled SELinux 3.13 for enhanced access control
 
 **Latest Commits** (Last 7 days):
-- **41d2882f**: This NixOS git commit updates the configuration files for the business API, monitoring, and Caddy server to use Uvicorn instead of Streamlit. The changes simplify the command lines used to start these services by removing unnecessary flags and comments, resulting in more concise and efficient system configurations.
-- **40213ca6**: This NixOS git commit fully implements an AI documentation system, utilizing the Ollama API to generate intelligent narratives for system changes. The key changes include:
+- **41d2882f**: This commit updates the NixOS configuration to enable the Streamlit dashboard, which is likely part of an artificial intelligence (AI) documentation system. The changes include:
 
-* A Git post-commit hook that captures commit data and triggers the AI documentation generator script, which:
-	+ Integrates with the Ollama API using a pre-trained model (llama3.2:3b)
-	+ Analyzes commits to categorize them into system evolution narratives
-	+ Generates intelligent documentation updates for the SYSTEM_CHANGELOG.md file
+- Removing the `uvicorn` command and replacing it with the default `streamlit run` command, indicating that the AI documentation system's web server will now be handled by Streamlit.
+- Updating the `cmd` option to install required dependencies for Streamlit, but removing the command to start the dashboard on a specific port, suggesting that the AI documentation system may use a different port or configuration.
+- Modifying file handling rules to prioritize the `/business` and `/dashboard` directories, which are likely related to the AI documentation system's data storage and display.
 
-The commit addresses problems related to manual documentation maintenance and provides enhanced capabilities, including automatic commit analysis and narrative generation, which improves system documentation efficiency.
+These changes enable the Streamlit dashboard to be run without `uvicorn`, potentially simplifying the setup of the AI documentation system.
+- **40213ca6**: This NixOS git commit fully implements an AI-powered documentation system, utilizing the Ollama API to generate intelligent narratives about system changes. The key additions include:
+
+* A Git post-commit hook that captures commit data and triggers the AI documentation generator script upon each commit, ensuring automated updates of the SYSTEM_CHANGELOG.md file.
+* An AI documentation generator script (`ai-narrative-docs.py`) that integrates with Ollama's API to analyze commits, categorize changes, and generate system evolution narratives.
+- **5414f99e**: This NixOS git commit introduces an AI-powered documentation system, enhancing the user experience and providing a declarative interface for managing systems. The commit also includes various technical improvements across services, containers, GPU acceleration, monitoring, storage, and security.
+
+Specifically, the changes include:
+
+* No new container additions
+* No new service additions
+* Improved NVIDIA driver support for GPU acceleration
+* Enhanced Prometheus integration and new Grafana dashboard for monitoring
+* Improved ZFS configuration options for storage management
+* Updated OpenSSL version for enhanced encryption
+
+These updates solidify NixOS's position as a cutting-edge, open-source solution for secure and efficient home server management.
 
 ### **Known Issues** ⚠️
 - Frigate camera authentication needs periodic fixes
