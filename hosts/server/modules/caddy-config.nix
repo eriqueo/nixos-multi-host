@@ -47,10 +47,10 @@
       }
 
       # Business services
-      handle_path /business/* {
+      handle /business* {
         reverse_proxy localhost:8000
       }
-      handle_path /dashboard/* {
+      handle /dashboard* {
         reverse_proxy localhost:8501
       }
 

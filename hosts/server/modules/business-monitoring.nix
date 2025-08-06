@@ -20,7 +20,7 @@
         "/mnt/media:/media:ro"
         "/etc/localtime:/etc/localtime:ro"
       ];
-      cmd = [ "sh" "-c" "cd /app && pip install streamlit pandas plotly requests prometheus_client && streamlit run dashboard.py --server.port=8501 --server.address=0.0.0.0 --server.baseUrlPath /dashboard" ];
+      cmd = [ "sh" "-c" "cd /app && pip install streamlit pandas plotly requests prometheus_client && streamlit run dashboard.py --server.port=8501 --server.address=0.0.0.0" ];
     };
 
     # Business Metrics Exporter
@@ -526,7 +526,7 @@ COPY *.py .
 EXPOSE 8501 9999
 
 # Default command for dashboard
-CMD ["streamlit", "run", "dashboard.py", "--server.port=8501", "--server.address=0.0.0.0", "--server.baseUrlPath", "/dashboard"]
+CMD ["streamlit", "run", "dashboard.py", "--server.port=8501", "--server.address=0.0.0.0"]
 EOF
 
       # Set permissions

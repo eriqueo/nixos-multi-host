@@ -100,7 +100,7 @@
       Type = "simple";
       User = "eric";
       WorkingDirectory = "/opt/business/api";
-      ExecStart = "${pkgs.python3Packages.uvicorn}/bin/uvicorn main:app --host 0.0.0.0 --port 8000 --root-path /business";
+      ExecStart = "${pkgs.python3Packages.uvicorn}/bin/uvicorn main:app --host 0.0.0.0 --port 8000";
       Restart = "always";
       RestartSec = "10";
     };
