@@ -45,7 +45,7 @@ access-control-allow-origin: "*"
 # No SMTP (we don't need email notifications)
 smtp-sender-addr: ""
 
-# No upstream providers
+# Upstream provider for instant push notifications to mobile devices
 upstream-base-url: "https://ntfy.sh"
 
 # No Firebase/Android integration (private server)

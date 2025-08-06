@@ -17,7 +17,8 @@
       "Bash(sudo podman run:*)",
       "Bash(curl:*)",
       "Bash(sudo find /var /etc /run -name \"*caddy*config*\" -type f 2>/dev/null)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(sudo systemctl status:*)"
     ],
     "deny": []
   }
