@@ -3,6 +3,12 @@
 ## Overview
 This document consolidates all conceptual information about the NixOS multi-host homelab setup, including system architecture, design decisions, and operational workflows.
 
+
+## Recent Architectural Evolution (AI-Generated: 2025-08-05)
+
+Upon analyzing the recent commits to the NixOS homeserver, it appears that there have been significant architectural changes focused on improving service orchestration and containerization. The implementation of a declarative AI documentation system has streamlined configuration management, with Caddy being integrated into the system through a custom configuration file (`hosts/server/modules/caddy-config.nix`). This change enables more efficient and automated deployment of services, aligning with NixOS's emphasis on declarative infrastructure management.
+
+---
 ## Table of Contents
 1. [System Architecture](#system-architecture)
 2. [GPU Acceleration Framework](#gpu-acceleration-framework) 
