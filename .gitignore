@@ -10,6 +10,11 @@ result-*
 
 # OS-specific files
 .DS_Store
-Thumbs.dbnixos-minimal-25.11pre-git-x86_64-linux.iso
-nixos-minimal-25.11pre-git-x86_64-linux.iso
+Thumbs.db
+
+# AI-generated documentation (auto-updated after commits)
+docs/SYSTEM_CHANGELOG.md
+docs/ai-doc-generation.log
+
+# Old ISO files
 nixos-minimal-25.11pre-git-x86_64-linux.iso
