@@ -1,0 +1,11 @@
+/run/current-system/sw/lib/python3.13/site-packages/requests/__init__.py:86: RequestsDependencyWarning: Unable to find acceptable character detection dependency (chardet or charset_normalizer).
+  warnings.warn(
+Traceback (most recent call last):
+  File "/etc/nixos/scripts/ai-narrative-docs.py", line 10, in <module>
+    import requests
+  File "/run/current-system/sw/lib/python3.13/site-packages/requests/__init__.py", line 151, in <module>
+    from . import packages, utils
+  File "/run/current-system/sw/lib/python3.13/site-packages/requests/packages.py", line 9, in <module>
+    locals()[package] = __import__(package)
+                        ~~~~~~~~~~^^^^^^^^^
+ModuleNotFoundError: No module named 'idna'

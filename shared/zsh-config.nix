@@ -259,6 +259,9 @@
           return 1
         fi
         
+        echo "🤖 AI documentation generation triggered by post-commit hook..."
+        sleep 2  # Give the hook time to complete
+        
         echo "☁️  Pushing to remote..."
         if ! sudo -E git push; then
           echo "❌ Git push failed"
@@ -282,7 +285,11 @@
           fi
         fi
         
-        echo "✅ Complete! System rebuilt and switched with: $*"
+        echo ""
+        echo "✅ System updated successfully with AI-generated documentation!"
+        echo "📖 Check /etc/nixos/docs/ for updated documentation"
+        echo "📊 View changelog: /etc/nixos/docs/SYSTEM_CHANGELOG.md"
+        echo "🤖 AI logs: /etc/nixos/docs/ai-doc-generation.log"
         cd "$original_dir"
       }
       
