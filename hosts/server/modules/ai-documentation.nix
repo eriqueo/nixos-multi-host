@@ -1,19 +1,11 @@
-# AI Documentation Services Configuration
+# AI Documentation Services Configuration - HARDENED VERSION
 # 
-# UPDATED: Separated AI documentation from grebuild workflow
+# UPDATED: Separated AI documentation from grebuild workflow with hardening
 # - Lightweight post-commit hook for logging only
 # - AI processing now triggered AFTER successful rebuilds
+# - HARDENED: Process locking prevents drift between commits
+# - HARDENED: Git push error handling with notifications
 # - Prevents blocking grebuild function with slow AI processing
-#
-# NOTE: Heavy AI/ML packages commented out for faster initial builds.
-# Uncomment these packages after initial system setup is complete:
-#   - python3Packages.torch (~25 min build time)
-#   - python3Packages.transformers (~15 min build time)
-#   - python3Packages.sentence-transformers
-#   - python3Packages.chromadb
-#   - python3Packages.langchain
-# 
-# GPU acceleration and ollama service are kept enabled for Frigate integration.
 
 { config, pkgs, ... }:
 
@@ -86,30 +78,57 @@
     after = [ "ollama.service" ];
   };
 
-  # NEW: Post-rebuild AI documentation service (separated from grebuild)
+  # HARDENED: Post-rebuild AI documentation service with locking
   systemd.services.post-rebuild-ai-docs = {
-    description = "AI documentation processing after successful NixOS rebuild";
+    description = "AI documentation processing after successful NixOS rebuild (HARDENED)";
     serviceConfig = {
       Type = "oneshot";
       User = "eric";
       WorkingDirectory = "/etc/nixos";
-      ExecStart = pkgs.writeShellScript "post-rebuild-ai-docs" ''
+      ExecStart = pkgs.writeShellScript "post-rebuild-ai-docs-hardened" ''
         set -e
         
         TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
         LOGFILE="/etc/nixos/docs/ai-doc-generation.log"
+        LOCKFILE="/tmp/ai_docs_rebuild.lock"
         
-        echo "🤖 Starting post-rebuild AI documentation processing..."
-        echo "$TIMESTAMP: Starting post-rebuild AI documentation" >> "$LOGFILE"
+        echo "🤖 Starting hardened post-rebuild AI documentation processing..."
+        echo "$TIMESTAMP: Starting post-rebuild AI documentation (HARDENED)" >> "$LOGFILE"
+        
+        # HARDENING: Process locking to prevent drift between commits
+        if [ -f "$LOCKFILE" ]; then
+            EXISTING_PID=$(cat "$LOCKFILE" 2>/dev/null || echo "unknown")
+            if kill -0 "$EXISTING_PID" 2>/dev/null; then
+                echo "⏳ Another AI documentation process is running (PID: $EXISTING_PID)"
+                echo "$TIMESTAMP: Skipped - another AI process running (PID: $EXISTING_PID)" >> "$LOGFILE"
+                
+                # Send notification about skipped processing
+                curl -s -H "Title: ⏳ AI Docs Queued" \
+                     -d "AI documentation skipped - another process running. Will retry on next rebuild." \
+                     https://hwc.ocelot-wahoo.ts.net/notify/hwc-alerts 2>/dev/null || true
+                exit 0
+            else
+                echo "🧹 Removing stale lock file (PID $EXISTING_PID not running)"
+                rm -f "$LOCKFILE"
+            fi
+        fi
+        
+        # Create lock with current PID
+        echo $$ > "$LOCKFILE"
+        trap 'rm -f "$LOCKFILE"' EXIT INT TERM
         
         # Check if there are uncommitted changes to process
         if [ -f "/etc/nixos/docs/SYSTEM_CHANGELOG.md" ]; then
           echo "📝 Processing system changes for AI documentation..."
           
+          # HARDENING: Capture current commit for accurate processing
+          CURRENT_COMMIT=$(git rev-parse HEAD)
+          echo "📍 Processing changes for commit: $CURRENT_COMMIT"
+          
           # Run AI documentation with timeout (5 minutes max)
           if timeout 300 bash /etc/nixos/scripts/ai-docs-wrapper.sh >> "$LOGFILE" 2>&1; then
             echo "✅ AI documentation generation complete!"
-            echo "$TIMESTAMP: AI documentation generation successful" >> "$LOGFILE"
+            echo "$TIMESTAMP: AI documentation generation successful for $CURRENT_COMMIT" >> "$LOGFILE"
             
             # Auto-commit documentation updates if any were made
             if ! git diff --quiet docs/; then
@@ -118,29 +137,36 @@
               git commit -m "🤖 Auto-update documentation via AI analysis (post-rebuild)
 
 Generated after successful NixOS rebuild
-Timestamp: $TIMESTAMP"
+Timestamp: $TIMESTAMP
+Source commit: $CURRENT_COMMIT"
               
-              # Send success notification
+              # Send success notification with commit info
               curl -s -H "Title: 📚 NixOS Docs Updated" \
-                   -d "AI documentation updated after successful rebuild at $TIMESTAMP" \
+                   -d "AI documentation updated after successful rebuild at $TIMESTAMP (commit: ''${CURRENT_COMMIT:0:8})" \
                    https://hwc.ocelot-wahoo.ts.net/notify/hwc-alerts 2>/dev/null || true
             else
               echo "📄 No documentation changes to commit"
+              # Send notification about no changes
+              curl -s -H "Title: 📄 AI Docs Checked" \
+                   -d "AI processing complete - no documentation changes needed for commit ''${CURRENT_COMMIT:0:8}" \
+                   https://hwc.ocelot-wahoo.ts.net/notify/hwc-alerts 2>/dev/null || true
             fi
           else
             echo "⚠️ AI documentation generation failed - check $LOGFILE"
-            echo "$TIMESTAMP: AI documentation generation failed" >> "$LOGFILE"
+            echo "$TIMESTAMP: AI documentation generation failed for $CURRENT_COMMIT" >> "$LOGFILE"
             
-            # Send error notification
+            # Send error notification with commit info
             curl -s -H "Title: ❌ NixOS AI Docs Failed" -H "Priority: high" \
-                 -d "AI documentation failed after rebuild at $TIMESTAMP" \
+                 -d "AI documentation failed after rebuild at $TIMESTAMP (commit: ''${CURRENT_COMMIT:0:8})" \
                  https://hwc.ocelot-wahoo.ts.net/notify/hwc-alerts 2>/dev/null || true
           fi
         else
           echo "📄 No changelog file found, skipping AI documentation"
+          echo "$TIMESTAMP: Skipped - no changelog found" >> "$LOGFILE"
         fi
         
-        echo "✅ Post-rebuild AI documentation processing complete!"
+        echo "✅ Hardened post-rebuild AI documentation processing complete!"
+        echo "$TIMESTAMP: Processing complete for $CURRENT_COMMIT" >> "$LOGFILE"
       '';
     };
     # This service is manually triggered, not automatically started
@@ -205,11 +231,12 @@ EOF
     wantedBy = [ "multi-user.target" ];
   };
 
-  # Enhanced grebuild function that triggers AI docs after successful rebuild
+  # HARDENED: Enhanced grebuild function with git push error handling
   environment.etc."nixos/scripts/grebuild.sh" = {
     text = ''
       #!/usr/bin/env bash
-      # Enhanced grebuild function - Fast git workflow + rebuild, then AI processing
+      # HARDENED Enhanced grebuild function - Fast git workflow + rebuild, then AI processing
+      # HARDENED: Git push error handling with notifications
       
       set -e
       
@@ -221,7 +248,7 @@ EOF
       COMMIT_MESSAGE="$1"
       TIMESTAMP=$(date '+%Y-%m-%d %H:%M:%S')
       
-      echo "🚀 Starting grebuild workflow..."
+      echo "🚀 Starting hardened grebuild workflow..."
       echo "📝 Commit message: $COMMIT_MESSAGE"
       
       # Step 1: Git operations (fast)
@@ -230,6 +257,10 @@ EOF
       
       echo "💾 Committing changes..."
       sudo git commit -m "$COMMIT_MESSAGE"
+      
+      # Capture commit hash for notifications
+      COMMIT_HASH=$(git rev-parse HEAD)
+      SHORT_HASH="''${COMMIT_HASH:0:8}"
       
       # Step 2: Test rebuild first (safety check)
       echo "🧪 Testing NixOS configuration..."
@@ -241,28 +272,56 @@ EOF
           if sudo nixos-rebuild switch --flake .#hwc-server; then
               echo "✅ Rebuild successful!"
               
-              # Step 4: Push to remote
+              # HARDENED Step 4: Git push with error handling
               echo "📤 Pushing to remote repository..."
-              sudo git push
+              if sudo git push; then
+                  echo "✅ Git push successful!"
+                  PUSH_STATUS="✅ Pushed to remote"
+              else
+                  echo "⚠️ Warning: Git push failed!"
+                  PUSH_STATUS="⚠️ Push failed - local changes only"
+                  
+                  # Send warning notification about push failure
+                  curl -s -H "Title: ⚠️ Git Push Failed" -H "Priority: default" \
+                       -d "NixOS rebuild succeeded but git push failed. Changes are local only. Commit: $SHORT_HASH" \
+                       https://hwc.ocelot-wahoo.ts.net/notify/hwc-alerts 2>/dev/null || true
+              fi
               
               # Step 5: Trigger AI documentation (non-blocking)
               echo "🤖 Triggering AI documentation processing..."
               sudo systemctl start post-rebuild-ai-docs &
               
-              # Send completion notification
+              # Send completion notification with push status
               curl -s -H "Title: ✅ NixOS Rebuild Complete" \
-                   -d "Successfully rebuilt and deployed: $COMMIT_MESSAGE" \
+                   -d "Successfully rebuilt and deployed: $COMMIT_MESSAGE ($SHORT_HASH)
+                   
+$PUSH_STATUS
+AI documentation processing started..." \
                    https://hwc.ocelot-wahoo.ts.net/notify/hwc-alerts 2>/dev/null || true
               
               echo "🎉 Grebuild complete! AI documentation running in background."
               echo "📱 You'll receive a notification when AI docs are updated."
+              echo "📍 Commit: $SHORT_HASH"
+              echo "📤 Push status: $PUSH_STATUS"
               
           else
               echo "❌ Rebuild failed!"
+              
+              # Send failure notification
+              curl -s -H "Title: ❌ NixOS Rebuild Failed" -H "Priority: urgent" \
+                   -d "NixOS rebuild failed for commit: $COMMIT_MESSAGE ($SHORT_HASH). Check system logs." \
+                   https://hwc.ocelot-wahoo.ts.net/notify/hwc-alerts 2>/dev/null || true
+              
               exit 1
           fi
       else
           echo "❌ Test failed! Not proceeding with rebuild."
+          
+          # Send test failure notification  
+          curl -s -H "Title: ❌ NixOS Test Failed" -H "Priority: high" \
+               -d "NixOS configuration test failed for: $COMMIT_MESSAGE ($SHORT_HASH). Changes not applied." \
+               https://hwc.ocelot-wahoo.ts.net/notify/hwc-alerts 2>/dev/null || true
+          
           exit 1
       fi
     '';
@@ -271,7 +330,7 @@ EOF
   
   # Create grebuild function alias
   programs.bash.shellInit = ''
-    # Enhanced grebuild function
+    # Enhanced grebuild function (HARDENED)
     grebuild() {
         bash /etc/nixos/scripts/grebuild.sh "$@"
     }
