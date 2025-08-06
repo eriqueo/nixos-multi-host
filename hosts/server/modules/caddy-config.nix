@@ -54,9 +54,15 @@
         reverse_proxy localhost:8501
       }
 
-      # Private notification service (bypass authentication)
-      handle_path /notify/* {
-        reverse_proxy localhost:8282
+      # Private notification service - robust proxy configuration for mobile app
+      route /notify/* {
+        reverse_proxy localhost:8282 {
+          header_up Host {host}
+          header_up X-Real-IP {remote}
+          header_up X-Forwarded-For {remote}
+          header_up X-Forwarded-Proto {scheme}
+          header_up X-Forwarded-Host {host}
+        }
       }
 
       # Photo management
