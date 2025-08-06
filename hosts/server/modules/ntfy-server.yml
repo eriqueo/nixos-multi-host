@@ -46,7 +46,7 @@ access-control-allow-origin: "*"
 smtp-sender-addr: ""
 
 # No upstream providers
-upstream-base-url: ""
+upstream-base-url: "https://ntfy.sh"
 
 # No Firebase/Android integration (private server)
 firebase-key-file: ""
