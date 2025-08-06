@@ -34,6 +34,19 @@
   networking.usePredictableInterfaceNames = true;
   
   # Network time synchronization
+  # Enhanced DNS resolution with systemd-resolved for public Wi-Fi compatibility
+  services.resolved = {
+    enable = true;
+    # Fallback DNS servers for when primary servers are unreachable
+    fallbackDns = [ 
+      "1.1.1.1"       # Cloudflare
+      "8.8.8.8"       # Google
+      "9.9.9.9"       # Quad9
+    ];
+    # Enable DNS-over-TLS for enhanced privacy/security
+    dnssec = "allow-downgrade";
+  };
+
   services.timesyncd.enable = true;
   
   ####################################################################
