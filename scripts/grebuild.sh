@@ -38,7 +38,7 @@
               
               # HARDENED Step 4: Git push with error handling
               echo "📤 Pushing to remote repository..."
-              if sudo git push; then
+              if sudo git push origin master; then
                   echo "✅ Git push successful!"
                   PUSH_STATUS="✅ Pushed to remote"
               else
