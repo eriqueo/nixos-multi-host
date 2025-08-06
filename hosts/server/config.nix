@@ -38,7 +38,7 @@
     ./modules/surveillance.nix
     ./modules/business-services.nix
     ./modules/business-api.nix
-    ./modules/ai-services.nix
+    ./modules/ai-documentation.nix
     ./modules/adhd-tools.nix
     ./modules/hardware-tools.nix
 
