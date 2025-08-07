@@ -46,6 +46,9 @@
     ./modules/couchdb-setup.nix          # CouchDB with SOPS integration
     ./modules/caddy-config.nix           # Caddy reverse proxy configuration
     ./modules/obsidian-livesync.nix      # Obsidian-specific monitoring
+
+    # YouTube transcript service
+    ./modules/transcript-service.nix     # YouTube transcript extraction (CLI + API)
   ];
 
   ####################################################################

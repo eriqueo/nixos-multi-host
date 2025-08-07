@@ -16,6 +16,10 @@
     # Shared configuration
     ../../shared/secrets.nix         # Shared secrets management
     ../../shared/networking.nix      # Shared networking configuration
+    
+    # YouTube transcript CLI tool
+    ./modules/transcript-cli.nix     # YouTube transcript extraction CLI
+    
     # REMOVED: UI modules are now in Home Manager
   ];
 
