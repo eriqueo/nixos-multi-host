@@ -1,0 +1,85 @@
+[Unit]
+Description=AI Bible Documentation System - Workflow Manager
+Documentation=file:///etc/nixos/docs/bibles/
+After=ollama.service nixos-rebuild.service network-online.target
+Wants=network-online.target
+Requires=ollama.service
+PartOf=multi-user.target
+
+# Service dependencies and ordering
+Before=graphical-session.target
+After=basic.target sysinit.target local-fs.target
+
+# Failure handling
+OnFailure=bible-system-recovery.service
+
+[Service]
+# Service type and execution
+Type=oneshot
+RemainAfterExit=no
+User=root
+Group=root
+
+# Working environment
+WorkingDirectory=/etc/nixos
+Environment=PYTHONPATH=/etc/nixos/scripts
+Environment=PATH=/run/current-system/sw/bin:/usr/bin:/bin
+Environment=BIBLE_SYSTEM_CONFIG=/etc/nixos/config/bible_system_config.yaml
+Environment=BIBLE_SYSTEM_MODE=production
+
+# Service execution
+ExecStartPre=/etc/nixos/scripts/bible_workflow_manager.py --health-check
+ExecStart=/etc/nixos/scripts/bible_workflow_manager.py --post-build --build-success
+ExecReload=/etc/nixos/scripts/bible_workflow_manager.py --health-check --full
+ExecStop=/etc/nixos/scripts/bible_workflow_manager.py --cleanup
+
+# Timeout and retry settings
+TimeoutStartSec=300
+TimeoutStopSec=60
+TimeoutSec=600
+Restart=no
+RestartSec=10
+
+# Resource limits
+MemoryMax=1G
+CPUQuota=50%
+TasksMax=100
+
+# Security settings
+NoNewPrivileges=false
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictRealtime=true
+RestrictSUIDSGID=true
+LockPersonality=true
+MemoryDenyWriteExecute=false
+
+# File system access
+ReadWritePaths=/etc/nixos
+ReadOnlyPaths=/run/current-system
+ProtectHome=true
+ProtectSystem=false
+PrivateTmp=true
+
+# Network access (needed for AI model communication)
+PrivateNetwork=false
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+
+# Logging and output
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=bible-system
+SyslogLevel=info
+LogLevelMax=info
+
+# Process management
+KillMode=mixed
+KillSignal=SIGTERM
+FinalKillSignal=SIGKILL
+
+[Install]
+WantedBy=multi-user.target
+Also=bible-system-timer.service
+
+# Optional: systemd timer for periodic health checks

@@ -2,6 +2,7 @@
 # Comprehensive monitoring stack with Grafana, Prometheus, and custom dashboards
 { config, lib, pkgs, ... }:
 
+
 let
   # Common patterns from monitoring utilities
   mediaServiceEnv = {
@@ -19,6 +20,14 @@ in
 {
   ####################################################################
   # 1. MONITORING CONTAINER STACK
+
+  # Import SOPS secrets
+  sops.secrets.ntfy_user = {
+    sopsFile = ../../../secrets/ntfy.yaml;
+    mode = "0440";
+    owner = "root";
+    group = "users";
+  };
   ####################################################################
   virtualisation.oci-containers.containers = {
     
@@ -176,9 +185,13 @@ in
       ports = [ "8282:80" ];
       volumes = [
         "/mnt/hot/cache/ntfy:/var/cache/ntfy"
+        "/var/lib/ntfy:/var/lib/ntfy"
         "/etc/ntfy-server.yml:/etc/ntfy/server.yml:ro"
         "/etc/localtime:/etc/localtime:ro"
       ];
+      environment = {
+        NTFY_AUTH_DEFAULT_ACCESS = "deny-all";
+      };
       cmd = [ "serve" "--config" "/etc/ntfy/server.yml" ];
     };
   };
@@ -202,10 +215,14 @@ in
       cache-batch-size: 0
       cache-batch-timeout: "0ms"
 
-      # Disable public features for security
+      # Enable authentication for security
       enable-signup: false
-      enable-login: false
+      enable-login: true
       enable-reservations: false
+      
+      # Authentication settings
+      auth-file: "/var/lib/ntfy/user.db"
+      auth-default-access: "deny-all"
 
       # Disable metrics and profiling for privacy
       enable-metrics: false
@@ -241,9 +258,8 @@ in
       # No Firebase/Android integration (private server)
       firebase-key-file: ""
 
-      # No authentication database (open for internal use only)
-      auth-file: ""
-      auth-default-access: "read-write"
+      # Upstream server for iOS push notifications
+      upstream-base-url: "https://ntfy.sh"
 
       # Manager interval for cleanup
       manager-interval: "1m"
@@ -280,8 +296,9 @@ in
     # Custom monitoring scripts
     "d /opt/monitoring/media-monitor 0755 eric users -"
     
-    # ntfy cache directory
+    # ntfy directories
     "d /mnt/hot/cache/ntfy 0755 eric users -"
+    "d /var/lib/ntfy 0755 eric users -"
     
     # Node exporter textfile collector
     "d /var/lib/node_exporter 0755 root root -"
@@ -289,7 +306,50 @@ in
   ];
 
   ####################################################################
-  # 4. CONFIGURATION GENERATION
+  # 4. NTFY USER INITIALIZATION SERVICE
+  ####################################################################
+  systemd.services.ntfy-user-init = {
+    description = "Initialize ntfy user database";
+    wantedBy = [ "podman-ntfy.service" ];
+    before = [ "podman-ntfy.service" ];
+    after = [ "sops-nix.service" ];
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+      User = "eric";
+      Group = "users";
+    };
+    script = ''
+      if [ ! -f /var/lib/ntfy/user.db ]; then
+        echo "Creating ntfy user database..."
+        # Read the encrypted user secret
+        USER_SECRET=$(cat ${config.sops.secrets.ntfy_user.path})
+        
+        # Extract username, hash, and role
+        USERNAME=$(echo "$USER_SECRET" | cut -d: -f1)
+        HASH=$(echo "$USER_SECRET" | cut -d: -f2)
+        ROLE=$(echo "$USER_SECRET" | cut -d: -f3)
+        
+        # Use ntfy user command to add user (we'll do this manually via SQL for now)
+        # Create the SQLite database with user
+        ${pkgs.sqlite}/bin/sqlite3 /var/lib/ntfy/user.db << EOF
+CREATE TABLE IF NOT EXISTS users (
+  user TEXT NOT NULL PRIMARY KEY,
+  pass TEXT NOT NULL,
+  role TEXT NOT NULL
+);
+INSERT OR REPLACE INTO users (user, pass, role) VALUES ('$USERNAME', '$HASH', '$ROLE');
+EOF
+        
+        echo "ntfy user database initialized successfully"
+      else
+        echo "ntfy user database already exists"
+      fi
+    '';
+  };
+
+  ####################################################################
+  # 5. CONFIGURATION GENERATION
   ####################################################################
   systemd.services.monitoring-config = {
     description = "Generate monitoring configuration files";
@@ -590,7 +650,7 @@ EOF
   };
 
   ####################################################################
-  # 5. FIREWALL CONFIGURATION
+  # 6. FIREWALL CONFIGURATION
   ####################################################################
   networking.firewall.interfaces."tailscale0" = {
     allowedTCPPorts = [ 3000 9090 9093 9100 8083 9115 9445 8888 8282 ];

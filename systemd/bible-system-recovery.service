@@ -1,0 +1,29 @@
+[Unit]
+Description=AI Bible Documentation System - Failure Recovery
+Documentation=file:///etc/nixos/docs/bibles/
+After=bible-system.service
+
+[Service]
+Type=oneshot
+User=root
+WorkingDirectory=/etc/nixos
+Environment=PYTHONPATH=/etc/nixos/scripts
+
+# Recovery actions
+ExecStart=/bin/bash -c 'echo "Bible system failure detected at $(date)" >> /etc/nixos/docs/logs/system_failures.log'
+ExecStart=/etc/nixos/scripts/bible_workflow_manager.py --health-check --debug
+ExecStart=/etc/nixos/scripts/bible_system_validator.py --health-check
+
+# Resource limits
+MemoryMax=256M
+CPUQuota=25%
+TimeoutSec=180
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=bible-system-recovery
+
+[Install]
+WantedBy=multi-user.target
+EOF < /dev/null

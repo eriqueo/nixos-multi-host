@@ -1,0 +1,393 @@
+# AI Bible Documentation System - Master Configuration
+# Agent 8: Configuration & Deployment System
+# Version: 1.0
+
+# System Metadata
+system:
+  name: "AI Bible Documentation System"
+  version: "1.0.0"
+  deployment_target: "NixOS hwc-server"
+  ai_model: "ollama:llama3.2:3b"
+  created: "2025-08-07"
+  agent_8_deliverable: true
+
+# Core System Paths
+paths:
+  base_directory: "/etc/nixos"
+  docs_directory: "/etc/nixos/docs"
+  bibles_directory: "/etc/nixos/docs/bibles"
+  scripts_directory: "/etc/nixos/scripts"
+  config_directory: "/etc/nixos/config"
+  backups_directory: "/etc/nixos/docs/bibles/backups"
+  archive_directory: "/etc/nixos/docs/archive"
+  logs_directory: "/etc/nixos/docs/logs"
+  
+  # Template and reference files
+  bible_template: "/etc/nixos/docs/bibles/BIBLE_TEMPLATE.md"
+  bible_categories: "/etc/nixos/config/bible_categories.yaml"
+  
+  # System integration points
+  git_hooks: "/etc/nixos/.git/hooks"
+  systemd_services: "/etc/systemd/system"
+
+# AI System Configuration
+ai_system:
+  model:
+    name: "llama3.2:3b"
+    provider: "ollama"
+    endpoint: "http://localhost:11434"
+    context_window: 4096
+    temperature: 0.2
+    max_tokens: 2048
+    
+  # AI Processing Settings
+  processing:
+    timeout_seconds: 300
+    retry_attempts: 3
+    batch_processing: true
+    concurrent_bibles: 2
+    memory_limit_mb: 1024
+    
+  # Error Handling
+  error_handling:
+    fallback_strategy: "preserve_existing"
+    backup_before_update: true
+    validation_required: true
+    rollback_on_failure: true
+
+# Bible System Configuration
+bible_system:
+  # Core Settings
+  enabled: true
+  auto_updates: true
+  change_tracking: true
+  threshold_based_updates: true
+  cross_bible_validation: true
+  
+  # Update Policies
+  update_policies:
+    emergency_bypass: true
+    manual_override: true
+    time_based_review: true
+    review_interval_days: 30
+    
+  # Performance Settings
+  performance:
+    max_bible_update_time_minutes: 2
+    max_batch_update_time_minutes: 5
+    backup_retention_count: 10
+    cleanup_age_days: 30
+    
+  # Quality Assurance
+  quality_assurance:
+    technical_accuracy_validation: true
+    content_preservation_check: true
+    cross_reference_validation: true
+    format_consistency_check: true
+    minimum_quality_score: 0.85
+
+# Change Accumulation System
+change_accumulation:
+  # Tracking Configuration
+  tracking:
+    enabled: true
+    git_integration: true
+    file_pattern_matching: true
+    significance_scoring: true
+    
+  # Change Categories
+  change_types:
+    - "configuration_change"
+    - "service_addition"
+    - "service_modification"
+    - "service_removal"
+    - "hardware_change"
+    - "optimization"
+    - "bugfix"
+    - "documentation_update"
+    
+  # Significance Scoring
+  significance_weights:
+    configuration_change: 0.7
+    service_addition: 0.9
+    service_modification: 0.6
+    service_removal: 0.8
+    hardware_change: 1.0
+    optimization: 0.5
+    bugfix: 0.7
+    documentation_update: 0.3
+
+# Threshold Detection System
+threshold_detection:
+  # Global Settings
+  enabled: true
+  check_frequency_minutes: 15
+  batch_processing: true
+  
+  # Override Conditions
+  emergency_triggers:
+    - "security_update"
+    - "critical_bugfix"
+    - "hardware_failure"
+    - "service_outage"
+    
+  # Time-based Triggers
+  time_triggers:
+    monthly_review: true
+    review_day: 1
+    force_update_days: 90
+
+# Cross-Bible Consistency System
+consistency_management:
+  # Validation Rules
+  validation:
+    enabled: true
+    strict_mode: true
+    auto_correction: false
+    notification_on_conflict: true
+    
+  # Dependency Tracking
+  dependency_tracking:
+    enabled: true
+    cascade_updates: true
+    circular_dependency_detection: true
+    
+  # Validation Categories
+  validation_rules:
+    - "gpu_device_access"
+    - "service_names"
+    - "storage_paths"
+    - "network_configuration"
+    - "security_configuration"
+
+# Integration Configuration
+integration:
+  # Git Integration
+  git:
+    enabled: true
+    auto_commit: false
+    commit_message_template: "AI Bible System: Update {bible_name} - {change_count} changes"
+    pre_commit_validation: true
+    post_commit_hooks: true
+    
+  # NixOS Integration
+  nixos:
+    rebuild_trigger: false
+    test_before_switch: true
+    rollback_on_failure: true
+    
+  # Systemd Integration
+  systemd:
+    service_enabled: true
+    service_name: "bible-system"
+    logging_enabled: true
+    auto_restart: true
+
+# Monitoring and Logging
+monitoring:
+  # Logging Configuration
+  logging:
+    enabled: true
+    level: "INFO"
+    rotation: true
+    max_size_mb: 50
+    backup_count: 5
+    
+  # Metrics Collection
+  metrics:
+    enabled: true
+    update_frequency_tracking: true
+    performance_monitoring: true
+    error_rate_tracking: true
+    quality_score_tracking: true
+    
+  # Health Checks
+  health_checks:
+    enabled: true
+    check_interval_minutes: 30
+    ai_model_connectivity: true
+    file_system_integrity: true
+    dependency_validation: true
+
+# Security Configuration
+security:
+  # Access Control
+  access_control:
+    file_permissions: "644"
+    directory_permissions: "755"
+    script_permissions: "755"
+    config_permissions: "600"
+    
+  # Backup Security
+  backup_security:
+    encrypted_backups: false
+    secure_deletion: true
+    access_logging: true
+    
+  # API Security
+  api_security:
+    localhost_only: true
+    timeout_protection: true
+    rate_limiting: false
+
+# Backup and Recovery
+backup_recovery:
+  # Backup Strategy
+  backup:
+    enabled: true
+    automatic_backups: true
+    backup_before_update: true
+    retention_policy: "keep_last_10"
+    compression: true
+    
+  # Recovery Options
+  recovery:
+    rollback_enabled: true
+    point_in_time_recovery: true
+    partial_recovery: true
+    emergency_restoration: true
+    
+  # Archive Management
+  archive:
+    enabled: true
+    auto_archive_obsolete: true
+    archive_threshold_days: 90
+    compress_archives: true
+
+# Migration Configuration
+migration:
+  # Source File Processing
+  source_processing:
+    enabled: true
+    duplicate_detection: true
+    content_deduplication: true
+    format_standardization: true
+    
+  # Migration Phases
+  phases:
+    phase_1_critical: ["hardware_gpu", "system_architecture"]
+    phase_2_services: ["container_services", "storage_data"]
+    phase_3_monitoring: ["monitoring_observability", "ai_documentation"]
+    
+  # Migration Options
+  options:
+    preserve_original: true
+    backup_before_migration: true
+    validation_after_migration: true
+    rollback_on_failure: true
+
+# Notification System
+notifications:
+  # General Settings
+  enabled: true
+  notification_types:
+    - "system_start"
+    - "update_completed"
+    - "error_occurred"
+    - "validation_failed"
+    - "consistency_conflict"
+    
+  # Notification Channels
+  channels:
+    file_log: true
+    systemd_journal: true
+    webhook: false
+    
+  # Error Notifications
+  error_notifications:
+    critical_errors: true
+    validation_failures: true
+    ai_model_failures: true
+    file_system_errors: true
+
+# Development and Testing
+development:
+  # Debug Settings
+  debug_mode: false
+  verbose_logging: false
+  dry_run_mode: false
+  
+  # Testing Configuration
+  testing:
+    enabled: true
+    test_mode_available: true
+    mock_ai_responses: false
+    validation_testing: true
+    
+  # Development Tools
+  tools:
+    config_validation: true
+    dependency_analyzer: true
+    performance_profiler: false
+    content_analyzer: true
+
+# Runtime Configuration
+runtime:
+  # Process Management
+  process:
+    max_concurrent_operations: 3
+    operation_timeout_minutes: 10
+    resource_monitoring: true
+    auto_cleanup: true
+    
+  # Memory Management
+  memory:
+    max_memory_usage_mb: 1024
+    gc_threshold: 0.8
+    memory_monitoring: true
+    
+  # File System
+  filesystem:
+    disk_usage_monitoring: true
+    disk_usage_threshold: 0.9
+    auto_cleanup_enabled: true
+    temp_file_cleanup: true
+
+# Agent 8 Specific Configuration
+agent_8:
+  role: "Configuration & Deployment System"
+  priority: "Medium"
+  deliverables:
+    - "bible_system_config.yaml"
+    - "bible_system_installer.py"
+    - "bible_system_validator.py"
+    
+  tasks:
+    configuration_design: "completed"
+    installation_scripts: "pending"
+    systemd_integration: "pending"
+    validation_tools: "pending"
+    migration_tools: "pending"
+    cleanup_procedures: "pending"
+
+# System Validation Rules
+validation:
+  # Configuration Validation
+  config_validation:
+    yaml_syntax: true
+    required_fields: true
+    value_ranges: true
+    dependency_check: true
+    
+  # File System Validation
+  filesystem_validation:
+    path_existence: true
+    permissions_check: true
+    disk_space: true
+    write_access: true
+    
+  # Service Validation
+  service_validation:
+    ollama_connectivity: true
+    git_repository: true
+    systemd_integration: true
+    log_accessibility: true
+
+---
+# Configuration Schema Version
+schema_version: "1.0"
+config_format: "YAML"
+maintained_by: "Agent 8: Configuration & Deployment System"
+last_updated: "2025-08-07"
+next_review: "2025-09-07"
+EOF < /dev/null

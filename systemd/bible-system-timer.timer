@@ -1,0 +1,20 @@
+[Unit]
+Description=AI Bible Documentation System - Periodic Health Check Timer
+Documentation=file:///etc/nixos/docs/bibles/
+Requires=bible-system-timer.service
+
+[Timer]
+# Run health check every 30 minutes
+OnCalendar=*:0/30
+# Run on boot with 5 minute delay
+OnBootSec=5min
+# Randomize execution to avoid system load spikes
+RandomizedDelaySec=60
+Persistent=true
+
+# Timer settings
+AccuracySec=1min
+RemainAfterElapse=true
+
+[Install]
+WantedBy=timers.target
