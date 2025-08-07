@@ -20,7 +20,9 @@
       "Bash(grep:*)",
       "Bash(sudo systemctl status:*)",
       "Bash(sudo virsh start:*)",
-      "Bash(mkdir:*)"
+      "Bash(mkdir:*)",
+      "Bash(journalctl:*)",
+      "Bash(echo:*)"
     ],
     "deny": []
   }

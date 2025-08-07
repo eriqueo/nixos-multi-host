@@ -699,4 +699,39 @@ in
      }
      '';
   };
+
+  # Fix waybar crashing by ensuring proper Wayland environment in systemd service
+  systemd.user.services.waybar = {
+    Unit = {
+      Description = "Highly customizable Wayland bar for Sway and Wlroots based compositors";
+      Documentation = "https://github.com/Alexays/Waybar/wiki/";
+      PartOf = "graphical-session.target";
+      After = "graphical-session.target";
+      Requisite = "graphical-session.target";
+    };
+    
+    Service = {
+      # Critical: Set Wayland environment variables for proper display access
+      Environment = [
+        "WAYLAND_DISPLAY=wayland-1"
+        "XDG_CURRENT_DESKTOP=Hyprland" 
+        "XDG_SESSION_DESKTOP=Hyprland"
+        "XDG_SESSION_TYPE=wayland"
+        "XDG_RUNTIME_DIR=/run/user/1000"
+      ];
+      
+      ExecStart = "${pkgs.waybar}/bin/waybar";
+      ExecReload = "kill -SIGUSR2 $MAINPID";
+      Restart = "on-failure";
+      RestartSec = "1";
+      
+      # Additional restart configuration to handle crashes better
+      StartLimitBurst = 3;
+      StartLimitInterval = 10;
+    };
+    
+    Install = {
+      WantedBy = [ "graphical-session.target" ];
+    };
+  };
 }
