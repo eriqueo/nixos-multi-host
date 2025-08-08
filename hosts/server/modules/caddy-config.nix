@@ -37,53 +37,45 @@
       
       # ---- Sonarr
       handle /sonarr { redir /sonarr/ 301 }
-      handle_path /sonarr/* {
-        reverse_proxy localhost:8989 {
-          header_up Host {host}
-          header_up X-Forwarded-Host {host}
+      route /sonarr/* {
+        uri strip_prefix /sonarr
+        reverse_proxy 127.0.0.1:8989 {
           header_up X-Forwarded-Proto {scheme}
-          header_up X-Forwarded-Port {server_port}
-          header_up X-Forwarded-For {remote}
-          header_up X-Real-IP {remote}
+          header_up X-Forwarded-For {remote_host}
+          header_up Host {host}
         }
       }
       
       # ---- Radarr
       handle /radarr { redir /radarr/ 301 }
-      handle_path /radarr/* {
-        reverse_proxy localhost:7878 {
-          header_up Host {host}
-          header_up X-Forwarded-Host {host}
+      route /radarr/* {
+        uri strip_prefix /radarr
+        reverse_proxy 127.0.0.1:7878 {
           header_up X-Forwarded-Proto {scheme}
-          header_up X-Forwarded-Port {server_port}
-          header_up X-Forwarded-For {remote}
-          header_up X-Real-IP {remote}
+          header_up X-Forwarded-For {remote_host}
+          header_up Host {host}
         }
       }
       
       # ---- Lidarr
       handle /lidarr { redir /lidarr/ 301 }
-      handle_path /lidarr/* {
-        reverse_proxy localhost:8686 {
-          header_up Host {host}
-          header_up X-Forwarded-Host {host}
+      route /lidarr/* {
+        uri strip_prefix /lidarr
+        reverse_proxy 127.0.0.1:8686 {
           header_up X-Forwarded-Proto {scheme}
-          header_up X-Forwarded-Port {server_port}
-          header_up X-Forwarded-For {remote}
-          header_up X-Real-IP {remote}
+          header_up X-Forwarded-For {remote_host}
+          header_up Host {host}
         }
       }
       
       # ---- Prowlarr
       handle /prowlarr { redir /prowlarr/ 301 }
-      handle_path /prowlarr/* {
-        reverse_proxy localhost:9696 {
-          header_up Host {host}
-          header_up X-Forwarded-Host {host}
+      route /prowlarr/* {
+        uri strip_prefix /prowlarr
+        reverse_proxy 127.0.0.1:9696 {
           header_up X-Forwarded-Proto {scheme}
-          header_up X-Forwarded-Port {server_port}
-          header_up X-Forwarded-For {remote}
-          header_up X-Real-IP {remote}
+          header_up X-Forwarded-For {remote_host}
+          header_up Host {host}
         }
       }
 

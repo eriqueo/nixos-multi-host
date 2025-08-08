@@ -325,6 +325,24 @@ EOF
     '';
   };
 
+  # Fix config file permissions for container access
+  systemd.services.arr-config-permissions = {
+    description = "Fix *arr config file permissions for container access";
+    after = [ "arr-urlbase-local-bypass.service" ];
+    before = [ "podman-sonarr.service" "podman-radarr.service" "podman-lidarr.service" "podman-prowlarr.service" ];
+    wantedBy = [ "multi-user.target" ];
+    serviceConfig.Type = "oneshot";
+    script = ''
+      # Fix ownership for all *arr config directories and files
+      for app in sonarr radarr lidarr prowlarr; do
+        if [ -d "${cfgRoot}/$app" ]; then
+          chown -R 1000:1000 "${cfgRoot}/$app"
+          echo "Fixed permissions for $app config"
+        fi
+      done
+    '';
+  };
+
   # After you set creds, you can run this to enforce auth
   systemd.services.arr-auth-enforce = {
     description = "Enforce AuthenticationRequired=Enabled for all *arr";
