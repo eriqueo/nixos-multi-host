@@ -11,7 +11,7 @@ let
     TZ = "America/Denver";
   };
   
-  mediaNetworkOptions = [ "--network=media-network" ];
+  mediaNetworkOptions = [ "--network=${config.hwc.media.networkName}" ];
   configVol = service: "/opt/monitoring/${service}:/config";
   dataVol = service: "/opt/monitoring/${service}/data:/data";
   

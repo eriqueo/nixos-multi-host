@@ -1,142 +1,158 @@
-# hosts/server/modules/media-stack.nix  
-# Boring-reliable media stack: Caddy + *arr + Soularr + slskd + Gluetun VPN routing
+# =============================================================================
+# Boring-Reliable Media Stack (NixOS + Podman)
+# - Caddy reverse proxy on subpaths
+# - Servarr apps with UrlBase + Forms auth
+# - qBittorrent + SABnzbd egress via Gluetun (VPN)
+# - Soularr + slskd
+# - Hot (SSD) downloads/processing; cold library on HDD
+# =============================================================================
 { config, lib, pkgs, ... }:
 
 let
-  # CONFIGURATION: Update these ports if using different container images
+  # ==== PORTS ================================================================
   ports = {
-    sonarr = 8989;
-    radarr = 7878; 
-    lidarr = 8686;
+    sonarr   = 8989;
+    radarr   = 7878;
+    lidarr   = 8686;
     prowlarr = 9696;
-    soularr = 8989;  # Soularr mimics sonarr port internally
-    slskd = 5030;
-    qbittorrent = 8080;  # Via Gluetun proxy
-    sabnzbd = 8081;      # Via Gluetun proxy (container uses 8085 internally)
+
+    # Soularr notes:
+    # internal port differs by image; default assumed 8989 here.
+    soularr_host = 9898;  # host binding
+    soularr_ctn  = 8989;  # container listen (adjust if image uses 3000/5055, etc.)
+
+    slskd   = 5030;
+
+    # Gluetun publishes UIs for qBT and SAB to host:
+    qbittorrent = 8080;
+    sabnzbd     = 8081;   # NOTE: maps to SAB internal 8085
   };
 
-  # NETWORKING: All services except downloaders use media-net bridge
-  mediaNetworkOptions = [ "--network=media-network" ];
-  vpnNetworkOptions = [ "--network=container:gluetun" ];
-  
-  # STORAGE: Standardized paths for consistency
-  configRoot = "/docker";  # Container configs under /docker/<name>
-  mediaRoot = "/mnt/media"; # Final media library storage
-  downloadRoot = "${mediaRoot}/downloads"; # Download staging area
+  # ==== NETWORKS =============================================================
+  mediaNet = config.hwc.media.networkName;
+  mediaNetworkOptions = [ "--network=${mediaNet}" ];
+  vpnNetworkOptions   = [ "--network=container:gluetun" ];
 
-  # HELPERS: Standard environment and volume patterns
-  commonEnv = {
-    PUID = "1000";
-    PGID = "1000"; 
-    TZ = "America/Denver";
-  };
+  # ==== STORAGE ROOTS ========================================================
+  # Configs live under /docker/<name>
+  configRoot = "/docker";
 
-  # Volume helper: config mount for each service  
+  # Hot = SSD (active downloads/processing/cache)
+  hotRoot = "/mnt/hot";
+  hotDownloads = "${hotRoot}/downloads";
+  hotProcessing = "${hotRoot}/processing";
+  hotCache = "${hotRoot}/cache";
+
+  # Cold = HDD (final library)
+  mediaRoot = "/mnt/media";
+
+  # ==== COMMON ENV ===========================================================
+  commonEnv = { PUID = "1000"; PGID = "1000"; TZ = "America/Denver"; };
+
+  # ==== VOLUME HELPERS =======================================================
   configVol = name: "${configRoot}/${name}:/config";
-  
-  # Volume helper: media library mounts
-  mediaVolumes = [
+
+  # *Arr mounts:
+  arrVolumes = kind: [
+    (configVol kind)
+    "${hotDownloads}:/hot-downloads"
+    "${hotProcessing}/${kind}:/processing"
+    "${hotCache}/${kind}:/cache"
     "${mediaRoot}/tv:/tv"
     "${mediaRoot}/movies:/movies"
     "${mediaRoot}/music:/music"
-    "${downloadRoot}:/downloads"
   ];
 in
 {
-  # SOPS: VPN credentials encrypted with age/gpg
+  # =============================================================================
+  # ## 1) Secrets (SOPS) – VPN creds for Gluetun
+  # =============================================================================
   sops.secrets.vpn_username = {
     sopsFile = ../../../secrets/admin.yaml;
-    key = "vpn/protonvpn/username";
-    mode = "0400";
-    owner = "root";
+    key = "vpn/protonvpn/username"; mode = "0400"; owner = "root";
   };
-  
   sops.secrets.vpn_password = {
     sopsFile = ../../../secrets/admin.yaml;
-    key = "vpn/protonvpn/password";
-    mode = "0400";
-    owner = "root";
+    key = "vpn/protonvpn/password"; mode = "0400"; owner = "root";
   };
 
-  # Create media-net bridge (idempotent)
-  systemd.services.init-media-network = {
-    description = "Create media container network bridge";
-    after = [ "network.target" ];
-    wantedBy = [ "multi-user.target" ];
+  # =============================================================================
+  # ## 2) Podman Network + Gluetun Env – must exist before containers
+  # =============================================================================
+
+ systemd.services.gluetun-env-setup = {
+    description = "Generate Gluetun environment from SOPS secrets";
+    before  = [ "podman-gluetun.service" ];
+    wants   = [ "sops-install-secrets.service" "hwc-media-network.service" ];
+    after   = [ "sops-install-secrets.service" "hwc-media-network.service" ];
+    wantedBy = [ "podman-gluetun.service" ];
     serviceConfig.Type = "oneshot";
     script = ''
-      if \! ${pkgs.podman}/bin/podman network exists media-network; then
-        ${pkgs.podman}/bin/podman network create media-network
-        echo "Created media-network bridge"
-      else
-        echo "media-network bridge already exists"  
-      fi
-    '';
-  };
-
-  # Generate Gluetun env file from SOPS secrets
-  systemd.services.gluetun-env-setup = {
-    description = "Generate Gluetun environment from SOPS secrets";
-    before = [ "podman-gluetun.service" ];
-    wantedBy = [ "podman-gluetun.service" ];
-    wants = [ "sops-install-secrets.service" ];
-    after = [ "sops-install-secrets.service" ];
-    serviceConfig = {
-      Type = "oneshot";
-      User = "root";
-    };
-    script = ''
+      set -e
       mkdir -p ${configRoot}
-      cat > ${configRoot}/.env << ENVEOF
-VPN_SERVICE_PROVIDER=protonvpn
-VPN_TYPE=openvpn
-OPENVPN_USER=$(cat ${config.sops.secrets.vpn_username.path})
-OPENVPN_PASSWORD=$(cat ${config.sops.secrets.vpn_password.path})
-SERVER_COUNTRIES=Netherlands
-HEALTH_VPN_DURATION_INITIAL=30s
-ENVEOF
+      cat > ${configRoot}/.env <<EOF
+  VPN_SERVICE_PROVIDER=protonvpn
+  VPN_TYPE=openvpn
+  OPENVPN_USER=$(cat ${config.sops.secrets.vpn_username.path})
+  OPENVPN_PASSWORD=$(cat ${config.sops.secrets.vpn_password.path})
+  SERVER_COUNTRIES=Netherlands
+  HEALTH_VPN_DURATION_INITIAL=30s
+  EOF
       chmod 600 ${configRoot}/.env
     '';
   };
 
-  # Container definitions
+
+  # Ensure container units wait for network/env readiness.
+  systemd.services."podman-gluetun".after     = [ "hwc-media-network.service" "gluetun-env-setup.service" ];
+  systemd.services."podman-sonarr".after      = [ "hwc-media-network.service" ];
+  systemd.services."podman-radarr".after      = [ "hwc-media-network.service" ];
+  systemd.services."podman-lidarr".after      = [ "hwc-media-network.service" ];
+  systemd.services."podman-prowlarr".after    = [ "hwc-media-network.service" ];
+  systemd.services."podman-soularr".after     = [ "hwc-media-network.service" ];
+  systemd.services."podman-slskd".after       = [ "hwc-media-network.service" ];
+  systemd.services."podman-qbittorrent".after = [ "podman-gluetun.service" ];
+  systemd.services."podman-sabnzbd".after     = [ "podman-gluetun.service" ];
+
+  # =============================================================================
+  # ## 3) Containers (Podman)
+  # =============================================================================
   virtualisation.oci-containers = {
     backend = "podman";
     containers = {
-    
-      # VPN GATEWAY: All download traffic routes through this
+      # --- Gluetun (VPN gateway; publishes qBT/SAB UIs to host) ---------------
       gluetun = {
         image = "qmcgaw/gluetun:latest";
         autoStart = true;
         extraOptions = [
           "--cap-add=NET_ADMIN"
           "--device=/dev/net/tun:/dev/net/tun"
-          "--network=media-network" 
+          "--network=${mediaNet}"
           "--network-alias=gluetun"
         ];
         environmentFiles = [ "${configRoot}/.env" ];
         ports = [
-          "127.0.0.1:8080:8080"
-          "127.0.0.1:8081:8085"
+          "127.0.0.1:${toString ports.qbittorrent}:${toString ports.qbittorrent}"
+          "127.0.0.1:${toString ports.sabnzbd}:8085" # host 8081 -> container 8085
         ];
-        volumes = [ 
-          "${configRoot}/gluetun:/gluetun"
-        ];
+        volumes = [ "${configRoot}/gluetun:/gluetun" ];
       };
 
-      # DOWNLOAD CLIENTS: Use Gluetun network namespace
+      # --- qBittorrent (shares gluetun netns; no host port mapping here) ------
       qbittorrent = {
         image = "lscr.io/linuxserver/qbittorrent:latest";
         autoStart = true;
         dependsOn = [ "gluetun" ];
         extraOptions = vpnNetworkOptions;
-        environment = commonEnv // { WEBUI_PORT = "8080"; };
+        environment = commonEnv // { WEBUI_PORT = toString ports.qbittorrent; };
         volumes = [
           (configVol "qbittorrent")
-          "${downloadRoot}/qbittorrent:/downloads"
-        ] ++ mediaVolumes;
+          "${hotDownloads}/qbittorrent:/downloads"
+          "${hotCache}/qbittorrent:/cache"
+        ];
       };
-      
+
+      # --- SABnzbd (shares gluetun netns) -------------------------------------
       sabnzbd = {
         image = "lscr.io/linuxserver/sabnzbd:latest";
         autoStart = true;
@@ -145,57 +161,55 @@ ENVEOF
         environment = commonEnv;
         volumes = [
           (configVol "sabnzbd")
-          "${downloadRoot}/sabnzbd:/downloads"
-          "${downloadRoot}/sabnzbd/incomplete:/incomplete-downloads"
-        ] ++ mediaVolumes;
+          "${hotDownloads}/sabnzbd:/downloads"
+          "${hotDownloads}/sabnzbd/incomplete:/incomplete-downloads"
+        ];
       };
 
-      # MEDIA MANAGEMENT: *arr apps on media-network
+      # --- Sonarr --------------------------------------------------------------
       sonarr = {
         image = "lscr.io/linuxserver/sonarr:latest";
         autoStart = true;
         extraOptions = mediaNetworkOptions;
         environment = commonEnv;
-        ports = [ "127.0.0.1:8989:8989" ];
-        volumes = [
-          (configVol "sonarr")
-        ] ++ mediaVolumes;
+        ports = [ "127.0.0.1:${toString ports.sonarr}:${toString ports.sonarr}" ];
+        volumes = arrVolumes "sonarr";
       };
-      
+
+      # --- Radarr --------------------------------------------------------------
       radarr = {
         image = "lscr.io/linuxserver/radarr:latest";
         autoStart = true;
         extraOptions = mediaNetworkOptions;
         environment = commonEnv;
-        ports = [ "127.0.0.1:7878:7878" ];
-        volumes = [
-          (configVol "radarr")
-        ] ++ mediaVolumes;
+        ports = [ "127.0.0.1:${toString ports.radarr}:${toString ports.radarr}" ];
+        volumes = arrVolumes "radarr";
       };
-      
+
+      # --- Lidarr --------------------------------------------------------------
       lidarr = {
         image = "lscr.io/linuxserver/lidarr:latest";
         autoStart = true;
         extraOptions = mediaNetworkOptions;
         environment = commonEnv;
-        ports = [ "127.0.0.1:8686:8686" ];
-        volumes = [
-          (configVol "lidarr")
-        ] ++ mediaVolumes;
+        ports = [ "127.0.0.1:${toString ports.lidarr}:${toString ports.lidarr}" ];
+        volumes = arrVolumes "lidarr";
       };
-      
+
+      # --- Prowlarr ------------------------------------------------------------
       prowlarr = {
         image = "lscr.io/linuxserver/prowlarr:latest";
         autoStart = true;
         extraOptions = mediaNetworkOptions;
         environment = commonEnv;
-        ports = [ "127.0.0.1:9696:9696" ];
+        ports = [ "127.0.0.1:${toString ports.prowlarr}:${toString ports.prowlarr}" ];
         volumes = [
           (configVol "prowlarr")
+          "${hotCache}/prowlarr:/cache"
         ];
       };
 
-      # SOULSEEK INTEGRATION
+      # --- slskd ---------------------------------------------------------------
       slskd = {
         image = "slskd/slskd:latest";
         autoStart = true;
@@ -204,157 +218,80 @@ ENVEOF
           SLSKD_USERNAME = "admin";
           SLSKD_PASSWORD = "slskd_admin_2024";
         };
-        ports = [ "127.0.0.1:5030:5030" ];
+        ports = [ "127.0.0.1:${toString ports.slskd}:${toString ports.slskd}" ];
         volumes = [
           (configVol "slskd")
-          "${downloadRoot}/slskd:/downloads"
+          "${hotDownloads}/slskd:/downloads"
           "${mediaRoot}/music:/music:ro"
         ];
       };
-      
-      soularr = {
-        image = "ghcr.io/theultimatecoders/soularr:latest"; 
-        autoStart = true;
+
+      # --- Soularr -------------------------------------------------------------
+       soularr = {
+        image = "ghcr.io/theultimatecoders/soularr:latest";
+        autoStart = false;  # park until we confirm internal port + image pull
         dependsOn = [ "slskd" "lidarr" ];
         extraOptions = mediaNetworkOptions;
         environment = commonEnv;
-        ports = [ "127.0.0.1:9898:8989" ];
+        ports = [
+          "127.0.0.1:${toString ports.soularr_host}:${toString ports.soularr_ctn}"
+        ];
         volumes = [
           (configVol "soularr")
-          "${downloadRoot}/slskd:/downloads"
-        ] ++ mediaVolumes;
+          "${hotDownloads}/slskd:/downloads"
+          "${mediaRoot}/music:/music"
+        ];
       };
     };
   };
 
-  # Caddy reverse proxy configuration with all services
-  services.caddy = {
-    enable = true;
-    virtualHosts."hwc.ocelot-wahoo.ts.net".extraConfig = ''
-      # Obsidian LiveSync proxy: strip /sync prefix and forward to CouchDB
-      @sync path /sync*
-      handle @sync {
-        uri strip_prefix /sync
-        reverse_proxy 127.0.0.1:5984 {
-          # preserve the Host header for CouchDB auth
-          header_up Host {host}
-          # rewrite any CouchDB redirect back under /sync
-          header_down Location ^/(.*)$ /sync/{1}
-        }
-      }
+  # =============================================================================
+  # ## 4) Caddy – single vhost, subpath proxy, proper headers
+  # =============================================================================
 
-      # Media services
-      handle_path /media/* {
-        reverse_proxy localhost:8096
-      }
-      handle_path /navidrome/* {
-        reverse_proxy localhost:4533
-      }
-
-      # *ARR STACK: Media management with Forms auth
-      handle /sonarr { redir /sonarr/ 301 }
-      handle_path /sonarr/* {
-        uri strip_prefix /sonarr
-        reverse_proxy 127.0.0.1:8989
-      }
-      
-      handle /radarr { redir /radarr/ 301 }
-      handle_path /radarr/* {
-        uri strip_prefix /radarr
-        reverse_proxy 127.0.0.1:7878
-      }
-      
-      handle /lidarr { redir /lidarr/ 301 }
-      handle_path /lidarr/* {
-        uri strip_prefix /lidarr  
-        reverse_proxy 127.0.0.1:8686
-      }
-      
-      handle /prowlarr { redir /prowlarr/ 301 }
-      handle_path /prowlarr/* {
-        uri strip_prefix /prowlarr
-        reverse_proxy 127.0.0.1:9696
-      }
-      
-      # SOULSEEK INTEGRATION: Music discovery
-      handle /soularr { redir /soularr/ 301 }
-      handle_path /soularr/* {
-        uri strip_prefix /soularr
-        reverse_proxy 127.0.0.1:9898
-      }
-      
-      handle /slskd { redir /slskd/ 301 }
-      handle_path /slskd/* {
-        uri strip_prefix /slskd
-        reverse_proxy 127.0.0.1:5030
-      }
-      
-      # DOWNLOAD CLIENTS: VPN-routed via Gluetun
-      handle /qbt { redir /qbt/ 301 }
-      handle_path /qbt/* {
-        uri strip_prefix /qbt
-        reverse_proxy 127.0.0.1:8080
-      }
-      
-      handle /sab { redir /sab/ 301 }
-      handle_path /sab/* {
-        uri strip_prefix /sab
-        reverse_proxy 127.0.0.1:8081
-      }
-
-      # Business services
-      handle /business* {
-        reverse_proxy localhost:8000
-      }
-      handle /dashboard* {
-        reverse_proxy localhost:8501
-      }
-
-      # Private notification service
-      handle_path /notify/* {
-        reverse_proxy localhost:8282
-      }
-
-      # Photo management
-      handle_path /immich/* {
-        reverse_proxy localhost:2283
-      }
-
-      # Monitoring services
-      handle_path /grafana/* {
-        reverse_proxy localhost:3000
-      }
-      handle_path /prometheus/* {
-        reverse_proxy localhost:9090
-      }
-    '';
-  };
-
-  # Directory structure
+  # =============================================================================
+  # ## 5) Directories & Firewall
+  # =============================================================================
   systemd.tmpfiles.rules = [
-    # Container config directories 
-    "d /docker 0755 root root -"
-    "d /docker/sonarr 0755 1000 1000 -"
-    "d /docker/radarr 0755 1000 1000 -" 
-    "d /docker/lidarr 0755 1000 1000 -"
-    "d /docker/prowlarr 0755 1000 1000 -"
-    "d /docker/soularr 0755 1000 1000 -"
-    "d /docker/slskd 0755 1000 1000 -"
-    "d /docker/qbittorrent 0755 1000 1000 -"
-    "d /docker/sabnzbd 0755 1000 1000 -"
-    "d /docker/gluetun 0755 1000 1000 -"
-    
-    # Download staging areas
-    "d /mnt/media/downloads 0755 1000 1000 -"
-    "d /mnt/media/downloads/qbittorrent 0755 1000 1000 -"
-    "d /mnt/media/downloads/sabnzbd 0755 1000 1000 -"
-    "d /mnt/media/downloads/sabnzbd/incomplete 0755 1000 1000 -"
-    "d /mnt/media/downloads/slskd 0755 1000 1000 -"
+    # Config roots
+    "d ${configRoot} 0755 root root -"
+    "d ${configRoot}/gluetun 0755 1000 1000 -"
+    "d ${configRoot}/sonarr 0755 1000 1000 -"
+    "d ${configRoot}/radarr 0755 1000 1000 -"
+    "d ${configRoot}/lidarr 0755 1000 1000 -"
+    "d ${configRoot}/prowlarr 0755 1000 1000 -"
+    "d ${configRoot}/soularr 0755 1000 1000 -"
+    "d ${configRoot}/slskd 0755 1000 1000 -"
+    "d ${configRoot}/qbittorrent 0755 1000 1000 -"
+    "d ${configRoot}/sabnzbd 0755 1000 1000 -"
+
+    # Hot storage
+    "d ${hotRoot} 0755 1000 1000 -"
+    "d ${hotDownloads} 0755 1000 1000 -"
+    "d ${hotDownloads}/qbittorrent 0755 1000 1000 -"
+    "d ${hotDownloads}/qbittorrent/incomplete 0755 1000 1000 -"
+    "d ${hotDownloads}/qbittorrent/complete 0755 1000 1000 -"
+    "d ${hotDownloads}/sabnzbd 0755 1000 1000 -"
+    "d ${hotDownloads}/sabnzbd/incomplete 0755 1000 1000 -"
+    "d ${hotDownloads}/sabnzbd/complete 0755 1000 1000 -"
+    "d ${hotDownloads}/slskd 0755 1000 1000 -"
+    "d ${hotProcessing} 0755 1000 1000 -"
+    "d ${hotProcessing}/sonarr 0755 1000 1000 -"
+    "d ${hotProcessing}/radarr 0755 1000 1000 -"
+    "d ${hotProcessing}/lidarr 0755 1000 1000 -"
+    "d ${hotCache} 0755 1000 1000 -"
+    "d ${hotCache}/sonarr 0755 1000 1000 -"
+    "d ${hotCache}/radarr 0755 1000 1000 -"
+    "d ${hotCache}/lidarr 0755 1000 1000 -"
+    "d ${hotCache}/qbittorrent 0755 1000 1000 -"
+    "d ${hotCache}/prowlarr 0755 1000 1000 -"
+
+    # Cold library
+    "d ${mediaRoot} 0755 1000 1000 -"
+    "d ${mediaRoot}/tv 0755 1000 1000 -"
+    "d ${mediaRoot}/movies 0755 1000 1000 -"
+    "d ${mediaRoot}/music 0755 1000 1000 -"
   ];
 
-  # Firewall: only expose HTTP/HTTPS publicly, other services only on Tailscale
   networking.firewall.allowedTCPPorts = [ 80 443 ];
-  networking.firewall.interfaces."tailscale0" = {
-    allowedTCPPorts = [ 5984 8000 8501 8282 ];
-  };
 }

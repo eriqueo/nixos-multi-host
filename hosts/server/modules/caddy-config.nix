@@ -63,6 +63,34 @@
         }
       }
 
+      # ---- Soularr
+      handle /soularr { redir /soularr/ 301 }
+      handle_path /soularr/* {
+        uri strip_prefix /soularr
+        reverse_proxy 127.0.0.1:9898 {
+          header_up Host {host}
+          header_up X-Forwarded-Host {host}
+          header_up X-Forwarded-Proto {scheme}
+          header_up X-Forwarded-Port {server_port}
+          header_up X-Forwarded-For {remote}
+          header_up X-Real-IP {remote}
+        }
+      }
+
+      # ---- slskd
+      handle /slskd { redir /slskd/ 301 }
+      handle_path /slskd/* {
+        uri strip_prefix /slskd
+        reverse_proxy 127.0.0.1:5030 {
+          header_up Host {host}
+          header_up X-Forwarded-Host {host}
+          header_up X-Forwarded-Proto {scheme}
+          header_up X-Forwarded-Port {server_port}
+          header_up X-Forwarded-For {remote}
+          header_up X-Real-IP {remote}
+        }
+      }
+
       # Business services
       handle /business* {
         reverse_proxy localhost:8000
@@ -101,6 +129,6 @@
 # IMPORTANT: Do not use Tailscale Serve with this Caddy configuration
 # ChatGPT's mistake was running: sudo tailscale serve --bg --https=8989 localhost:8989
 # This bypassed Caddy's path-based routing and broke everything
-# 
+#
 # On the server, run this cleanup command:
 # sudo tailscale serve reset

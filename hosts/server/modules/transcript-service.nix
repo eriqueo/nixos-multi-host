@@ -20,7 +20,7 @@ let
   };
 
   # Network options (following your media-containers pattern)
-  mediaNetworkOptions = [ "--network=media-network" ];
+  mediaNetworkOptions = [ "--network=${config.hwc.media.networkName}" ];
 
   # Volume patterns (following your storage tier approach)
   configVol = "/opt/transcript:/config";
@@ -99,15 +99,6 @@ in
   ];
 
   # Create media network for containers (if not already created)
-  systemd.services.create-media-network = {
-    description = "Create media container network";
-    after = [ "podman.service" ];
-    requires = [ "podman.service" ];
-    serviceConfig = {
-      Type = "oneshot";
-      RemainAfterExit = true;
-      ExecStart = "${pkgs.podman}/bin/podman network exists media-network || ${pkgs.podman}/bin/podman network create media-network";
-    };
     wantedBy = [ "multi-user.target" ];
   };
 
@@ -125,8 +116,9 @@ in
   # Transcript API service
   systemd.services."podman-transcript-api" = {
     description = "YouTube Transcript API Service";
-    after = [ "network.target" "podman.service" "create-media-network.service" "load-transcript-image.service" ];
-    requires = [ "podman.service" "create-media-network.service" "load-transcript-image.service" ];
+    after = [ "network-online.target" "podman.service" "hwc-media-network.service" "load-transcript-image.service" ];
+    requires = [ "podman.service" "load-transcript-image.service" ];
+    wants = [ "network-online.target" "hwc-media-network.service" "load-transcript-image.service" ];
     wantedBy = [ "multi-user.target" ];
 
     serviceConfig = {

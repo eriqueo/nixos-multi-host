@@ -3,6 +3,7 @@
 { config, lib, pkgs, ... }:
 
 {
+  hwc.media.enable = true;
   ####################################################################
   # 1. IMPORTS - Updated with new modules
   ####################################################################
@@ -26,6 +27,7 @@
     ./modules/gpu-acceleration.nix       # NVIDIA Quadro P1000 support
     ./modules/jellyfin-gpu.nix          # Jellyfin hardware acceleration configuration
     ./modules/hot-storage.nix           # SSD hot storage tier
+    ./modules/media-core.nix
     ./modules/media-stack.nix           # Boring-reliable media stack with Caddy subpaths
 
     # Monitoring stack

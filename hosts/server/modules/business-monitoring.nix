@@ -12,7 +12,7 @@
     business-dashboard = {
       image = "python:3.11-slim";
       autoStart = true;
-      extraOptions = [ "--network=media-network" ];
+      extraOptions = [ "--network=${config.hwc.media.networkName}" ];
       ports = [ "8501:8501" ];
       volumes = [
         "/opt/monitoring/business:/app"
@@ -27,7 +27,7 @@
     business-metrics = {
       image = "python:3.11-slim";
       autoStart = true;
-      extraOptions = [ "--network=media-network" ];
+      extraOptions = [ "--network=${config.hwc.media.networkName}" ];
       ports = [ "9999:9999" ];
       volumes = [
         "/opt/monitoring/business:/app"

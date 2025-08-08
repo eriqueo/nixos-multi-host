@@ -23,7 +23,19 @@
       "Bash(mkdir:*)",
       "Bash(journalctl:*)",
       "Bash(echo:*)",
-      "Bash(sudo touch:*)"
+      "Bash(sudo touch:*)",
+      "Bash(nix-shell:*)",
+      "Bash(sudo podman network create:*)",
+      "Bash(true)",
+      "Bash(nix-instantiate:*)",
+      "Bash(sudo systemctl:*)",
+      "Bash(sudo chown:*)",
+      "Bash(sudo mkdir:*)",
+      "Bash(sudo mv:*)",
+      "Bash(podman run:*)",
+      "Bash(sudo podman exec sonarr sh:*)",
+      "Bash(sudo podman exec radarr sh:*)",
+      "Bash(sudo podman exec:*)"
     ],
     "deny": []
   }
