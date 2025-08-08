@@ -1,4 +1,4 @@
-#\!/bin/bash
+#!/bin/bash
 # Integration script for ChatGPT Agent improvements
 # Deploys the reviewed and corrected implementations
 
@@ -39,7 +39,7 @@ validate_modules() {
     log "Validating new modules exist..."
     
     for module in "${modules[@]}"; do
-        if [[ \! -f "$module" ]]; then
+        if [[ ! -f "$module" ]]; then
             log "ERROR: Module not found: $module"
             return 1
         else
@@ -49,7 +49,7 @@ validate_modules() {
     
     # Validate syntax
     for module in "${modules[@]}"; do
-        if \! nix-instantiate --parse "$module" >/dev/null 2>&1; then
+        if ! nix-instantiate --parse "$module" >/dev/null 2>&1; then
             log "ERROR: Syntax error in module: $module"
             return 1
         else
@@ -66,7 +66,7 @@ add_modules_to_config() {
     
     log "Adding new modules to server configuration..."
     
-    if [[ \! -f "$server_config" ]]; then
+    if [[ ! -f "$server_config" ]]; then
         log "ERROR: Server configuration not found: $server_config"
         return 1
     fi
@@ -222,27 +222,27 @@ main() {
     backup_path=$(backup_current_config)
     
     # Validate modules
-    if \! validate_modules; then
+    if ! validate_modules; then
         log "ERROR: Module validation failed"
         exit 1
     fi
     
     # Add modules to configuration
-    if \! add_modules_to_config; then
+    if ! add_modules_to_config; then
         log "ERROR: Failed to add modules to configuration"
         log "Restore from backup: cp -r $backup_path/* /etc/nixos/"
         exit 1
     fi
     
     # Test configuration
-    if \! test_configuration; then
+    if ! test_configuration; then
         log "ERROR: Configuration test failed"
         log "Restore from backup: cp -r $backup_path/* /etc/nixos/"
         exit 1
     fi
     
     # Deploy configuration
-    if \! deploy_configuration; then
+    if ! deploy_configuration; then
         log "ERROR: Deployment failed"
         log "Restore from backup: cp -r $backup_path/* /etc/nixos/"
         exit 1
@@ -331,4 +331,3 @@ HELP_EOF
         exit 1
         ;;
 esac
-EOF < /dev/null

@@ -137,7 +137,7 @@ in
       
       ExecStartPre = "${pkgs.podman}/bin/podman rm -f transcript-api || true";
       
-      ExecStart = toString [
+      ExecStart = lib.concatStringsSep " " ([
         "${pkgs.podman}/bin/podman run"
         "--name transcript-api"
         "--detach"
@@ -166,7 +166,7 @@ in
         "--env PYTHONPATH=/etc/nixos/scripts"
         "--env PYTHONUNBUFFERED=1"
         "hwc/transcript-api:latest"
-      ];
+      ]);
       
       ExecStop = "${pkgs.podman}/bin/podman stop transcript-api";
     };

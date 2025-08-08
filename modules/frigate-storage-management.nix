@@ -13,7 +13,7 @@
     };
     
     script = ''
-      #\!/bin/bash
+      #!/bin/bash
       set -euo pipefail
       
       # Existing frigate media paths from current system
@@ -126,7 +126,7 @@
     };
     
     script = ''
-      #\!/bin/bash
+      #!/bin/bash
       set -euo pipefail
       
       FRIGATE_API="http://localhost:5000/api"
@@ -239,4 +239,3 @@
     };
   };
 }
-EOF < /dev/null

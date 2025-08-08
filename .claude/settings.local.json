@@ -22,7 +22,8 @@
       "Bash(sudo virsh start:*)",
       "Bash(mkdir:*)",
       "Bash(journalctl:*)",
-      "Bash(echo:*)"
+      "Bash(echo:*)",
+      "Bash(sudo touch:*)"
     ],
     "deny": []
   }

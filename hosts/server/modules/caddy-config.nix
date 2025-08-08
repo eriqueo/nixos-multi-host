@@ -35,16 +35,32 @@
       # *ARR stack - Fixed: Changed from 'handle' to 'handle_path' to strip path prefixes
       # This prevents apps from receiving URLs like /sonarr/api/ (they expect just /api/)
       handle_path /sonarr/* {
-        reverse_proxy localhost:8989
+        reverse_proxy localhost:8989 {
+          header_up X-Real-IP {remote_host}
+          header_up X-Forwarded-For {remote_host}
+          header_up X-Forwarded-Proto {scheme}
+        }
       }
       handle_path /radarr/* {
-        reverse_proxy localhost:7878
+        reverse_proxy localhost:7878 {
+          header_up X-Real-IP {remote_host}
+          header_up X-Forwarded-For {remote_host}
+          header_up X-Forwarded-Proto {scheme}
+        }
       }
       handle_path /lidarr/* {
-        reverse_proxy localhost:8686
+        reverse_proxy localhost:8686 {
+          header_up X-Real-IP {remote_host}
+          header_up X-Forwarded-For {remote_host}
+          header_up X-Forwarded-Proto {scheme}
+        }
       }
       handle_path /prowlarr/* {
-        reverse_proxy localhost:9696
+        reverse_proxy localhost:9696 {
+          header_up X-Real-IP {remote_host}
+          header_up X-Forwarded-For {remote_host}
+          header_up X-Forwarded-Proto {scheme}
+        }
       }
 
       # Business services

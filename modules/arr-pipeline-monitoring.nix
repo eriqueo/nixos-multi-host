@@ -13,7 +13,7 @@
     };
     
     script = ''
-      #\!/bin/bash
+      #!/bin/bash
       set -euo pipefail
       
       LOG_FILE="/var/log/arr-pipeline-monitor.log"
@@ -266,7 +266,7 @@
     };
     
     script = ''
-      #\!/bin/bash
+      #!/bin/bash
       set -euo pipefail
       
       LOG_FILE="/var/log/arr-queue-cleanup.log"
@@ -348,4 +348,3 @@
     };
   };
 }
-EOF < /dev/null

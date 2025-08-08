@@ -26,7 +26,7 @@
     ./modules/gpu-acceleration.nix       # NVIDIA Quadro P1000 support
     ./modules/jellyfin-gpu.nix          # Jellyfin hardware acceleration configuration
     ./modules/hot-storage.nix           # SSD hot storage tier
-    ./modules/media-containers.nix      # Media containers with VPN, GPU and hot/cold storage
+    ./modules/media-stack.nix           # Boring-reliable media stack with Caddy subpaths
 
     # Monitoring stack
     ./modules/monitoring.nix              # Comprehensive monitoring with Grafana/Prometheus
@@ -42,9 +42,8 @@
     ./modules/adhd-tools.nix
     ./modules/hardware-tools.nix
 
-    # Refactored Obsidian/CouchDB/Caddy modules
+    # Refactored Obsidian/CouchDB modules
     ./modules/couchdb-setup.nix          # CouchDB with SOPS integration
-    ./modules/caddy-config.nix           # Caddy reverse proxy configuration
     ./modules/obsidian-livesync.nix      # Obsidian-specific monitoring
 
     # YouTube transcript service

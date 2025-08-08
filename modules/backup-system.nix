@@ -13,7 +13,7 @@
     };
     
     script = ''
-      #\!/bin/bash
+      #!/bin/bash
       set -euo pipefail
       
       # Backup configuration - corrected paths for current system
@@ -227,7 +227,7 @@
     };
     
     script = ''
-      #\!/bin/bash
+      #!/bin/bash
       set -euo pipefail
       
       LOG_FILE="/var/log/backup-verify.log"
@@ -368,4 +368,3 @@
     };
   };
 }
-EOF < /dev/null
