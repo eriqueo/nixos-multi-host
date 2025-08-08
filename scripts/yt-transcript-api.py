@@ -53,7 +53,7 @@ class Config:
 class SubmitRequest(BaseModel):
     """Request model for transcript submission"""
     url: AnyHttpUrl
-    format: str = Field(default="standard", regex="^(standard|detailed)$")
+    format: str = Field(default="standard", pattern="^(standard|detailed)$")
     languages: Optional[List[str]] = None
     webhook_url: Optional[AnyHttpUrl] = None
 

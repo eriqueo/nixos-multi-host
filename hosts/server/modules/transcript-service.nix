@@ -1,101 +1,49 @@
-# hosts/server/modules/transcript-service.nix
-# YouTube Transcript extraction service with API and CLI
 { config, lib, pkgs, ... }:
 
 let
-  # Standard environment
-  serviceEnv = {
-    PUID = "1000";
-    PGID = "1000";
-    TZ = "America/Denver";
-    TRANSCRIPTS_ROOT = "/mnt/media/transcripts";
-    HOT_ROOT = "/mnt/hot";
-    LANGS = "en,en-US,en-GB";
-    API_HOST = "0.0.0.0";
-    API_PORT = "8099";
-    RATE_LIMIT = "10";
-    FREE_SPACE_GB_MIN = "5";
-    RETENTION_DAYS = "90";
-    WEBHOOKS = "1";
-  };
+  mediaNet = config.hwc.networking.mediaNetwork.name or "media-network";
 
-  # Use the shared media network from media-core
-  mediaNetworkOptions = [ "--network=${config.hwc.media.networkName}" ];
+  # Build a minimal image that includes a Python WITH packages
+  py = pkgs.python311.withPackages (ps: [
+    ps.fastapi
+    ps.uvicorn
+    ps.pydantic
+    ps.httpx
+    ps.aiofiles
+    ps.youtube-transcript-api
+    ps.python-slugify
+    ps.yt-dlp
+  ]);
 
-  # Volumes
-  configVol     = "/opt/transcript:/config";
-  transcriptsVol= "/mnt/media/transcripts:/mnt/media/transcripts";
-  hotVol        = "/mnt/hot:/mnt/hot";
-  localtime     = "/etc/localtime:/etc/localtime:ro";
-
-  # Container image build
   transcriptImage = pkgs.dockerTools.buildImage {
     name = "hwc/transcript-api";
-    tag  = "latest";
-
-    copyToRoot = pkgs.buildEnv {
-      name = "transcript-rootfs";
-      paths = with pkgs; [
-        python311
-        python311Packages.fastapi
-        python311Packages.uvicorn
-        python311Packages.pydantic
-        python311Packages.httpx
-        python311Packages.aiofiles
-        python311Packages.python-slugify
-        yt-dlp
-        python311Packages.youtube-transcript-api
-        bash
-        coreutils
-      ];
-      pathsToLink = [ "/bin" "/lib" ];
-    };
-
+    tag = "latest";
+    contents = [ py pkgs.bash pkgs.coreutils ];
     config = {
-      Cmd = [
-        "${pkgs.python311}/bin/python3"
-        "/etc/nixos/scripts/yt-transcript-api.py"
-      ];
+      # We run the host-mounted script using the bundled interpreter
+      Cmd = [ "${py}/bin/python3" "/app/yt-transcript-api.py" ];
+      WorkingDir = "/app";
+      ExposedPorts = { "8099/tcp" = { }; };
       Env = [
         "PYTHONUNBUFFERED=1"
-        "PYTHONPATH=/etc/nixos/scripts"
       ];
-      ExposedPorts = { "8099/tcp" = {}; };
-      WorkingDir = "/";
     };
   };
+
+  # Paths & env
+  TRANSCRIPTS_ROOT = "/mnt/media/transcripts";
+  HOT_ROOT         = "/mnt/hot";
 in
 {
-  # CLI tool
-  environment.systemPackages = with pkgs; [
-    python311
-    python311Packages.pydantic
-    python311Packages.httpx
-    python311Packages.aiofiles
-    python311Packages.python-slugify
-    yt-dlp
-    python311Packages.youtube-transcript-api
-    (pkgs.writeShellScriptBin "yt-transcript" ''
-      export PYTHONPATH="/etc/nixos/scripts:$PYTHONPATH"
-      exec ${pkgs.python311}/bin/python3 /etc/nixos/scripts/yt-transcript.py "$@"
-    '')
-  ];
+  # Ensure our network exists first
+  systemd.services."podman-transcript-api".after = [ "hwc-media-network.service" "load-transcript-image.service" ];
+  systemd.services."podman-transcript-api".requires = [ "load-transcript-image.service" ];
 
-  # Directories
-  systemd.tmpfiles.rules = [
-    "d /opt/transcript 0755 root root -"
-    "d /mnt/media/transcripts 0755 root root -"
-    "d /mnt/media/transcripts/individual 0755 root root -"
-    "d /mnt/media/transcripts/playlists 0755 root root -"
-    "d /mnt/media/transcripts/api-requests 0755 root root -"
-    "d /mnt/hot/transcript-temp 0755 root root -"
-  ];
-
-  # NOTE: legacy create-media-network unit REMOVED (owned by media-core)
-
-  # Load transcript image
+  # Load the built image once (and keep it cached)
   systemd.services.load-transcript-image = {
     description = "Load transcript container image";
+    after = [ "podman.service" ];
+    requires = [ "podman.service" ];
     serviceConfig = {
       Type = "oneshot";
       RemainAfterExit = true;
@@ -104,77 +52,57 @@ in
     wantedBy = [ "multi-user.target" ];
   };
 
-  # Transcript API service (depends on shared network)
-  systemd.services."podman-transcript-api" = {
-    description = "YouTube Transcript API Service";
-    after   = [ "network-online.target" "podman.service" "hwc-media-network.service" "load-transcript-image.service" ];
-    wants   = [ "network-online.target" "hwc-media-network.service" "load-transcript-image.service" ];
-    requires= [ "podman.service" "load-transcript-image.service" ];
-    wantedBy= [ "multi-user.target" ];
+  virtualisation.oci-containers.backend = "podman";
 
-    serviceConfig = {
-      Type            = "forking";
-      Restart         = "on-failure";
-      RestartSec      = "30s";
-      TimeoutStartSec = "5m";
-
-      ExecStartPre = "${pkgs.podman}/bin/podman rm -f transcript-api || true";
-
-      ExecStart = lib.concatStringsSep " " ([
-        "${pkgs.podman}/bin/podman run"
-        "--name transcript-api"
-        "--detach"
-        "--publish 8099:8099"
-        "--volume /etc/nixos/scripts:/etc/nixos/scripts:ro"
-        "--volume ${transcriptsVol}"
-        "--volume ${hotVol}"
-        "--volume ${configVol}"
-        "--volume ${localtime}"
-        "--memory=1g"
-        "--cpus=0.5"
-        "--memory-swap=2g"
-      ] ++ mediaNetworkOptions ++ [
-        "--env TRANSCRIPTS_ROOT=${serviceEnv.TRANSCRIPTS_ROOT}"
-        "--env HOT_ROOT=${serviceEnv.HOT_ROOT}"
-        "--env API_HOST=${serviceEnv.API_HOST}"
-        "--env API_PORT=${serviceEnv.API_PORT}"
-        "--env LANGS=${serviceEnv.LANGS}"
-        "--env RATE_LIMIT=${serviceEnv.RATE_LIMIT}"
-        "--env FREE_SPACE_GB_MIN=${serviceEnv.FREE_SPACE_GB_MIN}"
-        "--env RETENTION_DAYS=${serviceEnv.RETENTION_DAYS}"
-        "--env WEBHOOKS=${serviceEnv.WEBHOOKS}"
-        "--env TZ=${serviceEnv.TZ}"
-        "--env PUID=${serviceEnv.PUID}"
-        "--env PGID=${serviceEnv.PGID}"
-        "--env PYTHONPATH=/etc/nixos/scripts"
-        "--env PYTHONUNBUFFERED=1"
-        "hwc/transcript-api:latest"
-      ]);
-
-      ExecStop = "${pkgs.podman}/bin/podman stop transcript-api";
+  virtualisation.oci-containers.containers.transcript-api = {
+    image = "localhost/hwc/transcript-api:latest";
+    autoStart = true;
+    environment = {
+      PUID = "1000";
+      PGID = "1000";
+      TZ   = config.time.timeZone or "UTC";
+      TRANSCRIPTS_ROOT = TRANSCRIPTS_ROOT;
+      HOT_ROOT         = HOT_ROOT;
+      LANGS            = "en,en-US,en-GB";
+      API_HOST         = "0.0.0.0";
+      API_PORT         = "8099";
+      RATE_LIMIT       = "10";
+      FREE_SPACE_GB_MIN = "5";
+      RETENTION_DAYS    = "90";
+      WEBHOOKS          = "1";
+      PYTHONUNBUFFERED  = "1";
     };
+    ports = [ "8099:8099" ];
+    volumes = [
+      "/etc/nixos/scripts:/app:ro"               # expects yt-transcript-api.py here
+      "${TRANSCRIPTS_ROOT}:${TRANSCRIPTS_ROOT}"
+      "${HOT_ROOT}:${HOT_ROOT}"
+      "/opt/transcript:/config"
+      "/etc/localtime:/etc/localtime:ro"
+    ];
+    extraOptions = [
+      "--network=${mediaNet}"
+    ];
   };
 
-  # Cleanup service
+  # Simple weekly cleanup timer (unchanged behavior)
   systemd.services.transcript-cleanup = {
     description = "Cleanup old transcript files";
     serviceConfig = {
       Type = "oneshot";
       ExecStart = pkgs.writeShellScript "transcript-cleanup" ''
-        set -e
-        RETENTION_DAYS=''${RETENTION_DAYS:-90}
-        TRANSCRIPTS_ROOT=''${TRANSCRIPTS_ROOT:-/mnt/media/transcripts}
+        set -euo pipefail
+        RETENTION_DAYS=${lib.escapeShellArg (toString 90)}
+        TRANSCRIPTS_ROOT=${lib.escapeShellArg TRANSCRIPTS_ROOT}
         if [[ -d "$TRANSCRIPTS_ROOT" ]]; then
-          find "$TRANSCRIPTS_ROOT" -type f -name "*.md"  -mtime +$RETENTION_DAYS -delete 2>/dev/null || true
-          find "$TRANSCRIPTS_ROOT" -type f -name "*.zip" -mtime +$RETENTION_DAYS -delete 2>/dev/null || true
-          find "$TRANSCRIPTS_ROOT" -type d -empty -delete 2>/dev/null || true
+          find "$TRANSCRIPTS_ROOT" -type f -name "*.md"  -mtime +$RETENTION_DAYS -delete || true
+          find "$TRANSCRIPTS_ROOT" -type f -name "*.zip" -mtime +$RETENTION_DAYS -delete || true
+          find "$TRANSCRIPTS_ROOT" -type d -empty -delete || true
         fi
       '';
     };
-    environment = serviceEnv;
   };
 
-  # Weekly timer
   systemd.timers.transcript-cleanup = {
     description = "Weekly transcript cleanup";
     wantedBy = [ "timers.target" ];
@@ -185,9 +113,7 @@ in
     };
   };
 
-  # Firewall
-  networking.firewall = {
-    allowedTCPPorts = [ 8099 ];
-    interfaces."tailscale0".allowedTCPPorts = [ 8099 ];
-  };
+  # Local firewall: we expose 8099 to localhost only via Caddy/Tailscale upstreams as desired
+  networking.firewall.allowedTCPPorts = lib.mkDefault [ ];
+  networking.firewall.interfaces."tailscale0".allowedTCPPorts = [ 8099 ];
 }

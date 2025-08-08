@@ -29,6 +29,7 @@
     ./modules/hot-storage.nix           # SSD hot storage tier
     ./modules/media-core.nix
     ./modules/media-stack.nix           # Boring-reliable media stack with Caddy subpaths
+    ./networking/media-network.nix
 
     # Monitoring stack
     ./modules/monitoring.nix              # Comprehensive monitoring with Grafana/Prometheus
@@ -50,6 +51,9 @@
 
     # YouTube transcript service
     ./modules/transcript-service.nix     # YouTube transcript extraction (CLI + API)
+
+    # Caddy reverse proxy configuration
+    ./modules/caddy-config.nix           # Reverse proxy for all services
   ];
 
   ####################################################################

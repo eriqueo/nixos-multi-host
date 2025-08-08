@@ -35,7 +35,8 @@
       "Bash(podman run:*)",
       "Bash(sudo podman exec sonarr sh:*)",
       "Bash(sudo podman exec radarr sh:*)",
-      "Bash(sudo podman exec:*)"
+      "Bash(sudo podman exec:*)",
+      "Bash(sudo sed:*)"
     ],
     "deny": []
   }
