@@ -3,7 +3,7 @@
 { config, lib, pkgs, ... }:
 
 let
-  # Standard environment for media services (matching your pattern)
+  # Standard environment
   serviceEnv = {
     PUID = "1000";
     PGID = "1000";
@@ -19,20 +19,20 @@ let
     WEBHOOKS = "1";
   };
 
-  # Network options (following your media-containers pattern)
+  # Use the shared media network from media-core
   mediaNetworkOptions = [ "--network=${config.hwc.media.networkName}" ];
 
-  # Volume patterns (following your storage tier approach)
-  configVol = "/opt/transcript:/config";
-  transcriptsVol = "/mnt/media/transcripts:/mnt/media/transcripts";
-  hotVol = "/mnt/hot:/mnt/hot";
-  localtime = "/etc/localtime:/etc/localtime:ro";
+  # Volumes
+  configVol     = "/opt/transcript:/config";
+  transcriptsVol= "/mnt/media/transcripts:/mnt/media/transcripts";
+  hotVol        = "/mnt/hot:/mnt/hot";
+  localtime     = "/etc/localtime:/etc/localtime:ro";
 
-  # Container image build (using your existing patterns)
+  # Container image build
   transcriptImage = pkgs.dockerTools.buildImage {
     name = "hwc/transcript-api";
-    tag = "latest";
-    
+    tag  = "latest";
+
     copyToRoot = pkgs.buildEnv {
       name = "transcript-rootfs";
       paths = with pkgs; [
@@ -50,29 +50,24 @@ let
       ];
       pathsToLink = [ "/bin" "/lib" ];
     };
-    
+
     config = {
-      Cmd = [ 
-        "${pkgs.python311}/bin/python3" 
-        "/etc/nixos/scripts/yt-transcript-api.py" 
+      Cmd = [
+        "${pkgs.python311}/bin/python3"
+        "/etc/nixos/scripts/yt-transcript-api.py"
       ];
       Env = [
         "PYTHONUNBUFFERED=1"
         "PYTHONPATH=/etc/nixos/scripts"
       ];
-      ExposedPorts = {
-        "8099/tcp" = {};
-      };
+      ExposedPorts = { "8099/tcp" = {}; };
       WorkingDir = "/";
     };
   };
-
 in
-
 {
-  # Install CLI tool system-wide
+  # CLI tool
   environment.systemPackages = with pkgs; [
-    # Python dependencies for CLI tool
     python311
     python311Packages.pydantic
     python311Packages.httpx
@@ -80,15 +75,13 @@ in
     python311Packages.python-slugify
     yt-dlp
     python311Packages.youtube-transcript-api
-    
-    # Custom CLI wrapper script
     (pkgs.writeShellScriptBin "yt-transcript" ''
       export PYTHONPATH="/etc/nixos/scripts:$PYTHONPATH"
       exec ${pkgs.python311}/bin/python3 /etc/nixos/scripts/yt-transcript.py "$@"
     '')
   ];
 
-  # Create required directories
+  # Directories
   systemd.tmpfiles.rules = [
     "d /opt/transcript 0755 root root -"
     "d /mnt/media/transcripts 0755 root root -"
@@ -98,11 +91,9 @@ in
     "d /mnt/hot/transcript-temp 0755 root root -"
   ];
 
-  # Create media network for containers (if not already created)
-    wantedBy = [ "multi-user.target" ];
-  };
+  # NOTE: legacy create-media-network unit REMOVED (owned by media-core)
 
-  # Load container image
+  # Load transcript image
   systemd.services.load-transcript-image = {
     description = "Load transcript container image";
     serviceConfig = {
@@ -113,22 +104,22 @@ in
     wantedBy = [ "multi-user.target" ];
   };
 
-  # Transcript API service
+  # Transcript API service (depends on shared network)
   systemd.services."podman-transcript-api" = {
     description = "YouTube Transcript API Service";
-    after = [ "network-online.target" "podman.service" "hwc-media-network.service" "load-transcript-image.service" ];
-    requires = [ "podman.service" "load-transcript-image.service" ];
-    wants = [ "network-online.target" "hwc-media-network.service" "load-transcript-image.service" ];
-    wantedBy = [ "multi-user.target" ];
+    after   = [ "network-online.target" "podman.service" "hwc-media-network.service" "load-transcript-image.service" ];
+    wants   = [ "network-online.target" "hwc-media-network.service" "load-transcript-image.service" ];
+    requires= [ "podman.service" "load-transcript-image.service" ];
+    wantedBy= [ "multi-user.target" ];
 
     serviceConfig = {
-      Type = "forking";
-      Restart = "on-failure";
-      RestartSec = "30s";
+      Type            = "forking";
+      Restart         = "on-failure";
+      RestartSec      = "30s";
       TimeoutStartSec = "5m";
-      
+
       ExecStartPre = "${pkgs.podman}/bin/podman rm -f transcript-api || true";
-      
+
       ExecStart = lib.concatStringsSep " " ([
         "${pkgs.podman}/bin/podman run"
         "--name transcript-api"
@@ -159,34 +150,31 @@ in
         "--env PYTHONUNBUFFERED=1"
         "hwc/transcript-api:latest"
       ]);
-      
+
       ExecStop = "${pkgs.podman}/bin/podman stop transcript-api";
     };
   };
 
-  # Cleanup service for old transcripts
+  # Cleanup service
   systemd.services.transcript-cleanup = {
     description = "Cleanup old transcript files";
     serviceConfig = {
       Type = "oneshot";
       ExecStart = pkgs.writeShellScript "transcript-cleanup" ''
-        # Remove transcript files older than retention period
+        set -e
         RETENTION_DAYS=''${RETENTION_DAYS:-90}
         TRANSCRIPTS_ROOT=''${TRANSCRIPTS_ROOT:-/mnt/media/transcripts}
-        
         if [[ -d "$TRANSCRIPTS_ROOT" ]]; then
-          echo "Cleaning up transcript files older than $RETENTION_DAYS days..."
-          find "$TRANSCRIPTS_ROOT" -type f -name "*.md" -mtime +$RETENTION_DAYS -delete 2>/dev/null || true
+          find "$TRANSCRIPTS_ROOT" -type f -name "*.md"  -mtime +$RETENTION_DAYS -delete 2>/dev/null || true
           find "$TRANSCRIPTS_ROOT" -type f -name "*.zip" -mtime +$RETENTION_DAYS -delete 2>/dev/null || true
           find "$TRANSCRIPTS_ROOT" -type d -empty -delete 2>/dev/null || true
-          echo "Transcript cleanup completed"
         fi
       '';
     };
     environment = serviceEnv;
   };
 
-  # Schedule cleanup weekly
+  # Weekly timer
   systemd.timers.transcript-cleanup = {
     description = "Weekly transcript cleanup";
     wantedBy = [ "timers.target" ];
@@ -197,12 +185,9 @@ in
     };
   };
 
-  # Firewall configuration
+  # Firewall
   networking.firewall = {
     allowedTCPPorts = [ 8099 ];
     interfaces."tailscale0".allowedTCPPorts = [ 8099 ];
   };
-
-  # Optional: Basic auth configuration (add API keys via environment or secrets)
-  # You can set API_KEYS environment variable for the container to enable auth
 }
