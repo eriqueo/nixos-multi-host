@@ -303,32 +303,10 @@ EOF
     '';
   };
 
-  # URL base + local-only bypass so you can log in and set creds via WebUI
-  systemd.services.arr-urlbase-local-bypass = {
-    description = "Set UrlBase + local-only auth bypass to configure creds";
-    after = [ "podman-sonarr.service" "podman-radarr.service" "podman-lidarr.service" "podman-prowlarr.service" ];
-    wantedBy = [ "multi-user.target" ];
-    serviceConfig.Type = "oneshot";
-    script = ''
-      set -e
-      edit() {
-        f="${cfgRoot}/$1/config.xml"; [ -f "$f" ] || return 0
-        tmp="$(mktemp)"
-        ${pkgs.gnused}/bin/sed -E \
-          -e "s|<UrlBase>.*</UrlBase>|<UrlBase>/$1</UrlBase>|g" \
-          -e "s|<AuthenticationRequired>.*</AuthenticationRequired>|<AuthenticationRequired>DisabledForLocalAddresses</AuthenticationRequired>|g" \
-          "$f" > "$tmp"
-        mv "$tmp" "$f"
-        echo "Patched $f"
-      }
-      for a in sonarr radarr lidarr prowlarr; do edit "$a"; done
-    '';
-  };
-
   # Fix config file permissions for container access
   systemd.services.arr-config-permissions = {
     description = "Fix *arr config file permissions for container access";
-    after = [ "arr-urlbase-local-bypass.service" ];
+    after = [ "network-online.target" ];
     before = [ "podman-sonarr.service" "podman-radarr.service" "podman-lidarr.service" "podman-prowlarr.service" ];
     wantedBy = [ "multi-user.target" ];
     serviceConfig.Type = "oneshot";

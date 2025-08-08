@@ -32,50 +32,58 @@
         reverse_proxy localhost:4533
       }
 
-      # *ARR stack - Fixed: Changed from 'handle' to 'handle_path' to strip path prefixes
-      # This prevents apps from receiving URLs like /sonarr/api/ (they expect just /api/)
+      # *ARR stack - Keep UrlBase in apps, DO NOT strip prefix in Caddy
+      # Apps have UrlBase=/app, Caddy passes paths as-is - no conflict
       
       # ---- Sonarr
       handle /sonarr { redir /sonarr/ 301 }
-      route /sonarr/* {
-        uri strip_prefix /sonarr
-        reverse_proxy 127.0.0.1:8989 {
-          header_up X-Forwarded-Proto {scheme}
-          header_up X-Forwarded-For {remote_host}
+      route /sonarr* {
+        reverse_proxy localhost:8989 {
           header_up Host {host}
+          header_up X-Forwarded-Host {host}
+          header_up X-Forwarded-Proto {scheme}
+          header_up X-Forwarded-Port {server_port}
+          header_up X-Forwarded-For {remote}
+          header_up X-Real-IP {remote}
         }
       }
       
       # ---- Radarr
       handle /radarr { redir /radarr/ 301 }
-      route /radarr/* {
-        uri strip_prefix /radarr
-        reverse_proxy 127.0.0.1:7878 {
-          header_up X-Forwarded-Proto {scheme}
-          header_up X-Forwarded-For {remote_host}
+      route /radarr* {
+        reverse_proxy localhost:7878 {
           header_up Host {host}
+          header_up X-Forwarded-Host {host}
+          header_up X-Forwarded-Proto {scheme}
+          header_up X-Forwarded-Port {server_port}
+          header_up X-Forwarded-For {remote}
+          header_up X-Real-IP {remote}
         }
       }
       
       # ---- Lidarr
       handle /lidarr { redir /lidarr/ 301 }
-      route /lidarr/* {
-        uri strip_prefix /lidarr
-        reverse_proxy 127.0.0.1:8686 {
-          header_up X-Forwarded-Proto {scheme}
-          header_up X-Forwarded-For {remote_host}
+      route /lidarr* {
+        reverse_proxy localhost:8686 {
           header_up Host {host}
+          header_up X-Forwarded-Host {host}
+          header_up X-Forwarded-Proto {scheme}
+          header_up X-Forwarded-Port {server_port}
+          header_up X-Forwarded-For {remote}
+          header_up X-Real-IP {remote}
         }
       }
       
       # ---- Prowlarr
       handle /prowlarr { redir /prowlarr/ 301 }
-      route /prowlarr/* {
-        uri strip_prefix /prowlarr
-        reverse_proxy 127.0.0.1:9696 {
-          header_up X-Forwarded-Proto {scheme}
-          header_up X-Forwarded-For {remote_host}
+      route /prowlarr* {
+        reverse_proxy localhost:9696 {
           header_up Host {host}
+          header_up X-Forwarded-Host {host}
+          header_up X-Forwarded-Proto {scheme}
+          header_up X-Forwarded-Port {server_port}
+          header_up X-Forwarded-For {remote}
+          header_up X-Real-IP {remote}
         }
       }
 
@@ -88,6 +96,9 @@
           header_up Host {host}
           header_up X-Forwarded-Host {host}
           header_up X-Forwarded-Proto {scheme}
+          header_up X-Forwarded-Port {server_port}
+          header_up X-Forwarded-For {remote}
+          header_up X-Real-IP {remote}
           header_up X-Forwarded-Port {server_port}
           header_up X-Forwarded-For {remote}
           header_up X-Real-IP {remote}
