@@ -294,6 +294,7 @@ download_dir = /downloads
 [Slskd]
 host_url = http://slskd:5030
 api_key  = ''${SLSKD_API_KEY:-dummy-sls}
+download_dir = /downloads
 
 [General]
 interval = 300
