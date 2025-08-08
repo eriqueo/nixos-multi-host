@@ -98,6 +98,7 @@ in
   };
   sops.secrets.arr_api_keys_env = {
     sopsFile = ../../../secrets/arr_api_keys.env;
+    format = "dotenv";
     mode = "0400"; owner = "root"; group = "root";
   };
 
@@ -287,11 +288,11 @@ EOF
       cat > "$cfg" <<EOF
 [Lidarr]
 host_url = http://lidarr:8686
-api_key  = ${LIDARR_API_KEY:-dummy-lidarr}
+api_key  = ''${LIDARR_API_KEY:-dummy-lidarr}
 
 [Slskd]
 host_url = http://slskd:5030
-api_key  = ${SLSKD_API_KEY:-dummy-sls}
+api_key  = ''${SLSKD_API_KEY:-dummy-sls}
 
 [General]
 interval = 300
