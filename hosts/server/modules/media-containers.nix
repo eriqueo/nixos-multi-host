@@ -289,6 +289,7 @@ EOF
 [Lidarr]
 host_url = http://lidarr:8686
 api_key  = ''${LIDARR_API_KEY:-dummy-lidarr}
+download_dir = /downloads
 
 [Slskd]
 host_url = http://slskd:5030
