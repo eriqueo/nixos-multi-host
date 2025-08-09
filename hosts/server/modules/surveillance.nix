@@ -87,7 +87,7 @@ cameras:
       enabled: true
       width: 1280  # Restored to match likely camera stream resolution
       height: 720  # Restored to match likely camera stream resolution  
-      fps: 2       # Optimized for Pascal P1000 performance
+      fps: 1       # Reduced for better GPU performance
     record:
       enabled: true
       retain:
@@ -106,7 +106,7 @@ cameras:
       enabled: true
       width: 640  # Reduced resolution
       height: 360
-      fps: 2
+      fps: 1       # Reduced for better GPU performance
     record:
       enabled: true
       retain:
@@ -125,7 +125,7 @@ cameras:
       enabled: true
       width: 320
       height: 240
-      fps: 3
+      fps: 1       # Reduced for better GPU performance
     record:
       enabled: true
       retain:
@@ -150,20 +150,21 @@ cameras:
             min_area: 300  # Ignore small false positives
             threshold: 0.75  # Higher confidence for people detection
 
-  cobra_cam_4:
-    ffmpeg:
-      <<: *ffmpeg_defaults
-      inputs:
-        - path: rtsp://admin:il0wwlm%3F@192.168.1.104:554/ch01/0
-          roles: [ detect, record ]
-    detect:
-      enabled: false
-    record:
-      enabled: true
-      retain:
-        days: 7
-        mode: motion
-
+  # cobra_cam_4:  # DISABLED - Camera unreachable at 192.168.1.104
+  #   cobra_cam_4:
+  #     ffmpeg:
+  #       <<: *ffmpeg_defaults
+  #       inputs:
+  #         - path: rtsp://admin:il0wwlm%3F@192.168.1.104:554/ch01/0
+  #           roles: [ detect, record ]
+  #     detect:
+  #       enabled: false
+  #     record:
+  #       enabled: true
+  #       retain:
+  #         days: 7
+  #         mode: motion
+  # 
 objects:
   track: [ person, car, truck, bicycle, motorcycle, dog, cat ]
 
@@ -172,7 +173,7 @@ go2rtc:
     cobra_cam_1: [ "rtsp://admin:il0wwlm%3F@192.168.1.101:554/ch01/0" ]
     cobra_cam_2: [ "rtsp://admin:il0wwlm%3F@192.168.1.102:554/ch01/0" ]
     cobra_cam_3: [ "rtsp://admin:il0wwlm%3F@192.168.1.103:554/ch01/0" ]
-    cobra_cam_4: [ "rtsp://admin:il0wwlm%3F@192.168.1.104:554/ch01/0" ]
+    # cobra_cam_4: [ "rtsp://admin:il0wwlm%3F@192.168.1.104:554/ch01/0" ]  # DISABLED
 
 ui:
   live_mode: mse

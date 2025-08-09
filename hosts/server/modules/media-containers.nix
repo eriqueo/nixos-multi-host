@@ -307,17 +307,35 @@ EOF
   systemd.services.arr-config-permissions = {
     description = "Fix *arr config file permissions for container access";
     after = [ "network-online.target" ];
-    before = [ "podman-sonarr.service" "podman-radarr.service" "podman-lidarr.service" "podman-prowlarr.service" ];
+    before = [ "podman-sonarr.service" "podman-radarr.service" "podman-lidarr.service" "podman-prowlarr.service" "podman-sabnzbd.service" "podman-qbittorrent.service" ];
     wantedBy = [ "multi-user.target" ];
     serviceConfig.Type = "oneshot";
     script = ''
       # Fix ownership for all *arr config directories and files
-      for app in sonarr radarr lidarr prowlarr; do
+      for app in sonarr radarr lidarr prowlarr sabnzbd qbittorrent gluetun; do
         if [ -d "${cfgRoot}/$app" ]; then
-          chown -R 1000:1000 "${cfgRoot}/$app"
+          chown -R 1000:100 "${cfgRoot}/$app"
           echo "Fixed permissions for $app config"
         fi
       done
+      
+      # Fix permissions for media storage directories
+      echo "Setting up media directory permissions..."
+      
+      # Create missing directories if they don't exist
+      mkdir -p "${hotRoot}/downloads" "${hotRoot}/cache" "${hotRoot}/processing" "${hotRoot}/quarantine"
+      mkdir -p "${hotRoot}/processing/lidarr-temp" "${hotRoot}/quarantine/music"
+      mkdir -p "${mediaRoot}/music" "${mediaRoot}/movies" "${mediaRoot}/tv"
+      
+      # Set proper ownership and permissions for hot storage
+      chown -R 1000:100 "${hotRoot}/downloads" "${hotRoot}/cache" "${hotRoot}/processing" "${hotRoot}/quarantine"
+      chmod -R 775 "${hotRoot}/downloads" "${hotRoot}/cache" "${hotRoot}/processing" "${hotRoot}/quarantine"
+      
+      # Set proper ownership and permissions for media storage
+      chown -R 1000:100 "${mediaRoot}/music" "${mediaRoot}/movies" "${mediaRoot}/tv"
+      chmod -R 775 "${mediaRoot}/music" "${mediaRoot}/movies" "${mediaRoot}/tv"
+      
+      echo "Media directory permissions fixed successfully"
     '';
   };
 
