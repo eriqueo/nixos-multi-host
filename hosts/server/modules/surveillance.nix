@@ -137,15 +137,18 @@ cameras:
       bounding_box: true
       retain:
         default: 14
+    motion:
+      mask: "0,0,320,100,320,0"  # Mask road area behind sidewalk
+      threshold: 35  # Increase threshold for street activity
     zones:
       sidewalk:
         coordinates: "0.132,0.468,0.996,0.7,0.993,0.998,0.003,0.996,0.007,0.5"
         objects:
-          - person
-          - car
-          - truck
-          - bicycle
-          - motorcycle
+          - person  # Only detect people
+        filters:
+          person:
+            min_area: 300  # Ignore small false positives
+            threshold: 0.75  # Higher confidence for people detection
 
   cobra_cam_4:
     ffmpeg:
