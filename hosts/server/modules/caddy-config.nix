@@ -118,9 +118,17 @@
         reverse_proxy localhost:8282
       }
 
-      # Photo management
-      handle_path /immich/* {
-        reverse_proxy localhost:2283
+      # Photo management - fixed proxy configuration  
+      handle /immich { redir /immich/ 301 }
+      route /immich* {
+        reverse_proxy localhost:2283 {
+          header_up Host {host}
+          header_up X-Forwarded-Host {host}
+          header_up X-Forwarded-Proto {scheme}
+          header_up X-Forwarded-Port {server_port}
+          header_up X-Forwarded-For {remote}
+          header_up X-Real-IP {remote}
+        }
       }
 
       # Monitoring services
