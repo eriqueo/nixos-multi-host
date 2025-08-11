@@ -3,7 +3,8 @@
   # Caddy reverse proxy for all services
   services.caddy = {
     enable = true;
-    virtualHosts."hwc.ocelot-wahoo.ts.net".extraConfig = ''
+    virtualHosts = {
+      "hwc.ocelot-wahoo.ts.net".extraConfig = ''
       # Obsidian LiveSync proxy: strip /sync prefix and forward to CouchDB
       @sync path /sync*
       handle @sync {
@@ -118,18 +119,6 @@
         reverse_proxy localhost:8282
       }
 
-      # Photo management - fixed proxy configuration  
-      handle /immich { redir /immich/ 301 }
-      route /immich* {
-        reverse_proxy localhost:2283 {
-          header_up Host {host}
-          header_up X-Forwarded-Host {host}
-          header_up X-Forwarded-Proto {scheme}
-          header_up X-Forwarded-Port {server_port}
-          header_up X-Forwarded-For {remote}
-          header_up X-Real-IP {remote}
-        }
-      }
 
       # Monitoring services
       handle_path /grafana/* {
@@ -139,6 +128,22 @@
         reverse_proxy localhost:9090
       }
     '';
+    
+      "photos.ocelot-wahoo.ts.net".extraConfig = ''
+        reverse_proxy localhost:2283 {
+          header_up Host {host}
+          header_up X-Real-IP {remote_host}
+          header_up X-Forwarded-For {remote_host}
+          header_up X-Forwarded-Proto {scheme}
+          header_up Connection {>Connection}
+          header_up Upgrade {>Upgrade}
+        }
+        
+        request_body {
+          max_size 50GB
+        }
+      '';
+    };
   };
 
   # Firewall: only expose HTTP/S publicly, other services only on Tailscale
