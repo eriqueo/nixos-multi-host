@@ -15,10 +15,10 @@ let
     # Background services
     sleep 2
     
-    # Start waybar
-    pkill waybar
+    # Start waybar with proper backgrounding
+    pkill waybar 2>/dev/null || true
     sleep 1
-    waybar >/dev/null 2>&1 &
+    setsid waybar >/dev/null 2>&1 &
     sleep 2
     
     # Initialize GPU mode to Intel (default)
