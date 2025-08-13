@@ -30,7 +30,9 @@ except ImportError as e:
 class Config:
     """Configuration for transcript extraction"""
     def __init__(self):
-        self.transcripts_root = Path(os.getenv("TRANSCRIPTS_ROOT", "/mnt/media/transcripts"))
+        # Default to Obsidian vault location
+        default_root = "/home/eric/01-documents/01-vaults/04-transcripts"
+        self.transcripts_root = Path(os.getenv("TRANSCRIPTS_ROOT", default_root))
         self.hot_root = Path(os.getenv("HOT_ROOT", "/mnt/hot"))
         self.allow_languages = os.getenv("LANGS", "en,en-US,en-GB").split(",")
         self.timezone = os.getenv("TZ", "America/Denver")
@@ -52,6 +54,7 @@ class TranscriptExtractor:
             "subtitlesformat": "vtt",
             "no_warnings": True,
             "extract_flat": False,
+            "subtitleslangs": ["en", "en-US", "en-GB", "en.*"],  # More aggressive language matching
         }
     
     def is_youtube_url(self, url: str) -> bool:
@@ -128,8 +131,12 @@ class TranscriptExtractor:
             sections.append(f"### {i:02d} ▸ {start_time}")
             sections.append("")
             
-            # Join text from all segments in this chunk
+            # Join text from all segments in this chunk and clean up VTT timing codes
             paragraph_text = " ".join([seg["text"].strip() for seg in chunk if seg["text"].strip()])
+            
+            # Remove VTT timing codes like <00:01:23.456><c> or <00:01:23>
+            import re
+            paragraph_text = re.sub(r'<[\d:.<>c/\s]*>', '', paragraph_text)
             paragraph_text = paragraph_text.replace("  ", " ").strip()
             sections.append(paragraph_text)
             sections.append("")
@@ -184,9 +191,14 @@ class TranscriptExtractor:
                     i += 1
                 
                 if text_lines:
+                    # Clean VTT timing codes from text
+                    clean_text = " ".join(text_lines)
+                    clean_text = re.sub(r'<[\d:.<>c/\s]*>', '', clean_text)
+                    clean_text = clean_text.replace("  ", " ").strip()
+                    
                     segments.append({
                         "start": start_time,
-                        "text": " ".join(text_lines)
+                        "text": clean_text
                     })
             i += 1
         
@@ -210,44 +222,104 @@ class TranscriptExtractor:
             return ydl.extract_info(url, download=False)
     
     async def fetch_transcript_segments(self, video_id: str, prefer_langs: List[str]) -> List[Dict]:
-        """Fetch transcript segments, trying API first then subtitle download"""
-        # Try YouTube Transcript API first
-        try:
-            transcript = YouTubeTranscriptApi.get_transcript(video_id, languages=prefer_langs)
-            return [{"start": t["start"], "text": t["text"]} for t in transcript]
-        except (TranscriptsDisabled, NoTranscriptFound, VideoUnavailable):
-            pass
+        """Fetch transcript segments using yt-dlp subtitle download"""
+        # Skip YouTube Transcript API for now, go directly to yt-dlp
+        # try:
+        #     transcript = YouTubeTranscriptApi.get_transcript(video_id, languages=prefer_langs)
+        #     return [{"start": t["start"], "text": t["text"]} for t in transcript]
+        # except (TranscriptsDisabled, NoTranscriptFound, VideoUnavailable):
+        #     pass
         
         # Fallback to yt-dlp subtitle extraction
-        with yt_dlp.YoutubeDL({**self.ydl_opts_base, "subtitleslangs": prefer_langs}) as ydl:
+        opts = {**self.ydl_opts_base}
+        opts["subtitleslangs"] = prefer_langs + ["en", "en-US", "en-GB", "en.*"]  # Broader language search
+        
+        with yt_dlp.YoutubeDL(opts) as ydl:
             try:
                 info = ydl.extract_info(f"https://youtube.com/watch?v={video_id}", download=False)
-                subtitles = info.get("requested_subtitles") or info.get("subtitles") or {}
+                
+                # Check multiple subtitle sources
+                requested_subs = info.get("requested_subtitles") or {}
+                automatic_subs = info.get("automatic_captions") or {}
+                manual_subs = info.get("subtitles") or {}
+                
+                # Priority: requested > manual > automatic
+                all_subtitles = {}
+                all_subtitles.update(automatic_subs)  # Lowest priority
+                all_subtitles.update(manual_subs)     # Medium priority  
+                all_subtitles.update(requested_subs)  # Highest priority
+                
+                print(f"Available subtitles: {list(all_subtitles.keys())}")  # Debug output
                 
                 # Find best subtitle match
                 best_subtitle = None
-                for lang in prefer_langs:
-                    if lang in subtitles:
-                        best_subtitle = subtitles[lang][0] if subtitles[lang] else None
-                        break
+                best_url = None
                 
-                if not best_subtitle:
-                    # Take any available subtitle
-                    for lang, entries in subtitles.items():
-                        if entries:
-                            best_subtitle = entries[0]
+                # First, try preferred languages
+                for lang in prefer_langs:
+                    if lang in all_subtitles and all_subtitles[lang]:
+                        entries = all_subtitles[lang]
+                        if isinstance(entries, list):
+                            for entry in entries:
+                                if isinstance(entry, dict) and entry.get("ext") == "vtt":
+                                    best_subtitle = entry
+                                    best_url = entry.get("url")
+                                    break
+                        elif isinstance(entries, dict) and entries.get("ext") == "vtt":
+                            best_subtitle = entries
+                            best_url = entries.get("url")
+                        if best_subtitle:
                             break
                 
-                if not best_subtitle or "url" not in best_subtitle:
+                # If no match, try any English variant
+                if not best_subtitle:
+                    for lang_key in all_subtitles:
+                        if lang_key.startswith('en') and all_subtitles[lang_key]:
+                            entries = all_subtitles[lang_key]
+                            if isinstance(entries, list):
+                                for entry in entries:
+                                    if isinstance(entry, dict) and entry.get("ext") == "vtt":
+                                        best_subtitle = entry
+                                        best_url = entry.get("url")
+                                        break
+                            elif isinstance(entries, dict) and entries.get("ext") == "vtt":
+                                best_subtitle = entries
+                                best_url = entries.get("url")
+                            if best_subtitle:
+                                break
+                
+                # Last resort: take any available subtitle
+                if not best_subtitle:
+                    for lang_key, entries in all_subtitles.items():
+                        if entries:
+                            if isinstance(entries, list):
+                                for entry in entries:
+                                    if isinstance(entry, dict) and entry.get("ext") == "vtt":
+                                        best_subtitle = entry
+                                        best_url = entry.get("url")
+                                        break
+                            elif isinstance(entries, dict) and entries.get("ext") == "vtt":
+                                best_subtitle = entries
+                                best_url = entries.get("url")
+                            if best_subtitle:
+                                break
+                
+                if not best_url:
+                    print("No subtitle URL found")  # Debug output
                     return []
+                
+                print(f"Using subtitle URL: {best_url}")  # Debug output
                 
                 # Download and parse VTT
                 async with httpx.AsyncClient(timeout=30) as client:
-                    response = await client.get(best_subtitle["url"])
+                    response = await client.get(best_url)
                     response.raise_for_status()
-                    return self.parse_vtt_to_segments(response.text)
+                    vtt_content = response.text
+                    print(f"Downloaded VTT content length: {len(vtt_content)}")  # Debug output
+                    return self.parse_vtt_to_segments(vtt_content)
                 
-            except Exception:
+            except Exception as e:
+                print(f"yt-dlp subtitle extraction failed: {e}")  # Debug output
                 return []
     
     def meta_from_ydl_info(self, info: Dict) -> Dict:

@@ -214,6 +214,28 @@ in
         "workspace 3,class:^(Chromium-browser)$,title:^.*JobTread.*$"
         "tile,class:^(chromium-.*|Chromium-.*)$"
 
+        # File picker dialogs - comprehensive patterns
+        "float,title:^(Open).*"
+        "float,title:^(Save).*"
+        "float,title:^(Choose).*"
+        "float,title:^(Select).*"
+        "float,title:^(Upload).*"
+        "float,class:^(file_dialog)$"
+        "float,class:^(xdg-desktop-portal-gtk)$"
+        "float,class:^(org.gtk.FileChooserDialog)$"
+        "move 50 100,title:^(Open).*"
+        "move 50 100,title:^(Save).*"
+        "move 50 100,title:^(Choose).*"
+        "move 50 100,title:^(Select).*"
+        "move 50 100,title:^(Upload).*"
+        "move 50 100,class:^(xdg-desktop-portal-gtk)$"
+        "move 50 100,class:^(org.gtk.FileChooserDialog)$"
+        "size 1000 700,title:^(Open).*"
+        "size 1000 700,title:^(Save).*"
+        "size 1000 700,title:^(Choose).*"
+        "size 1000 700,title:^(Select).*"
+        "size 1000 700,title:^(Upload).*"
+
         # Floating windows
         "float,class:^(pavucontrol)$"
         "float,class:^(blueman-manager)$"

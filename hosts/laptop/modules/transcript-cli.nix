@@ -14,36 +14,38 @@
     yt-dlp
     python311Packages.youtube-transcript-api
     
-    # CLI wrapper script
+    # CLI wrapper script with proper Python environment
     (pkgs.writeShellScriptBin "yt-transcript" ''
-      export PYTHONPATH="/etc/nixos/scripts:$PYTHONPATH"
-      exec ${pkgs.python311}/bin/python3 /etc/nixos/scripts/yt-transcript.py "$@"
+      export PYTHONPATH="/etc/nixos/scripts"
+      # Use python311 with the installed packages
+      exec ${pkgs.python311.withPackages (ps: with ps; [ 
+        pydantic httpx aiofiles python-slugify youtube-transcript-api yt-dlp
+      ])}/bin/python /etc/nixos/scripts/yt-transcript.py "$@"
     '')
-  ];
-
-  # Create default transcript directories in user's home
-  systemd.tmpfiles.rules = [
-    "d /home/eric/Documents/transcripts 0755 eric eric -"
-    "d /home/eric/Documents/transcripts/individual 0755 eric eric -"
-    "d /home/eric/Documents/transcripts/playlists 0755 eric eric -"
-  ];
-
-  # Set default environment for local usage
-  environment.sessionVariables = {
-    TRANSCRIPTS_ROOT = "/home/eric/Documents/transcripts";
-    LANGS = "en,en-US,en-GB";
-    TZ = "America/Denver";
-  };
-
-  # Optional: Add desktop entry for GUI file manager integration
-  environment.systemPackages = [
+    
+    # Desktop entry for GUI integration
     (pkgs.makeDesktopItem {
       name = "yt-transcript";
       desktopName = "YouTube Transcript";
       comment = "Extract transcripts from YouTube videos";
-      exec = "${pkgs.kitty}/bin/kitty --title 'YouTube Transcript' -e yt-transcript";
+      exec = "${pkgs.kitty}/bin/kitty --title YouTube-Transcript -e yt-transcript";
       icon = "video-x-generic";
-      categories = [ "AudioVideo" "Utility" ];
+      categories = [ "AudioVideo" ];
     })
   ];
+
+  # Create transcript directories in Obsidian vault (will sync via LiveSync)
+  systemd.tmpfiles.rules = [
+    "d /home/eric/01-documents/01-vaults/04-transcripts 0755 eric eric -"
+    "d /home/eric/01-documents/01-vaults/04-transcripts/individual 0755 eric eric -"
+    "d /home/eric/01-documents/01-vaults/04-transcripts/playlists 0755 eric eric -"
+    "d /home/eric/01-documents/01-vaults/04-transcripts/api-requests 0755 eric eric -"
+  ];
+
+  # Set default environment for local usage
+  environment.sessionVariables = {
+    TRANSCRIPTS_ROOT = "/home/eric/01-documents/01-vaults/04-transcripts";
+    LANGS = "en,en-US,en-GB";
+    TZ = "America/Denver";
+  };
 }
