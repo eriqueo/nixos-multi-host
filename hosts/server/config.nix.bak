@@ -3,21 +3,9 @@
 { config, lib, pkgs, ... }:
 
 {
-
-  ####################################################################
-  # 1. FILESYSTEM CONFIGURATION - Enable all server directory sets
-  ####################################################################
-  hwc.filesystem = {
-    userDirectories.enable = true;      # PARA directories, XDG config, symlinks
-    serverStorage.enable = true;        # Hot/cold storage directories 
-    businessDirectories.enable = true;  # Business intelligence and AI directories
-    serviceDirectories.enable = true;   # *ARR service configuration directories
-    securityDirectories.enable = true;  # Security and secrets directories
-  };
-
   hwc.media.enable = true;
   ####################################################################
-  # 2. IMPORTS - Updated with new modules
+  # 1. IMPORTS - Updated with new modules
   ####################################################################
   imports = [
     ./hardware-configuration.nix
@@ -30,7 +18,7 @@
     ../../shared/networking.nix        # Shared networking configuration
 
     # Consolidated filesystem structure
-    ../../modules/filesystem.nix
+    ../../modules/filesystem
 
     # NixOS vault sync system
     ../../modules/vault-sync-system.nix
@@ -62,6 +50,7 @@
     ./modules/obsidian-livesync.nix      # Obsidian-specific monitoring
 
     # YouTube transcript service
+    ./modules/transcript-service.nix     # YouTube transcript extraction (CLI + API)
 
     # Caddy reverse proxy configuration
     ./modules/caddy-config.nix           # Reverse proxy for all services
@@ -158,26 +147,26 @@
     openFirewall = false;  # We'll manage firewall manually
   };
 
-  # Fresh Immich Native Service - Photo management with GPU support
+  # Immich Native Service - Photo management with GPU support
   services.immich = {
     enable = true;
     host = "0.0.0.0";
-    port = 2284;  # Changed port to avoid Tailscale conflict
-    mediaLocation = "/mnt/photos";
+    port = 2283;
+    mediaLocation = "/mnt/media/pictures";
 
-    # Database configuration - fresh database 
+    # Database configuration on hot storage for performance
     database = {
       enable = true;
-      name = "immich_new";
-      user = "immich_new";
+      name = "immich";
+      user = "immich";
       createDB = true;
     };
 
-    # Redis configuration for caching - new port
+    # Redis configuration for caching
     redis = {
       enable = true;
-      host = "0.0.0.0";
-      port = 6381;  # Different port for fresh instance
+      host = "127.0.0.1";
+      port = 6380;  # Use different port to avoid conflict
     };
 
     environment = {
@@ -186,8 +175,9 @@
       IMMICH_THUMBNAIL_LOCATION = "/mnt/hot/cache/immich/thumb";
       IMMICH_ENCODED_VIDEO_LOCATION = "/mnt/hot/cache/immich/encoded";
 
-      # Redis connection to new Immich instance
-      REDIS_PORT = "6381";
+      # Redis connection to Immich-specific instance
+      REDIS_HOSTNAME = "127.0.0.1";
+      REDIS_PORT = "6380";
 
       # GPU acceleration settings
       IMMICH_MACHINE_LEARNING_ENABLED = "true";
@@ -196,7 +186,7 @@
 
   # Jellyfin GPU configuration now handled by ./modules/jellyfin-gpu.nix
 
-  # Override Immich services to enable GPU access and external library
+  # Override Immich services to enable GPU access
   systemd.services.immich-server = {
     serviceConfig = {
       # Add GPU device access for photo/video processing
@@ -208,13 +198,6 @@
         "/dev/nvidia-modeset rw"
         "/dev/nvidia-uvm rw"
         "/dev/nvidia-uvm-tools rw"
-      ];
-      # Allow access to both new uploads and external library directories
-      ReadWritePaths = [
-        "/mnt/photos"
-      ];
-      ReadOnlyPaths = [
-        "/mnt/media/pictures"
       ];
     };
     environment = {
@@ -238,10 +221,6 @@
         "/dev/nvidia-uvm rw"
         "/dev/nvidia-uvm-tools rw"
       ];
-      # Allow ML service to read external library for analysis
-      ReadOnlyPaths = [
-        "/mnt/media/pictures"
-      ];
     };
     environment = {
       # NVIDIA GPU acceleration for ML workloads
@@ -259,7 +238,7 @@
   services.ollama = {
     enable = true;
     acceleration = "cuda";  # Enable CUDA acceleration
-    host = "0.0.0.0";
+    host = "127.0.0.1";
     port = 11434;
     # Move models to hot storage for faster loading
     home = "/mnt/hot/ai";
@@ -281,8 +260,7 @@
       9696  # Prowlarr
       4533  # Navidrome
       8096  # Jellyfin
-      2284  # Immich (new port)
-      # HTTPS direct port access via Tailscale is handled by Tailscale's HTTPS certificates
+      2283  # Immich
       8081  # SABnzbd
       8888  # Receipt API
       5030  # SLSKD

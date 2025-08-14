@@ -6,17 +6,17 @@
   home.packages = with pkgs; [
     # Modern CLI replacements
     bat           # Better cat with syntax highlighting
-    eza           # Modern ls replacement with git integration  
+    eza           # Modern ls replacement with git integration
     fzf           # Fuzzy finder for files and commands
     ripgrep       # Fast grep replacement (rg command)
     btop          # Modern system monitor (replaces htop)
-    
+
     # Essential CLI utilities
     tree          # Directory tree visualization
     tmux          # Terminal multiplexer for session management
     neofetch      # System information display
     micro         # Modern terminal text editor
-    
+
     # Network and transfer tools
     curl          # HTTP client
     wget          # File downloader
@@ -24,18 +24,18 @@
     rclone        # Cloud storage sync
     speedtest-cli # Network speed testing
     nmap          # Network scanning and discovery
-    
+
     # Archive and compression
     zip           # ZIP archive creation
     unzip         # ZIP archive extraction
     p7zip         # 7-Zip archive support
-    
+
     # Text and data processing
     jq            # JSON processor and formatter
     yq            # YAML processor and formatter
     pandoc        # Universal document converter
-    
-    # System utilities  
+
+    # System utilities
     xclip         # X11 clipboard utility (useful for SSH X11 forwarding)
     diffutils     # File comparison utilities
     less          # Pager for viewing large files
@@ -47,12 +47,12 @@
     enable = true;
     enableZshIntegration = true;
     defaultCommand = "find . -type f";
-    defaultOptions = [ 
-      "--height 40%" 
-      "--reverse" 
+    defaultOptions = [
+      "--height 40%"
+      "--reverse"
       "--border"
       "--color=bg+:#32302f,bg:#282828,spinner:#89b482,hl:#7daea3"
-      "--color=fg:#d4be98,header:#7daea3,info:#d8a657,pointer:#89b482"  
+      "--color=fg:#d4be98,header:#7daea3,info:#d8a657,pointer:#89b482"
       "--color=marker:#89b482,fg+:#d4be98,prompt:#d8a657,hl+:#89b482"
     ];
   };
@@ -69,7 +69,7 @@
       set -g status-left-style "bg=#7daea3,fg=#282828"
       set -g status-right-style "bg=#45403d,fg=#d4be98"
       set -g window-status-current-style "bg=#7daea3,fg=#282828"
-      
+
       # Better key bindings
       bind-key v split-window -h
       bind-key s split-window -v

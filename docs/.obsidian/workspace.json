@@ -11,14 +11,10 @@
             "id": "b5a774681b1bdaa2",
             "type": "leaf",
             "state": {
-              "type": "markdown",
-              "state": {
-                "file": "SKETCHUP-VM-SETUP.md",
-                "mode": "source",
-                "source": false
-              },
+              "type": "empty",
+              "state": {},
               "icon": "lucide-file",
-              "title": "SKETCHUP-VM-SETUP"
+              "title": "New tab"
             }
           }
         ]
@@ -78,8 +74,7 @@
       }
     ],
     "direction": "horizontal",
-    "width": 300,
-    "collapsed": true
+    "width": 300
   },
   "right": {
     "id": "deb3553d159c1f43",
