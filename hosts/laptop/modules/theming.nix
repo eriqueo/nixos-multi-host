@@ -74,8 +74,8 @@ in
     (writeScriptBin "thunar-setup" ''
       #!/usr/bin/env bash
       # Configure Thunar via xfconf
-      ${xfce.xfconf}/bin/xfconf-query -c thunar -p /default-view -t string -s "ThunarListView" --create
-      ${xfce.xfconf}/bin/xfconf-query -c thunar -p /last-view -t string -s "ThunarListView" --create
+      ${xfce.xfconf}/bin/xfconf-query -c thunar -p /default-view -t string -s "ThunarDetailsView" --create
+      ${xfce.xfconf}/bin/xfconf-query -c thunar -p /last-view -t string -s "ThunarDetailsView" --create
       ${xfce.xfconf}/bin/xfconf-query -c thunar -p /misc-show-hidden -t bool -s true --create
       ${xfce.xfconf}/bin/xfconf-query -c thunar -p /last-show-hidden -t bool -s true --create
       ${xfce.xfconf}/bin/xfconf-query -c thunar -p /misc-single-click -t bool -s false --create
@@ -89,8 +89,8 @@ in
   home.file.".config/xfce4/xfconf/xfce-perchannel-xml/thunar.xml".text = ''
     <?xml version="1.0" encoding="UTF-8"?>
     <channel name="thunar" version="1.0">
-      <property name="default-view" type="string" value="ThunarListView"/>
-      <property name="last-view" type="string" value="ThunarListView"/>
+      <property name="default-view" type="string" value="ThunarDetailsView"/>
+      <property name="last-view" type="string" value="ThunarDetailsView"/>
       <property name="misc-show-hidden" type="bool" value="true"/>
       <property name="last-show-hidden" type="bool" value="true"/>
       <property name="misc-single-click" type="bool" value="false"/>
