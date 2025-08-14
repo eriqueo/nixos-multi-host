@@ -137,7 +137,7 @@ in
       
       ExecStartPre = "${pkgs.podman}/bin/podman rm -f transcript-api || true";
       
-      ExecStart = toString [
+      ExecStart = lib.escapeShellArgs [
         "${pkgs.podman}/bin/podman run"
         "--name transcript-api"
         "--detach"

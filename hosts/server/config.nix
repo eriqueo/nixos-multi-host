@@ -50,7 +50,6 @@
     ./modules/obsidian-livesync.nix      # Obsidian-specific monitoring
 
     # YouTube transcript service
-    ./modules/transcript-service.nix     # YouTube transcript extraction (CLI + API)
 
     # Caddy reverse proxy configuration
     ./modules/caddy-config.nix           # Reverse proxy for all services
