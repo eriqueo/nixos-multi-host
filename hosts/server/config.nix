@@ -296,6 +296,11 @@
   ####################################################################
   # File ownership rules now handled in modules/users/eric.nix
 
+
+  # Ensure Immich media directory has correct permissions
+  systemd.tmpfiles.rules = [
+    "Z /mnt/media/pictures 0755 immich immich - -"
+  ];
   ####################################################################
   # 14. PERFORMANCE OPTIMIZATIONS
   ####################################################################
