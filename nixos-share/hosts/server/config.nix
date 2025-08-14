@@ -3,21 +3,9 @@
 { config, lib, pkgs, ... }:
 
 {
-
-  ####################################################################
-  # 1. FILESYSTEM CONFIGURATION - Enable all server directory sets
-  ####################################################################
-  hwc.filesystem = {
-    userDirectories.enable = true;      # PARA directories, XDG config, symlinks
-    serverStorage.enable = true;        # Hot/cold storage directories 
-    businessDirectories.enable = true;  # Business intelligence and AI directories
-    serviceDirectories.enable = true;   # *ARR service configuration directories
-    securityDirectories.enable = true;  # Security and secrets directories
-  };
-
   hwc.media.enable = true;
   ####################################################################
-  # 2. IMPORTS - Updated with new modules
+  # 1. IMPORTS - Updated with new modules
   ####################################################################
   imports = [
     ./hardware-configuration.nix
@@ -30,7 +18,7 @@
     ../../shared/networking.nix        # Shared networking configuration
 
     # Consolidated filesystem structure
-    ../../modules/filesystem.nix
+    ../../modules/filesystem
 
     # NixOS vault sync system
     ../../modules/vault-sync-system.nix
@@ -62,6 +50,7 @@
     ./modules/obsidian-livesync.nix      # Obsidian-specific monitoring
 
     # YouTube transcript service
+    ./modules/transcript-service.nix     # YouTube transcript extraction (CLI + API)
 
     # Caddy reverse proxy configuration
     ./modules/caddy-config.nix           # Reverse proxy for all services
@@ -308,11 +297,6 @@
   ####################################################################
   # File ownership rules now handled in modules/users/eric.nix
 
-
-  # Ensure Immich media directory has correct permissions
-  systemd.tmpfiles.rules = [
-    "Z /mnt/media/pictures 0755 immich immich - -"
-  ];
   ####################################################################
   # 14. PERFORMANCE OPTIMIZATIONS
   ####################################################################
