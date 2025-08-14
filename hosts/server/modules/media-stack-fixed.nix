@@ -324,7 +324,7 @@ ENVEOF
 
       # Photo management
       handle_path /immich/* {
-        reverse_proxy localhost:2283
+        reverse_proxy localhost:2284
       }
 
       # Monitoring services

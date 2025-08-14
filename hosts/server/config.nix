@@ -146,26 +146,26 @@
     openFirewall = false;  # We'll manage firewall manually
   };
 
-  # Immich Native Service - Photo management with GPU support
+  # Fresh Immich Native Service - Photo management with GPU support
   services.immich = {
     enable = true;
     host = "0.0.0.0";
-    port = 2283;
-    mediaLocation = "/mnt/media/pictures";
+    port = 2284;  # Changed port to avoid Tailscale conflict
+    mediaLocation = "/mnt/photos";
 
-    # Database configuration on hot storage for performance
+    # Database configuration - fresh database 
     database = {
       enable = true;
-      name = "immich";
-      user = "immich";
+      name = "immich_new";
+      user = "immich_new";
       createDB = true;
     };
 
-    # Redis configuration for caching
+    # Redis configuration for caching - new port
     redis = {
       enable = true;
-      host = "127.0.0.1";
-      port = 6380;  # Use different port to avoid conflict
+      host = "0.0.0.0";
+      port = 6381;  # Different port for fresh instance
     };
 
     environment = {
@@ -174,9 +174,8 @@
       IMMICH_THUMBNAIL_LOCATION = "/mnt/hot/cache/immich/thumb";
       IMMICH_ENCODED_VIDEO_LOCATION = "/mnt/hot/cache/immich/encoded";
 
-      # Redis connection to Immich-specific instance
-      REDIS_HOSTNAME = "127.0.0.1";
-      REDIS_PORT = "6380";
+      # Redis connection to new Immich instance
+      REDIS_PORT = "6381";
 
       # GPU acceleration settings
       IMMICH_MACHINE_LEARNING_ENABLED = "true";
@@ -185,7 +184,7 @@
 
   # Jellyfin GPU configuration now handled by ./modules/jellyfin-gpu.nix
 
-  # Override Immich services to enable GPU access
+  # Override Immich services to enable GPU access and external library
   systemd.services.immich-server = {
     serviceConfig = {
       # Add GPU device access for photo/video processing
@@ -198,8 +197,11 @@
         "/dev/nvidia-uvm rw"
         "/dev/nvidia-uvm-tools rw"
       ];
-      # Allow access to external library directory
+      # Allow access to both new uploads and external library directories
       ReadWritePaths = [
+        "/mnt/photos"
+      ];
+      ReadOnlyPaths = [
         "/mnt/media/pictures"
       ];
     };
@@ -224,6 +226,10 @@
         "/dev/nvidia-uvm rw"
         "/dev/nvidia-uvm-tools rw"
       ];
+      # Allow ML service to read external library for analysis
+      ReadOnlyPaths = [
+        "/mnt/media/pictures"
+      ];
     };
     environment = {
       # NVIDIA GPU acceleration for ML workloads
@@ -241,7 +247,7 @@
   services.ollama = {
     enable = true;
     acceleration = "cuda";  # Enable CUDA acceleration
-    host = "127.0.0.1";
+    host = "0.0.0.0";
     port = 11434;
     # Move models to hot storage for faster loading
     home = "/mnt/hot/ai";
@@ -263,7 +269,8 @@
       9696  # Prowlarr
       4533  # Navidrome
       8096  # Jellyfin
-      2283  # Immich
+      2284  # Immich (new port)
+      # HTTPS direct port access via Tailscale is handled by Tailscale's HTTPS certificates
       8081  # SABnzbd
       8888  # Receipt API
       5030  # SLSKD
@@ -296,11 +303,6 @@
   ####################################################################
   # File ownership rules now handled in modules/users/eric.nix
 
-
-  # Ensure Immich media directory has correct permissions
-  systemd.tmpfiles.rules = [
-    "Z /mnt/media/pictures 0755 immich immich - -"
-  ];
   ####################################################################
   # 14. PERFORMANCE OPTIMIZATIONS
   ####################################################################
