@@ -401,10 +401,15 @@ class ConsistencyManager:
         
         # Summary statistics
         total_issues = sum(len(result.issues_found) for result in report.bible_results.values())
-        avg_score = sum(result.consistency_score for result in report.bible_results.values()) / len(report.bible_results)
-        
+        bible_count = len(report.bible_results)
+        avg_score = (
+            sum(result.consistency_score for result in report.bible_results.values()) / bible_count
+            if bible_count > 0
+            else 0.0
+        )
+
         output.append("## Summary")
-        output.append(f"- **Bibles Validated**: {len(report.bible_results)}")
+        output.append(f"- **Bibles Validated**: {bible_count}")
         output.append(f"- **Total Issues Found**: {total_issues}")
         output.append(f"- **Average Consistency Score**: {avg_score:.1f}%")
         output.append(f"- **Automatic Resolutions**: {len(report.automatic_resolutions)}")
