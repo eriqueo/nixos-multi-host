@@ -264,8 +264,11 @@ EOF
           ND_DATAFOLDER    = "/data";
           ND_LOGLEVEL      = "info";
           ND_SESSIONTIMEOUT= "24h";
+          # No ND_BASEURL - run at root for direct access
+          ND_INITIAL_ADMIN_USER = "admin";
+          ND_INITIAL_ADMIN_PASSWORD = "admin1234";
         };
-        ports = [ "127.0.0.1:4533:4533" ];
+        ports = [ "0.0.0.0:4533:4533" ];
         volumes = [ (configVol "navidrome") "${mediaRoot}/music:/music:ro" ];
       };
     };

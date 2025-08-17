@@ -208,6 +208,47 @@ The NixOS homeserver system has evolved from basic AI documentation to an intell
 - Storage monitoring requires proper gawk package paths
 - GPU monitoring may need occasional restarts
 
+## 🌐 Network Architecture & Reverse Proxy Solutions
+
+### **Navidrome Local/External Access Pattern** ⭐
+**Problem**: Needed both fast local access and secure external access to Navidrome music streaming.
+
+**Solution Architecture**:
+```
+Local Network (Fast):     http://192.168.1.13:4533 → Direct container access (no subpath)
+External Access (Secure): https://hwc.ocelot-wahoo.ts.net/navidrome → Caddy proxy (with subpath)
+```
+
+**Key Configuration**:
+1. **Container Setup**: Bind to all interfaces (`0.0.0.0:4533`) with NO base URL
+2. **Caddy Configuration**: Use `handle_path /navidrome/*` to strip subpath before forwarding
+3. **Single Database**: Both access methods use the same data directory and user accounts
+
+**Critical Insights for Future Container/Proxy Issues**:
+- ❌ **Don't use port + subpath together** (`192.168.1.13:4533/navidrome` is wrong)
+- ✅ **Direct access = no subpath**, **proxied access = with subpath**
+- ✅ **Caddy `handle_path`** strips prefix, **`handle`** preserves it
+- ✅ **Container base URL** should only be set when ALWAYS accessed via proxy
+- ✅ **Same database** requires same data directory regardless of access method
+
+**Environment Variables Used**:
+```bash
+# Container runs without ND_BASEURL for direct access
+ND_REVERSEPROXYWHITELIST=0.0.0.0/0  # Trust all proxy sources
+```
+
+**Caddy Configuration**:
+```caddyfile
+handle_path /navidrome/* {
+  reverse_proxy 127.0.0.1:4533  # No base URL, strips /navidrome prefix
+}
+```
+
+**Final Result**: Clean dual access with single authentication database
+- **Substreamer internal**: `http://192.168.1.13:4533`
+- **Substreamer external**: `https://hwc.ocelot-wahoo.ts.net/navidrome`
+- **Same credentials**: admin/il0wwlm? works for both
+
 ## 📊 Monitoring & Observability Architecture
 
 ### **Metrics Collection**

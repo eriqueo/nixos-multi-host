@@ -236,9 +236,19 @@ ENVEOF
     };
   };
 
-  # Caddy reverse proxy configuration
+  # Caddy reverse proxy configuration  
   services.caddy = {
     enable = true;
+    
+    # Direct HTTPS access for Immich on port 2284
+    virtualHosts."hwc.ocelot-wahoo.ts.net:2284" = {
+      useACMEHost = "hwc.ocelot-wahoo.ts.net";
+      extraConfig = ''
+        reverse_proxy localhost:2284
+      '';
+    };
+    
+    # Main services on standard HTTPS port
     virtualHosts."hwc.ocelot-wahoo.ts.net".extraConfig = ''
       # Obsidian LiveSync proxy
       @sync path /sync*

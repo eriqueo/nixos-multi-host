@@ -84,7 +84,7 @@ in
 	  nil                             # Nix LSP  
 	  pyright                         # Python LSP
 	  nodePackages.typescript-language-server  # TypeScript/JavaScript LSP
-	  rust-analyzer                   # Rust LSP
+	  #rust-analyzer # temporarily disabled due to hash mismatch                   # Rust LSP
 	  gopls                          # Go LSP
 	  clang-tools                    # C/C++ LSP (includes clangd)
 	  

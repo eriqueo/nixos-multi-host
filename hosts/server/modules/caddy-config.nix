@@ -28,8 +28,10 @@
       handle_path /media/* {
         reverse_proxy localhost:8096
       }
+      
+      # Navidrome - strip /navidrome prefix for direct backend access
       handle_path /navidrome/* {
-        reverse_proxy localhost:4533
+        reverse_proxy 127.0.0.1:4533
       }
 
       # *ARR stack - Keep UrlBase in apps, DO NOT strip prefix in Caddy
