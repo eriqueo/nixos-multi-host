@@ -6,8 +6,7 @@
   # Caddy reverse proxy for all services
   services.caddy = {
     enable = true;
-    virtualHosts = {
-      "hwc.ocelot-wahoo.ts.net".extraConfig = ''
+    virtualHosts."hwc.ocelot-wahoo.ts.net".extraConfig = ''
       # Obsidian LiveSync proxy: strip /sync prefix and forward to CouchDB
       @sync path /sync*
       handle @sync {
@@ -32,13 +31,6 @@
       handle_path /media/* {
         reverse_proxy localhost:8096
       }
-
-      # Immich - Direct port exposure (no subpath proxy due to SvelteKit issues)
-      # HTTPS access: https://hwc.ocelot-wahoo.ts.net:2283 (Tailscale HTTPS)
-      # Local access: http://192.168.1.13:2283 (direct)
-      # Both use same database/credentials
-
-
 
       # Navidrome - strip /navidrome prefix for direct backend access
       handle_path /navidrome/* {
@@ -140,8 +132,6 @@
         reverse_proxy localhost:9090
       }
     '';
-
-    };
   };
 
   # Firewall: only expose HTTP/S publicly, other services only on Tailscale
@@ -150,3 +140,10 @@
     allowedTCPPorts = [ 5984 8000 8501 8282 2283 ];
   };
 }
+
+# IMPORTANT: Do not use Tailscale Serve with this Caddy configuration
+# ChatGPT's mistake was running: sudo tailscale serve --bg --https=8989 localhost:8989
+# This bypassed Caddy's path-based routing and broke everything
+#
+# On the server, run this cleanup command:
+# sudo tailscale serve reset
