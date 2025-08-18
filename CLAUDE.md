@@ -210,6 +210,25 @@ The NixOS homeserver system has evolved from basic AI documentation to an intell
 
 ## 🌐 Network Architecture & Reverse Proxy Solutions
 
+### **Tailscale MagicDNS Limitations** ⚠️
+**Critical Constraint**: Tailscale does **NOT** support subdomains for MagicDNS addresses like `hwc.ocelot-wahoo.ts.net`.
+
+**Impact**: 
+- ❌ **Cannot use**: `photos.hwc.ocelot-wahoo.ts.net` (subdomain blocked)
+- ✅ **Must use**: `hwc.ocelot-wahoo.ts.net:2283` (port-based access)
+- ✅ **Alternative**: `hwc.ocelot-wahoo.ts.net/immich` (subpath, if supported)
+
+**Services Requiring Port Exposure**:
+- **Immich**: Does not support subpath reverse proxy properly → Requires port `2283`
+- **Other services**: May require port exposure if subpath proxy fails
+
+**Firewall Configuration**:
+```nix
+networking.firewall.interfaces."tailscale0" = {
+  allowedTCPPorts = [ 2283 ]; # Immich direct access
+};
+```
+
 ### **Navidrome Local/External Access Pattern** ⭐
 **Problem**: Needed both fast local access and secure external access to Navidrome music streaming.
 

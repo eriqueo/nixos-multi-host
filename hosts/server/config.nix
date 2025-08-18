@@ -9,7 +9,7 @@
   ####################################################################
   hwc.filesystem = {
     userDirectories.enable = true;      # PARA directories, XDG config, symlinks
-    serverStorage.enable = true;        # Hot/cold storage directories 
+    serverStorage.enable = true;        # Hot/cold storage directories
     businessDirectories.enable = true;  # Business intelligence and AI directories
     serviceDirectories.enable = true;   # *ARR service configuration directories
     securityDirectories.enable = true;  # Security and secrets directories
@@ -21,6 +21,7 @@
   ####################################################################
   imports = [
     ./hardware-configuration.nix
+    ../../arr-perms-fix.nix
 
     # User configuration
     ../../modules/users/eric.nix
@@ -158,108 +159,109 @@
     openFirewall = false;  # We'll manage firewall manually
   };
 
+  # Fix immich-geodata hash mismatch
   # Fresh Immich Native Service - Photo management with GPU support
-#   services.immich = {
-#     enable = true;
-#     host = "0.0.0.0";
-#     port = 2284;  # Changed port to avoid Tailscale conflict
-#     mediaLocation = "/mnt/photos";
-# 
-#     # Database configuration - fresh database 
-#     database = {
-#       enable = true;
-#       name = "immich_new";
-#       user = "immich_new";
-#       createDB = true;
-#     };
+  services.immich = {
+     enable = true;
+     host = "0.0.0.0";
+     port = 2283;  # Changed port to avoid Tailscale conflict
+     mediaLocation = "/mnt/photos";
 
-#     # Redis configuration for caching - new port
-#     redis = {
-#       enable = true;
-#       host = "0.0.0.0";
-#       port = 6381;  # Different port for fresh instance
-#     };
-# 
-#     environment = {
-#       # Hot storage paths for processing and caching
-#       IMMICH_UPLOAD_LOCATION = "/mnt/hot/cache/immich/upload";
-#       IMMICH_THUMBNAIL_LOCATION = "/mnt/hot/cache/immich/thumb";
-#       IMMICH_ENCODED_VIDEO_LOCATION = "/mnt/hot/cache/immich/encoded";
-# 
-#       # Redis connection to new Immich instance
-#       REDIS_PORT = "6381";
-# 
-#       # GPU acceleration settings
-#       IMMICH_MACHINE_LEARNING_ENABLED = "true";
-#     };
-#   };
+     # Database configuration - fresh database
+     database = {
+       enable = true;
+       name = "immich_new";
+       user = "immich_new";
+       createDB = true;
+     };
+
+     # Redis configuration for caching - new port
+     redis = {
+       enable = true;
+       host = "0.0.0.0";
+       port = 6381;  # Different port for fresh instance
+     };
+
+     environment = {
+       # Hot storage paths for processing and caching
+       IMMICH_UPLOAD_LOCATION = "/mnt/hot/cache/immich/upload";
+       IMMICH_THUMBNAIL_LOCATION = "/mnt/hot/cache/immich/thumb";
+       IMMICH_ENCODED_VIDEO_LOCATION = "/mnt/hot/cache/immich/encoded";
+
+       # Redis connection to new Immich instance
+       REDIS_PORT = "6381";
+
+       # GPU acceleration settings
+       IMMICH_MACHINE_LEARNING_ENABLED = "true";
+     };
+   };
 
   # Jellyfin GPU configuration now handled by ./modules/jellyfin-gpu.nix
 
 
   # Override Immich services to enable GPU access and external library
-#   systemd.services.immich-server = {
-#     serviceConfig = {
-#       # Add GPU device access for photo/video processing
-#       DeviceAllow = [
-#         "/dev/dri/card0 rw"
-#         "/dev/dri/renderD128 rw"
-#         "/dev/nvidia0 rw"
-#         "/dev/nvidiactl rw"
-#         "/dev/nvidia-modeset rw"
-#         "/dev/nvidia-uvm rw"
-#         "/dev/nvidia-uvm-tools rw"
-#       ];
-#       # Allow access to both new uploads and external library directories
-#       ReadWritePaths = [
-#         "/mnt/photos"
-#       ];
-#       ReadOnlyPaths = [
-#         "/mnt/media/pictures"
-#       ];
-#       # Add user to GPU groups via supplementary groups
-#       SupplementaryGroups = [ "video" "render" ];
-#     };
-#     environment = {
-#       # NVIDIA GPU acceleration
-#       NVIDIA_VISIBLE_DEVICES = "all";
-#       NVIDIA_DRIVER_CAPABILITIES = "compute,video,utility";
-#       # Critical: Add library path for NVIDIA libraries
-#       LD_LIBRARY_PATH = "/run/opengl-driver/lib:/run/opengl-driver-32/lib";
-#     };
-#   };
-# 
-#   systemd.services.immich-machine-learning = {
-#     serviceConfig = {
-#       # Add GPU device access for ML processing
-#       DeviceAllow = [
-#         "/dev/dri/card0 rw"
-#         "/dev/dri/renderD128 rw"
-#         "/dev/nvidia0 rw"
-#         "/dev/nvidiactl rw"
-#         "/dev/nvidia-modeset rw"
-#         "/dev/nvidia-uvm rw"
-#         "/dev/nvidia-uvm-tools rw"
-#       ];
-#       # Allow ML service to read external library for analysis
-#       ReadOnlyPaths = [
-#         "/mnt/media/pictures"
-#       ];
-#       # Add user to GPU groups via supplementary groups
-#       SupplementaryGroups = [ "video" "render" ];
-#     };
-#     environment = {
-#       # NVIDIA GPU acceleration for ML workloads
-#       NVIDIA_VISIBLE_DEVICES = "all";
-#       NVIDIA_DRIVER_CAPABILITIES = "compute,video,utility";
-#       # Critical: Add library path for NVIDIA libraries
-#       LD_LIBRARY_PATH = "/run/opengl-driver/lib:/run/opengl-driver-32/lib";
-#       # Fix cache directory permissions
-#       MPLCONFIGDIR = "/var/cache/immich-machine-learning";
-#       TRANSFORMERS_CACHE = "/var/cache/immich-machine-learning";
-#       HF_HOME = "/var/cache/immich-machine-learning";
-#     };
-#   };
+   systemd.services.immich-server = {
+     serviceConfig = {
+       # Add GPU device access for photo/video processing
+       DeviceAllow = [
+         "/dev/dri/card0 rw"
+         "/dev/dri/renderD128 rw"
+         "/dev/nvidia0 rw"
+         "/dev/nvidiactl rw"
+         "/dev/nvidia-modeset rw"
+         "/dev/nvidia-uvm rw"
+         "/dev/nvidia-uvm-tools rw"
+       ];
+       # Allow access to both new uploads and external library directories
+       ReadWritePaths = [
+         "/mnt/photos"
+       ];
+       ReadOnlyPaths = [
+         "/mnt/media/pictures"
+       ];
+       # Add user to GPU groups via supplementary groups
+       SupplementaryGroups = [ "video" "render" ];
+     };
+     environment = {
+       # NVIDIA GPU acceleration
+       NVIDIA_VISIBLE_DEVICES = "all";
+       NVIDIA_DRIVER_CAPABILITIES = "compute,video,utility";
+       # Critical: Add library path for NVIDIA libraries
+       LD_LIBRARY_PATH = "/run/opengl-driver/lib:/run/opengl-driver-32/lib";
+     };
+   };
+
+   systemd.services.immich-machine-learning = {
+     serviceConfig = {
+       # Add GPU device access for ML processing
+       DeviceAllow = [
+         "/dev/dri/card0 rw"
+         "/dev/dri/renderD128 rw"
+         "/dev/nvidia0 rw"
+         "/dev/nvidiactl rw"
+         "/dev/nvidia-modeset rw"
+         "/dev/nvidia-uvm rw"
+         "/dev/nvidia-uvm-tools rw"
+       ];
+       # Allow ML service to read external library for analysis
+       ReadOnlyPaths = [
+         "/mnt/media/pictures"
+       ];
+       # Add user to GPU groups via supplementary groups
+       SupplementaryGroups = [ "video" "render" ];
+     };
+     environment = {
+       # NVIDIA GPU acceleration for ML workloads
+       NVIDIA_VISIBLE_DEVICES = "all";
+       NVIDIA_DRIVER_CAPABILITIES = "compute,video,utility";
+       # Critical: Add library path for NVIDIA libraries
+       LD_LIBRARY_PATH = "/run/opengl-driver/lib:/run/opengl-driver-32/lib";
+       # Fix cache directory permissions
+       MPLCONFIGDIR = "/var/cache/immich-machine-learning";
+       TRANSFORMERS_CACHE = "/var/cache/immich-machine-learning";
+       HF_HOME = "/var/cache/immich-machine-learning";
+     };
+   };
 
   ####################################################################
   # 10. BUSINESS AI SERVICES - Updated for GPU acceleration
@@ -290,7 +292,7 @@
       9696  # Prowlarr
       4533  # Navidrome
       8096  # Jellyfin
-      2284  # Immich (new port)
+      2283  # Immich (new port)
       # HTTPS direct port access via Tailscale is handled by Tailscale's HTTPS certificates
       8081  # SABnzbd
       8888  # Receipt API
@@ -353,5 +355,6 @@
   # settings for stateful data, like file locations and database versions
   # on your system were taken. It's perfectly fine and recommended to leave
   # this value at the release version of the first install of this system.
+
   system.stateVersion = "24.05"; # Did you read the comment?
 }
