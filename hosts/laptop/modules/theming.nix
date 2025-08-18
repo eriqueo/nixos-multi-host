@@ -85,6 +85,7 @@ in
 
   # Application-specific theming
   
+<<<<<<< Updated upstream
   # Thunar file manager configuration using xfconf
   home.file.".config/xfce4/xfconf/xfce-perchannel-xml/thunar.xml".text = ''
     <?xml version="1.0" encoding="UTF-8"?>
@@ -99,6 +100,47 @@ in
   '';
   
   
+=======
+  # Thunar file manager configuration
+  home.file.".config/Thunar/thunarrc".text = ''
+    [Configuration]
+    DefaultView=THUNAR_VIEW_LIST
+    LastView=THUNAR_VIEW_LIST
+    LastShowHidden=TRUE
+    LastDetailsViewColumnOrder=THUNAR_COLUMN_NAME,THUNAR_COLUMN_SIZE,THUNAR_COLUMN_TYPE,THUNAR_COLUMN_DATE_MODIFIED
+    LastDetailsViewColumnWidths=200,80,120,150
+    LastListViewColumnOrder=THUNAR_COLUMN_NAME,THUNAR_COLUMN_SIZE,THUNAR_COLUMN_TYPE,THUNAR_COLUMN_DATE_MODIFIED
+    LastListViewColumnWidths=200,80,120,150
+    LastWindowWidth=900
+    LastWindowHeight=700
+    LastWindowMaximized=FALSE
+    MiscVolumeBookmarks=TRUE
+    MiscFileSize=THUNAR_FILE_SIZE_BINARY
+    MiscDateStyle=THUNAR_DATE_STYLE_SHORT
+    MiscRememberGeometry=TRUE
+    MiscShowAboutTemplates=TRUE
+    MiscSingleClick=FALSE
+    ShortcutsIconEmblem=TRUE
+    ShortcutsIconSize=THUNAR_ICON_SIZE_SMALLER
+    TreeIconEmblem=TRUE
+    TreeIconSize=THUNAR_ICON_SIZE_SMALLER
+    MiscMiddleClickInTab=FALSE
+    MiscRecursivePermissions=THUNAR_RECURSIVE_PERMISSIONS_ASK
+    MiscShowFullPathInTitlebar=FALSE
+    MiscPathStyleInToolbar=THUNAR_PATH_STYLE_ICONS
+  '';
+  
+  # Alternative Thunar view configuration using xfconf
+  home.file.".config/xfce4/xfconf/xfce-perchannel-xml/thunar.xml".text = ''
+    <?xml version="1.0" encoding="UTF-8"?>
+    <channel name="thunar" version="1.0">
+      <property name="default-view" type="string" value="THUNAR_VIEW_LIST"/>
+      <property name="misc-show-hidden" type="bool" value="true"/>
+      <property name="last-view" type="string" value="THUNAR_VIEW_LIST"/>
+    </channel>
+  '';
+  
+>>>>>>> Stashed changes
   # Obsidian CSS theme (for tech vault)
   home.file."Documents/01-vaults/00_tech/.obsidian/snippets/gruvbox-material.css".text = ''
     /* Gruvbox Material theme for Obsidian */
