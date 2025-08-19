@@ -254,7 +254,7 @@ EOF
         dependsOn = [ "slskd" "lidarr" ];
       };
 
-      # Navidrome
+      # Navidrome - Enable reverse proxy support for Caddy subpath
       navidrome = {
         image = "deluan/navidrome";
         autoStart = true;
@@ -266,7 +266,7 @@ EOF
           ND_SESSIONTIMEOUT= "24h";
           # No ND_BASEURL - run at root for direct access
           ND_INITIAL_ADMIN_USER = "admin";
-          ND_INITIAL_ADMIN_PASSWORD = "admin1234";
+          ND_INITIAL_ADMIN_PASSWORD = "il0wwlm?";
         };
         ports = [ "0.0.0.0:4533:4533" ];
         volumes = [ (configVol "navidrome") "${mediaRoot}/music:/music:ro" ];
@@ -304,6 +304,152 @@ interval = 300
 EOF
       chmod 600 "$cfg"
     '';
+  };
+
+  ####################################################################
+  # CADDY REVERSE PROXY CONFIGURATION
+  ####################################################################
+  # Caddy reverse proxy for all services
+  services.caddy = {
+    enable = true;
+    virtualHosts = {
+      "hwc.ocelot-wahoo.ts.net".extraConfig = ''
+      # Obsidian LiveSync proxy: strip /sync prefix and forward to CouchDB
+      @sync path /sync*
+      handle @sync {
+        uri strip_prefix /sync
+        reverse_proxy 127.0.0.1:5984 {
+          # preserve the Host header for CouchDB auth
+          header_up Host {host}
+          # rewrite any CouchDB redirect back under /sync
+          header_down Location ^/(.*)$ /sync/{1}
+        }
+      }
+
+      # Download clients (VPN-routed)
+      handle_path /qbt/* {
+        reverse_proxy localhost:8080
+      }
+      handle_path /sab/* {
+        reverse_proxy localhost:8081
+      }
+
+      # Media services
+      handle_path /media/* {
+        reverse_proxy localhost:8096
+      }
+
+      # Immich - Direct port exposure (no subpath proxy due to SvelteKit issues)
+      # HTTPS access: https://hwc.ocelot-wahoo.ts.net:2283 (Tailscale HTTPS)
+      # Local access: http://192.168.1.13:2283 (direct)
+      # Both use same database/credentials
+
+      # Navidrome - strip /navidrome prefix for direct backend access
+      handle_path /navidrome/* {
+        reverse_proxy 127.0.0.1:4533
+      }
+
+      # *ARR stack - Keep UrlBase in apps, DO NOT strip prefix in Caddy
+      # Apps have UrlBase=/app, Caddy passes paths as-is - no conflict
+
+      # ---- Sonarr
+      handle /sonarr { redir /sonarr/ 301 }
+      route /sonarr* {
+        reverse_proxy localhost:8989 {
+          header_up Host {host}
+          header_up X-Forwarded-Host {host}
+          header_up X-Forwarded-Proto {scheme}
+          header_up X-Forwarded-Port {server_port}
+          header_up X-Forwarded-For {remote}
+          header_up X-Real-IP {remote}
+        }
+      }
+
+      # ---- Radarr
+      handle /radarr { redir /radarr/ 301 }
+      route /radarr* {
+        reverse_proxy localhost:7878 {
+          header_up Host {host}
+          header_up X-Forwarded-Host {host}
+          header_up X-Forwarded-Proto {scheme}
+          header_up X-Forwarded-Port {server_port}
+          header_up X-Forwarded-For {remote}
+          header_up X-Real-IP {remote}
+        }
+      }
+
+      # ---- Lidarr
+      handle /lidarr { redir /lidarr/ 301 }
+      route /lidarr* {
+        reverse_proxy localhost:8686 {
+          header_up Host {host}
+          header_up X-Forwarded-Host {host}
+          header_up X-Forwarded-Proto {scheme}
+          header_up X-Forwarded-Port {server_port}
+          header_up X-Forwarded-For {remote}
+          header_up X-Real-IP {remote}
+        }
+      }
+
+      # ---- Prowlarr
+      handle /prowlarr { redir /prowlarr/ 301 }
+      route /prowlarr* {
+        reverse_proxy localhost:9696 {
+          header_up Host {host}
+          header_up X-Forwarded-Host {host}
+          header_up X-Forwarded-Proto {scheme}
+          header_up X-Forwarded-Port {server_port}
+          header_up X-Forwarded-For {remote}
+          header_up X-Real-IP {remote}
+        }
+      }
+
+      # ---- slskd
+      handle /slskd { redir /slskd/ 301 }
+      handle_path /slskd/* {
+        uri strip_prefix /slskd
+        reverse_proxy 127.0.0.1:5030 {
+          header_up Host {host}
+          header_up X-Forwarded-Host {host}
+          header_up X-Forwarded-Proto {scheme}
+          header_up X-Forwarded-Port {server_port}
+          header_up X-Forwarded-For {remote}
+          header_up X-Real-IP {remote}
+          header_up X-Forwarded-Port {server_port}
+          header_up X-Forwarded-For {remote}
+          header_up X-Real-IP {remote}
+        }
+      }
+
+      # Business services
+      handle /business* {
+        reverse_proxy localhost:8000
+      }
+      handle /dashboard* {
+        reverse_proxy localhost:8501
+      }
+
+      # Private notification service - strip /notify prefix for mobile app compatibility
+      handle_path /notify/* {
+        reverse_proxy localhost:8282
+      }
+
+      # Monitoring services
+      handle_path /grafana/* {
+        reverse_proxy localhost:3000
+      }
+      handle_path /prometheus/* {
+        reverse_proxy localhost:9090
+      }
+    '';
+
+    };
+  };
+
+  # Firewall: only expose HTTP/S publicly, other services only on Tailscale
+  networking.firewall.allowedTCPPorts = [ 80 443 ];
+  networking.firewall.interfaces."tailscale0" = {
+    allowedTCPPorts = [ 5984 8000 8501 8282 2283 ];
   };
 
   # Fix config file permissions for container access

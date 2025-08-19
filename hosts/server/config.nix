@@ -41,7 +41,7 @@
     ./modules/jellyfin-gpu.nix          # Jellyfin hardware acceleration configuration
     ./modules/hot-storage.nix           # SSD hot storage tier
     ./modules/media-core.nix
-    ./modules/media-stack.nix           # Boring-reliable media stack with Caddy subpaths
+    ./modules/media-containers.nix      # Complete media stack with containers and Caddy proxy
     ./networking/media-network.nix
 
     # Monitoring stack
@@ -64,8 +64,7 @@
 
     # YouTube transcript service
 
-    # Caddy reverse proxy configuration
-    ./modules/caddy-config.nix           # Reverse proxy for all services
+    # Caddy reverse proxy configuration now included in media-containers.nix
   ];
 
   ####################################################################
@@ -217,7 +216,7 @@
          "/mnt/photos"
        ];
        ReadOnlyPaths = [
-         "/mnt/media/pictures"
+         "/mnt/hot/pictures"
        ];
        # Add user to GPU groups via supplementary groups
        SupplementaryGroups = [ "video" "render" ];
@@ -245,7 +244,7 @@
        ];
        # Allow ML service to read external library for analysis
        ReadOnlyPaths = [
-         "/mnt/media/pictures"
+         "/mnt/hot/pictures"
        ];
        # Add user to GPU groups via supplementary groups
        SupplementaryGroups = [ "video" "render" ];
@@ -256,6 +255,9 @@
        NVIDIA_DRIVER_CAPABILITIES = "compute,video,utility";
        # Critical: Add library path for NVIDIA libraries
        LD_LIBRARY_PATH = "/run/opengl-driver/lib:/run/opengl-driver-32/lib";
+       # PyTorch CUDA configuration
+       CUDA_VISIBLE_DEVICES = "0";
+       TORCH_CUDA_ARCH_LIST = "6.1";
        # Fix cache directory permissions
        MPLCONFIGDIR = "/var/cache/immich-machine-learning";
        TRANSFORMERS_CACHE = "/var/cache/immich-machine-learning";
