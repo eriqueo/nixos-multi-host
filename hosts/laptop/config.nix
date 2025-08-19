@@ -12,14 +12,14 @@
     ../../modules/users/eric.nix     # Consolidated user configuration
     ../../modules/filesystem.nix     # Charter-compliant filesystem structure
     ../../modules/vault-sync-system.nix  # NixOS vault sync system
-    
+
     # Shared configuration
     ../../shared/secrets.nix         # Shared secrets management
     ../../shared/networking.nix      # Shared networking configuration
-    
+
     # YouTube transcript CLI tool
     ./modules/transcript-cli.nix     # YouTube transcript extraction CLI
-    
+
     # REMOVED: UI modules are now in Home Manager
   ];
 
@@ -77,7 +77,7 @@
     settings = {
       default_session = {
         user = "greeter";
-        command = "${pkgs.greetd.tuigreet}/bin/tuigreet --time --cmd Hyprland";
+        command = "${pkgs.tuigreet}/bin/tuigreet --time --cmd Hyprland";
       };
       initial_session = {
         user = "eric";
@@ -91,42 +91,42 @@
   ####################################################################
   services.xserver.enable = true;
   services.xserver.videoDrivers = [ "nvidia" ];
-  
+
   hardware.graphics = {
     enable = true;
     enable32Bit = true;  # For 32-bit apps
   };
-  
+
   hardware.nvidia = {
     # Use open-source kernel modules (recommended for RTX 2000 Ada)
     open = true;
-    
+
     # Modesetting is required
     modesetting.enable = true;
-    
+
     # Power management (helps with stability)
     powerManagement.enable = true;
     powerManagement.finegrained = false;
-    
+
     # Enable nvidia-settings
     nvidiaSettings = true;
-    
+
     # Use stable driver
     package = config.boot.kernelPackages.nvidiaPackages.stable;
-    
+
     # PRIME configuration - OFFLOAD MODE (recommended)
     prime = {
       offload = {
         enable = true;
         enableOffloadCmd = true;  # Enables nvidia-offload command
       };
-      
+
       # Your specific bus IDs
       intelBusId = "PCI:0:2:0";
       nvidiaBusId = "PCI:1:0:0";
     };
   };
-  
+
   # Specializations for different modes
   specialisation = {
     nvidia-sync.configuration = {
@@ -139,15 +139,15 @@
       };
     };
   };
-  
+
   xdg.portal.enable = true;
   xdg.portal.wlr.enable = true;
-  
+
   # File manager support
   services.gvfs.enable = true;
   services.udisks2.enable = true;
   services.tumbler.enable = true;
-  
+
   security.rtkit.enable = true;
   services.pipewire = {
     enable = true;
@@ -167,7 +167,7 @@
       AutoEnable = true;
     };
   };
-  
+
 services.samba = {
   enable = true;
   openFirewall = true;
@@ -182,7 +182,7 @@ services.samba = {
       "server min protocol" = "SMB2_10";
       "client min protocol" = "SMB2_10";
       "server max protocol" = "SMB3";
-                
+
       # SMB Signing and Encryption (CRITICAL for modern Windows)
       "server signing" = "auto";
       "server schannel" = "auto";
@@ -214,8 +214,8 @@ services.samba = {
     };
   };
 };
- 
-  
+
+
   ####################################################################
   # 16. PRINTING (laptop-specific)
   ####################################################################
@@ -257,7 +257,7 @@ services.samba = {
       ovmf.packages = [ pkgs.OVMF.fd ];
       vhostUserPackages = with pkgs; [ virtiofsd ];
     };
-    
+
   };
   virtualisation.spiceUSBRedirection.enable = true;
 
@@ -270,7 +270,7 @@ services.samba = {
   services.thermald.enable = true;
   services.tlp.enable = true;
   powerManagement.enable = true;
-  
+
   ####################################################################
   # 16. LAPTOP-SPECIFIC SYSTEM PACKAGES
   ####################################################################
@@ -278,7 +278,7 @@ services.samba = {
   # Only laptop-specific packages are included here
   environment.systemPackages = with pkgs; [
     # Login Manager
-    greetd.tuigreet
+    tuigreet
 
     # Wayland Workspace Manager
     hyprsome
@@ -286,10 +286,10 @@ services.samba = {
     # Printing Support
     cups
     system-config-printer
-    
+
     # Claude Code CLI
     claude-code
-    
+
     # Power & Sensor Tools (laptop-specific)
     acpi
     lm_sensors
@@ -302,25 +302,25 @@ services.samba = {
     speedtest-cli
     nmap
     wireguard-tools
-    
+
     # GUI utilities
     xclip
-    
+
     # Remote access tools
     sshfs
     rclone
-    
+
     # Documentation and conversion
     pandoc
-    
+
     # System utilities
     diffutils
     less
     which
-    
+
     # Graphics testing tools
     glxinfo
-    
+
     # VM/QEMU tools
     spice
     spice-gtk
