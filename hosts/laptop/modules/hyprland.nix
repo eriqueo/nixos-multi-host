@@ -289,7 +289,7 @@ in
         "$mod, 3, exec, gpu-launch chromium --new-window https://jobtread.com"
         "$mod, 4, exec, gpu-launch electron-mail"
         "$mod, 5, exec, gpu-launch obsidian"
-        "$mod, 6, exec, kitty nvim"
+        "$mod, 6, exec, kitty -e nvim"
         "$mod, K, exec, kitty"
         "$mod, 7, exec, kitty"
         "$mod, M, exec, kitty btop"
@@ -304,9 +304,9 @@ in
         "$mod, TAB, exec, workspace-overview"
         "$mod SHIFT, T, togglefloating"
         # Screenshots
-        ", Print, exec, hyprshot -m region -o ~/Pictures/01-screenshots"
+        ", Print, exec, hyprshot -m region -o ~/05-media/pictures/screenshots/"
         "SHIFT, Print, exec, hyprshot -m region -c"
-        "CTRL, Print, exec, hyprshot -m window -o ~/Pictures/01-screenshots"
+        "CTRL, Print, exec, hyprshot -m window -o ~/05-media/pictures/screenshots/"
         "ALT, Print, exec, hyprshot -m output -o ~/Pictures/01-screenshots"
 
         # Focus movement (SUPER + arrows)
