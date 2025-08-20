@@ -8,13 +8,12 @@
     syntaxHighlighting.enable = true;
 
     shellAliases = {
-      # File management with modern tools
-      "ls" = "eza --group-directories-first --icons";
-      "ll" = "eza -l --git --icons";
-      "la" = "eza -la --git --icons";
+      # File management shortcuts (tools configured in core-cli.nix)
+      "ll" = "eza -l";
+      "la" = "eza -la"; 
       "lt" = "eza --tree --level=2";
 
-      # zoxide as drop-in cd
+      # Navigation shortcuts (zoxide configured in core-cli.nix)
       "cd" = "z";
       "cdi" = "zi";       # interactive selection
       "cz" = "z";         # short mnemonic
@@ -49,7 +48,7 @@
       "gstatus" = "cd /etc/nixos && sudo git status";
       "glog" = "cd /etc/nixos && sudo git log --oneline -10";
 
-      # NixOS system management
+      # NixOS system management (editor configured in core-cli.nix)
       "nixcon" = "sudo micro /etc/nixos/configuration.nix";
       "nixflake" = "sudo micro /etc/nixos/flake.nix";
       "nixlaphome" = "sudo micro /etc/nixos/hosts/laptop/home.nix";
@@ -57,10 +56,12 @@
       "nixserverhome" = "sudo micro /etc/nixos/hosts/server/home.nix";
       "nixservercon" = "sudo micro /etc/nixos/hosts/server/config.nix";
       "nixsecrets" = "sudo micro /etc/nixos/shared/secrets.nix";
+      "nixcameras" = "sudo micro /etc/nixos/hosts/server/modules/surveillance.nix";
+      
+      # NixOS utilities
       "nixsearch" = "nix search nixpkgs";
       "nixclean" = "nix-collect-garbage -d";
       "nixgen" = "sudo nix-env --list-generations --profile /nix/var/nix/profiles/system";
-      "nixcameras" = "sudo micro /etc/nixos/hosts/server/modules/surveillance.nix";
 
       # Development and productivity
       "speedtest" = "speedtest-cli";
@@ -302,7 +303,7 @@
         mkdir -p "$1" && cd "$1"
       }
 
-      # Fuzzy finding functions (emulate Neovim telescope in terminal)
+      # Fuzzy finding functions (using tools configured in core-cli.nix)
       ff() {
         fd -t f . / | fzf --query="$*" --preview 'head -20 {}'
       }
