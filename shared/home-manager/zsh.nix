@@ -305,7 +305,7 @@
 
       # Fuzzy finding functions (using tools configured in core-cli.nix)
       ff() {
-        fd -t f . / | fzf --query="$*" --preview 'head -20 {}'
+        fd -t f . ~ | fzf --query="$*" --preview 'head -20 {}'
       }
 
       fn() {
