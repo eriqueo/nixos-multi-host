@@ -32,11 +32,27 @@
     force  = true;              # <- skip backups and clobber non-symlink targets
   };
 
-  # 2) One-time cleanup guard so your first switch won’t fail if old backups exist.
-  home.activation.pruneExistingHmBackups =
+  # 2) Universal cleanup guard to prevent Home Manager backup conflicts system-wide
+  home.activation.pruneAllHmBackups =
     lib.hm.dag.entryBefore [ "checkLinkTargets" ] ''
-      rm -f "$HOME/.config/gtk-3.0/bookmarks.backup" \
-            "$HOME/.config/gtk-3.0/bookmarks.hm-bak"
+      # Remove all backup files that could cause Home Manager conflicts
+      # This prevents the backup.backup.backup chain and allows clean rebuilds
+      echo "Cleaning Home Manager backup files to prevent conflicts..."
+      
+      # Clean config directory backup files
+      find "$HOME/.config" -name "*.backup*" -type f -delete 2>/dev/null || true
+      find "$HOME/.config" -name "*.hm-bak*" -type f -delete 2>/dev/null || true
+      
+      # Clean other common Home Manager directories
+      find "$HOME/.local" -name "*.backup*" -type f -delete 2>/dev/null || true
+      find "$HOME/.local" -name "*.hm-bak*" -type f -delete 2>/dev/null || true
+      
+      # Clean specific known problematic files
+      rm -f "$HOME/.config/xfce4/xfconf/xfce-perchannel-xml/thunar.xml.backup"* || true
+      rm -f "$HOME/.config/nvim/init.lua.backup"* || true
+      rm -f "$HOME/.config/micro/settings.json.backup"* || true
+      
+      echo "Backup cleanup complete - Home Manager can now manage files cleanly"
     '';
   # IDENTITY
   home.username = "eric";
