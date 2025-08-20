@@ -415,9 +415,6 @@ EOF
           header_up X-Forwarded-Port {server_port}
           header_up X-Forwarded-For {remote}
           header_up X-Real-IP {remote}
-          header_up X-Forwarded-Port {server_port}
-          header_up X-Forwarded-For {remote}
-          header_up X-Real-IP {remote}
         }
       }
 
