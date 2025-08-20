@@ -67,6 +67,7 @@
       "myip" = "curl -s ifconfig.me";
       "reload" = "source ~/.zshrc";
 
+
       # SERVER-SPECIFIC ALIASES (safe to have on laptop)
       # Media server navigation
       "media" = "cd /mnt/media";
@@ -299,6 +300,15 @@
       # ADHD-friendly productivity functions
       mkcd() {
         mkdir -p "$1" && cd "$1"
+      }
+
+      # Fuzzy finding functions (emulate Neovim telescope in terminal)
+      ff() {
+        fd -t f . / | fzf --query="$*" --preview 'head -20 {}'
+      }
+
+      fn() {
+        fd -t f . /etc/nixos | fzf --query="$*" --preview 'head -20 {}'
       }
 
       # Universal archive extraction
