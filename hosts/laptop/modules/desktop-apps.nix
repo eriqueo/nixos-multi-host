@@ -60,7 +60,9 @@
       background_opacity = "0.95";
     };
   }; 
-     hwc.blender = {
+
+    # blender options set (from blender.nix)
+    hwc.blender = {
         enable = true;
         mediaRoot = "${config.home.homeDirectory}/05-media/blender";
 
@@ -75,7 +77,12 @@
         deckTools.setupPy     = "${config.home.homeDirectory}/05-media/blender/scripts/deck_kit_setup.py";
         deckTools.exportCsvPy = "${config.home.homeDirectory}/05-media/blender/scripts/export_deck_parts_to_csv.py";
       };
-    
+
+
+
+
+
+
   # Desktop applications
   home.packages = with pkgs; [
     # Communication
