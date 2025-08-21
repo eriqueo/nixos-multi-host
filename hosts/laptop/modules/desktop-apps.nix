@@ -62,57 +62,64 @@
   };
 
 
-  hwc.blender = {
-    enable = true;
+ # /path/to/your/desktop-apps.nix
 
-    # Single front-of-house root for all user assets/projects/templates/extensions
-    mediaRoot       = "${config.home.homeDirectory}/05-media/blender";
-    renderOutputDir = "${config.home.homeDirectory}/05-media/blender/renders";
-    tempDir         = "${config.home.homeDirectory}/.cache/blender";
+ {
+   # ... other application configurations
 
-    # Extensions: auto-install every *.zip under ${mediaRoot}/extensions
-    extensionsRoot = "${config.home.homeDirectory}/05-media/blender/extensions";
-    autoInstallAllZipsInExtensionsRoot = true;
+   # Enhanced Dynamic Blender Configuration
+   hwc.blender = {
+     enable = true;
 
-    # Enable addons by their final folder names (see note below)
-    enableAddons = [
-      "hwc_deck_tools"
-      "ConstructionLines_0_9_6_9_4"
-      "home_builder_4"
-      # add more if needed after you see the extracted names
-    ];
+     # --- Basic Paths (auto-created if they don't exist) ---
+     mediaRoot = "/home/your-user/05-media/blender";
+     renderOutputDir = "/home/your-user/05-media/blender/renders";
 
-    # Your deck tools wiring (scripts live under mediaRoot)
-    deckTools = {
-      enable       = true;
-      cutlistXlsx  = "${config.home.homeDirectory}/05-media/blender/data/deck_cutlist.xlsx";
-      setupPy      = "${config.home.homeDirectory}/05-media/blender/scripts/deck_kit_setup.py";
-      exportCsvPy  = "${config.home.homeDirectory}/05-media/blender/scripts/export_deck_parts_to_csv.py";
-    };
+     # --- Dynamic Addon Management ---
+     autoDiscoverAddons = true;  # This is the key feature!
 
-    # Optional: add or override asset libraries (defaults point to mediaRoot/assets/*)
-    # assetLibraries = {
-    #   HDRI      = "${config.home.homeDirectory}/05-media/blender/assets/hdri";
-    #   Textures  = "${config.home.homeDirectory}/05-media/blender/assets/textures";
-    #   Models    = "${config.home.homeDirectory}/05-media/blender/assets/models";
-    #   Materials = "${config.home.homeDirectory}/05-media/blender/assets/materials";
-    #   Brushes   = "${config.home.homeDirectory}/05-media/blender/assets/brushes";
-    # };
+     # Only specify built-in Blender addons or ones with special names
+     enableAddons = [
+       "io_import_images_as_planes"  # Built-in addon
+       "node_wrangler"               # Built-in addon
+       "mesh_extra_objects"          # Built-in addon
+     ];
 
-    # Optional: extra Python to run at startup
-    # extraStartupPy = ''
-    # try:
-    #     bpy.context.scene.render.engine = "BLENDER_EEVEE"
-    # except Exception:
-    #     pass
-    # '';
+     # Exclude any problematic addons from auto-enablement
+     excludeAddons = [
+       # "some_broken_addon"  # Uncomment if you have problematic addons
+     ];
 
-    # Hyprland niceties (float/center Preferences, Alt+F4 closes window)
-    addWindowRules = true;
-    addAltF4       = true;
-    preferenceSize = "1100 800";
-  };
+     # --- Extensions & ZIP Management ---
+     extensionsRoot = "/home/your-user/05-media/blender/extensions";
+     autoInstallAllZipsInExtensionsRoot = true;  # Auto-install all ZIPs
 
+     # --- Performance Optimization ---
+     optimizePerformance = true;
+     memoryCacheLimit = 4096;  # Adjust based on your RAM
+     computeDeviceType = "CUDA";  # Change to "OPENCL" for AMD, "OPTIX" for RTX cards
+
+     # --- User Interface Preferences ---
+     showSplashScreen = false;
+     enterEditModeOnAdd = true;
+     autoSave = true;
+     autoSaveTime = 2;  # minutes
+
+     # --- Enhanced Deck Tools (with dynamic script discovery) ---
+     deckTools = {
+       enable = true;
+       # The addon will automatically discover scripts in mediaRoot/scripts/
+       # You can still specify paths for specific scripts if needed:
+       # cutlistXlsx = "/path/to/your/cutlist.xlsx";
+     };
+
+     # --- Window Manager Rules ---
+     addWindowRules = true;
+     addAltF4 = true;
+   };
+
+   # ... rest of your desktop-apps.nix
+ }
 
 
 
