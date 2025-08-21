@@ -64,16 +64,14 @@
 
  # /path/to/your/desktop-apps.nix
 
- {
-   # ... other application configurations
 
    # Enhanced Dynamic Blender Configuration
    hwc.blender = {
      enable = true;
 
      # --- Basic Paths (auto-created if they don't exist) ---
-     mediaRoot = "/home/your-user/05-media/blender";
-     renderOutputDir = "/home/your-user/05-media/blender/renders";
+     mediaRoot = "/home/eric/05-media/blender";
+     renderOutputDir = "/home/eric/05-media/blender/renders";
 
      # --- Dynamic Addon Management ---
      autoDiscoverAddons = true;  # This is the key feature!
@@ -91,7 +89,7 @@
      ];
 
      # --- Extensions & ZIP Management ---
-     extensionsRoot = "/home/your-user/05-media/blender/extensions";
+     extensionsRoot = "/home/eric/05-media/blender/extensions";
      autoInstallAllZipsInExtensionsRoot = true;  # Auto-install all ZIPs
 
      # --- Performance Optimization ---
@@ -117,9 +115,6 @@
      addWindowRules = true;
      addAltF4 = true;
    };
-
-   # ... rest of your desktop-apps.nix
- }
 
 
 
