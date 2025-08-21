@@ -20,6 +20,7 @@
     ./modules/startup.nix
     ./modules/virtualization.nix
     ./modules/betterbird.nix
+    ./modules/blender.nix
   ];
   # 1) Make HM own the file (source-of-truth in your repo) and always overwrite it.
   xdg.configFile."gtk-3.0/bookmarks" = {
@@ -38,20 +39,20 @@
       # Remove all backup files that could cause Home Manager conflicts
       # This prevents the backup.backup.backup chain and allows clean rebuilds
       echo "Cleaning Home Manager backup files to prevent conflicts..."
-      
+
       # Clean config directory backup files
       find "$HOME/.config" -name "*.backup*" -type f -delete 2>/dev/null || true
       find "$HOME/.config" -name "*.hm-bak*" -type f -delete 2>/dev/null || true
-      
+
       # Clean other common Home Manager directories
       find "$HOME/.local" -name "*.backup*" -type f -delete 2>/dev/null || true
       find "$HOME/.local" -name "*.hm-bak*" -type f -delete 2>/dev/null || true
-      
+
       # Clean specific known problematic files
       rm -f "$HOME/.config/xfce4/xfconf/xfce-perchannel-xml/thunar.xml.backup"* || true
       rm -f "$HOME/.config/nvim/init.lua.backup"* || true
       rm -f "$HOME/.config/micro/settings.json.backup"* || true
-      
+
       echo "Backup cleanup complete - Home Manager can now manage files cleanly"
     '';
   # IDENTITY

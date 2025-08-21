@@ -60,7 +60,22 @@
       background_opacity = "0.95";
     };
   }; 
+     hwc.blender = {
+        enable = true;
+        mediaRoot = "${config.home.homeDirectory}/05-media/blender";
 
+        enableAddons = [
+          "hwc_deck_tools"
+          "ConstructionLines_0_9_6_9_4"
+          "home_builder_4"
+        ];
+
+        deckTools.enable = true;
+        deckTools.cutlistXlsx = "${config.home.homeDirectory}/05-media/blender/data/deck_cutlist.xlsx";
+        deckTools.setupPy     = "${config.home.homeDirectory}/05-media/blender/scripts/deck_kit_setup.py";
+        deckTools.exportCsvPy = "${config.home.homeDirectory}/05-media/blender/scripts/export_deck_parts_to_csv.py";
+      };
+    
   # Desktop applications
   home.packages = with pkgs; [
     # Communication
