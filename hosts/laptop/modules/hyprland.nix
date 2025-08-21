@@ -279,11 +279,11 @@ in
       # Keybindings
       bind = [
         # Window/Session Management
-        "$mod, Return, exec, kitty"
+     #   "$mod, Return, exec, kitty"
         "$mod, Q, killactive"
         "$mod, F, fullscreen"
         "$mod, Space, exec, wofi --show drun"
-        "$mod, B, exec, gpu-launch chromium"
+       # "$mod, B, exec, gpu-launch chromium"
         "$mod, 2, exec, gpu-launch chromium"
         "$mod, J, exec, gpu-launch chromium --new-window https://jobtread.com"
         "$mod, 3, exec, gpu-launch chromium --new-window https://jobtread.com"
@@ -292,13 +292,13 @@ in
         "$mod, 6, exec, kitty -e nvim"
         "$mod, K, exec, kitty"
         "$mod, 7, exec, kitty"
-        "$mod, M, exec, kitty btop"
+     #   "$mod, M, exec, kitty btop"
         "$mod, 8, exec, kitty btop"
         "$mod, 1, exec, thunar"
-        "$mod, O, exec, gpu-launch obsidian"
-        "$mod, E, exec, gpu-launch electron-mail"
-        "$mod, N, exec, kitty nvim"
-        "$mod, T, exec, thunar"
+      #  "$mod, O, exec, gpu-launch obsidian"
+       # "$mod, E, exec, gpu-launch electron-mail"
+       # "$mod, N, exec, kitty nvim"
+    #    "$mod, T, exec, thunar"
         "$mod, G, exec, gpu-toggle"  # GPU mode toggle
         "$mod SHIFT, M, exec, monitor-toggle"
         "$mod, TAB, exec, workspace-overview"
@@ -366,6 +366,23 @@ in
         "$mod CTRL ALT, M, exec, hyprsome workspace 8"
         "$mod CTRL ALT, left, workspace, e-1"
         "$mod CTRL ALT, right, workspace, e+1"
+
+        # Enhanced workspace management
+        "$mod, TAB, exec, workspace-manager overview"
+        "$mod CTRL, right, exec, workspace-manager next"
+        "$mod CTRL, left, exec, workspace-manager prev"
+
+        # Smart application launching
+        "$mod, B, exec, app-launcher browser"
+        "$mod, T, exec, app-launcher files"
+        "$mod, Return, exec, app-launcher terminal"
+        "$mod, N, exec, app-launcher editor"
+        "$mod, E, exec, app-launcher email"
+        "$mod, O, exec, app-launcher notes"
+        "$mod, M, exec, app-launcher monitor"
+
+        # System health check
+        "$mod SHIFT, H, exec, system-health-checker"
 
         # Volume controls
         ", XF86AudioRaiseVolume, exec, wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+"
