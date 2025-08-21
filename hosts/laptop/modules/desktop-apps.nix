@@ -61,7 +61,7 @@
     };
   };
 
-{
+
   hwc.blender = {
     enable = true;
 
@@ -112,7 +112,7 @@
     addAltF4       = true;
     preferenceSize = "1100 800";
   };
-}
+
 
 
 
