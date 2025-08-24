@@ -361,7 +361,7 @@ in
     lm_sensors
     ethtool
     iw
-    mesa-utils
+    mesa-demos
 
     # Portal packages
     xdg-desktop-portal-gtk
