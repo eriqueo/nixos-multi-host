@@ -87,7 +87,7 @@ let
     
     # CPU usage
     CPU_USAGE=$(top -bn1 | grep "Cpu(s)" | awk '{print $2}' | sed 's/%us,//')
-    CPU_NUM=$(echo "$CPU_USAGE" | cut -d'.' -f1)
+    CPU_NUM=$(echo "$CPU_USAGE" | cut -d'.' -f1 | grep -o '[0-9]*' || echo "0")
     
     # Memory usage
     MEM_INFO=$(free | grep Mem)
@@ -97,14 +97,14 @@ let
     
     # Temperature
     TEMP=$(sensors 2>/dev/null | grep -E "(Core 0|Tctl)" | head -1 | awk '{print $3}' | sed 's/+//;s/°C.*//' || echo "0")
-    TEMP_NUM=$(echo "$TEMP" | cut -d'.' -f1)
+    TEMP_NUM=$(echo "$TEMP" | cut -d'.' -f1 | grep -o '[0-9]*' || echo "0")
     
     # Check for alerts
     ALERTS=""
-    if [[ $CPU_NUM -gt 80 ]]; then
+    if [[ -n "$CPU_NUM" && "$CPU_NUM" =~ ^[0-9]+$ && $CPU_NUM -gt 80 ]]; then
       ALERTS="$ALERTS🔥 CPU: ${CPU_NUM}% "
     fi
-    if [[ $MEM_PERCENT -gt 85 ]]; then
+    if [[ -n "$MEM_PERCENT" && "$MEM_PERCENT" =~ ^[0-9]+$ && $MEM_PERCENT -gt 85 ]]; then
       ALERTS="$ALERTS🔥 RAM: ${MEM_PERCENT}% "
     fi
     if [[ $TEMP_NUM -gt 75 ]]; then
