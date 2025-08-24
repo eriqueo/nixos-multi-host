@@ -110,7 +110,9 @@ let
    if [[ -n "$TEMP_NUM" && "$TEMP_NUM" =~ ^[0-9]+$ && $TEMP_NUM -gt 75 ]]; then
      ALERTS="$ALERTS🔥 TEMP: ''${TEMP_NUM}°C "
    fi
-   TIME_STR="''${HOURS}h ''${MINUTES}m"
+   if [[ -n "$TEMP_NUM" && "$TEMP_NUM" =~ ^[0-9]+$ && $TEMP_NUM -gt 75 ]]; then
+     ALERTS="$ALERTS🔥 TEMP: ''${TEMP_NUM}°C "
+   fi
 
   '';
 
