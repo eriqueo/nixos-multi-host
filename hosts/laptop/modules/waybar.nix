@@ -725,7 +725,7 @@ in
      #workspaces button:hover {
        background: rgba(125, 174, 163, 0.3);
        border-bottom: 2px solid ${colors.css.accent};
-       transform: translateY(-1px);
+
        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
      }
 
@@ -734,7 +734,7 @@ in
        color: ${colors.css.accent};
        border-bottom: 2px solid ${colors.css.accent};
        font-weight: bold;
-       transform: scale(1.05);
+
      }
 
      #workspaces button.urgent {
@@ -783,7 +783,7 @@ in
 
      #clock:hover {
        background: rgba(76, 86, 106, 0.6);
-       transform: scale(1.02);
+
      }
 
      /* Enhanced module styling with hover effects */
@@ -817,7 +817,7 @@ in
      #custom-network:hover,
      #custom-battery:hover {
        background: rgba(76, 86, 106, 0.6);
-       transform: translateY(-1px);
+
        box-shadow: 0 2px 8px rgba(0,0,0,0.3);
      }
 
@@ -927,7 +927,7 @@ in
      #custom-power:hover {
        background: rgba(191, 97, 106, 0.4);
        color: #ffffff;
-       transform: scale(1.1);
+
      }
 
      #idle_inhibitor {
@@ -1051,13 +1051,13 @@ in
      }
 
      @keyframes notification-bounce {
-       0% { transform: scale(1); }
-       100% { transform: scale(1.1); }
+       0% {}
+       100% {}
      }
 
      @keyframes attention-bounce {
-       0% { transform: scale(1); }
-       100% { transform: scale(1.05); }
+       0% {}
+       100% {}
      }
 
      @keyframes music-pulse {
