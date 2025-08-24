@@ -80,10 +80,10 @@ let
     fi
   '';
 
-  # System resource monitor with alerts
+  # System resource monitor (kept minimal; safe)
   resourceMonitor = pkgs.writeScriptBin "resource-monitor" ''
     #!/usr/bin/env bash
-    # Monitor system resources and show alerts
+    # Monitor system resources (placeholder; safe to run)
 
     # CPU usage
     CPU_USAGE=$(top -bn1 | grep "Cpu(s)" | awk '{print $2}' | sed 's/%us,//')
@@ -91,15 +91,16 @@ let
 
     # Memory usage
     MEM_INFO=$(free | grep Mem)
-    MEM_TOTAL=$(echo $MEM_INFO | awk '{print $2}')
-    MEM_USED=$(echo $MEM_INFO | awk '{print $3}')
+    MEM_TOTAL=$(echo "$MEM_INFO" | awk '{print $2}')
+    MEM_USED=$(echo "$MEM_INFO" | awk '{print $3}')
     MEM_PERCENT=$(( MEM_USED * 100 / MEM_TOTAL ))
 
     # Temperature
     TEMP=$(sensors 2>/dev/null | grep -E "(Core 0|Tctl)" | head -1 | awk '{print $3}' | sed 's/+//;s/°C.*//' || echo "0")
     TEMP_NUM=$(echo "$TEMP" | cut -d'.' -f1 | grep -o '[0-9]*' || echo "0")
 
-    '';
+    exit 0
+  '';
 
   # Enhanced network status with connection quality
   networkStatus = pkgs.writeScriptBin "network-status" ''
@@ -174,7 +175,7 @@ let
         TIME_REMAINING=$(( ENERGY_NOW / POWER_NOW ))
         HOURS=$(( TIME_REMAINING ))
         MINUTES=$(( (TIME_REMAINING * 60) % 60 ))
-        TIME_STR="${HOURS}h ${MINUTES}m"
+        TIME_STR=$(printf '%sh %sm' "$HOURS" "$MINUTES")
       else
         TIME_STR="Unknown"
       fi
@@ -360,6 +361,7 @@ in
     lm_sensors
     ethtool
     iw
+    mesa-utils
 
     # Portal packages
     xdg-desktop-portal-gtk
@@ -1196,4 +1198,3 @@ in
     };
   };
 }
-
