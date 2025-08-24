@@ -99,20 +99,7 @@ let
     TEMP=$(sensors 2>/dev/null | grep -E "(Core 0|Tctl)" | head -1 | awk '{print $3}' | sed 's/+//;s/°C.*//' || echo "0")
     TEMP_NUM=$(echo "$TEMP" | cut -d'.' -f1 | grep -o '[0-9]*' || echo "0")
 
-    # Check for alerts
-    ALERTS=""
-     if [[ -n "$CPU_NUM" && "$CPU_NUM" =~ ^[0-9]+$ && $CPU_NUM -gt 80 ]]; then
-       ALERTS="$ALERTS🔥 CPU: ${CPU_NUM}% "
-     fi
-
-     if [[ -n "$MEM_PERCENT" && "$MEM_PERCENT" =~ ^[0-9]+$ && $MEM_PERCENT -gt 85 ]]; then
-       ALERTS="$ALERTS🔥 RAM: ${MEM_PERCENT}% "
-     fi
-
-     if [[ -n "$TEMP_NUM" && "$TEMP_NUM" =~ ^[0-9]+$ && $TEMP_NUM -gt 75 ]]; then
-        ALERTS="$ALERTS🔥 TEMP: $TEMP_NUM°C "
-     fi
-  '';
+    '';
 
   # Enhanced network status with connection quality
   networkStatus = pkgs.writeScriptBin "network-status" ''
