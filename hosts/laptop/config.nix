@@ -17,6 +17,9 @@
     ../../shared/secrets.nix         # Shared secrets management
     ../../shared/networking.nix      # Shared networking configuration
 
+    # Network services
+    ../../modules/services/network/vpn.nix  # ProtonVPN service with management functions
+
     # YouTube transcript CLI tool
     ./modules/transcript-cli.nix     # YouTube transcript extraction CLI
 
@@ -27,6 +30,17 @@
   # 2. FILESYSTEM CONFIGURATION - Enable user directories only
   ####################################################################
   hwc.filesystem.userDirectories.enable = true;  # PARA directories, XDG config, symlinks
+
+  ####################################################################
+  # 3. NETWORK SERVICES CONFIGURATION
+  ####################################################################
+  # ProtonVPN service with management functions (Charter V4 style)
+  hwc.services.network.vpn = {
+    enable = true;
+    serverType = "regular";  # Options: "regular", "p2p", "country"
+    country = "US";         # Used when serverType = "country"
+    autoConnect = false;    # Don't auto-connect on boot
+  };
 
   ####################################################################
   # 16. HOST IDENTITY

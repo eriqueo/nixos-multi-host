@@ -101,6 +101,14 @@
       # SSH shortcuts
       "homeserver" = "ssh eric@100.115.126.41";
       "server" = "ssh eric@100.115.126.41";
+
+      # VPN management (ProtonVPN)
+      "vpn" = "vpnstatus";           # Quick status check
+      "vpnon" = "vpnstart";          # Connect VPN
+      "vpnoff" = "vpnstop";          # Disconnect VPN  
+      "vpncheck" = "vpnstatus";      # Check connection status
+      "vpnp2p" = "vpnp2p";           # Switch to P2P servers
+      "vpnfast" = "vpnregular";      # Switch to fastest servers
     };
 
     # Environment variables
