@@ -37,7 +37,8 @@
       "Bash(sudo podman exec radarr sh:*)",
       "Bash(sudo podman exec:*)",
       "Bash(sudo sed:*)",
-      "Bash(sudo -u postgres:*)"
+      "Bash(sudo -u postgres:*)",
+      "Bash(sudo git status:*)"
     ],
     "deny": []
   }

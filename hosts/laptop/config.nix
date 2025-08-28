@@ -37,9 +37,10 @@
   # ProtonVPN service with management functions (Charter V4 style)
   hwc.services.network.vpn = {
     enable = true;
-    serverType = "regular";  # Options: "regular", "p2p", "country"
-    country = "US";         # Used when serverType = "country"
-    autoConnect = false;    # Don't auto-connect on boot
+    connectionMethod = "wireguard";  # WireGuard is faster and more reliable
+    serverType = "regular";         # Options: "regular", "p2p", "country"
+    country = "US";                # Used when serverType = "country"
+    autoConnect = false;           # Don't auto-connect on boot
   };
 
   ####################################################################

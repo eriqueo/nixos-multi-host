@@ -102,13 +102,13 @@
       "homeserver" = "ssh eric@100.115.126.41";
       "server" = "ssh eric@100.115.126.41";
 
-      # VPN management (ProtonVPN)
+      # VPN management (ProtonVPN with WireGuard)
       "vpn" = "vpnstatus";           # Quick status check
-      "vpnon" = "vpnstart";          # Connect VPN
+      "vpnon" = "vpnstart";          # Connect VPN (WireGuard preferred)
       "vpnoff" = "vpnstop";          # Disconnect VPN  
       "vpncheck" = "vpnstatus";      # Check connection status
-      "vpnp2p" = "vpnp2p";           # Switch to P2P servers
-      "vpnfast" = "vpnregular";      # Switch to fastest servers
+      "vpnwg" = "vpnwg";             # Connect via WireGuard directly
+      "vpnp2p" = "vpnp2p";           # P2P server info
     };
 
     # Environment variables
