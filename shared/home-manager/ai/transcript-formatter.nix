@@ -174,7 +174,7 @@ in
           "OLLAMA_MODEL=${cfg.model}"
           "OLLAMA_TEMPERATURE=0.2"
           "OLLAMA_TOP_P=0.9"
-          "PATH=${config.home.profileDirectory}/bin:${config.home.sessionPath}"
+          "PATH=${config.home.profileDirectory}/bin"
         ];
         ExecStart = "%h/.local/bin/transcript-formatter";
         WorkingDirectory = "%h";
