@@ -4,7 +4,12 @@
   home.file =
     let
       obsidianVaults = [
-        "Documents/01-vaults/00_tech"
+        "/home/eric/99-vaults/00_tech"
+        "/home/eric/99-vaults/01_hwc"
+        "/home/eric/99-vaults/02_personal"
+        "/home/eric/99-vaults/03_nixos"
+        "/home/eric/99-vaults/04-transcripts"
+        "/home/eric/99-vaults/05-website"
         # Add more vaults here
       ];
       obsidianCss = ''

@@ -5,15 +5,11 @@
 
 let
   hyprStartup = pkgs.writeScriptBin "hypr-startup" ''
-    #!/usr/bin/env bash
-    
-    # Enhanced startup script with better timing and error handling
-    
+    #!/usr/bin/env bash    
     # Function for logging
     log() {
       echo "[$(date '+%H:%M:%S')] $1" >> /tmp/hypr-startup.log
     }
-    
     log "=== Hyprland Startup Begin ==="
     
     # Wait until Hyprland is fully ready with timeout
@@ -29,14 +25,11 @@ let
     done
     
     log "Hyprland is ready"
-    
     # Wait a bit more for full initialization
     sleep 1
-    
     # Initialize GPU mode to Intel (default)
     echo "intel" > /tmp/gpu-mode
     log "GPU mode initialized to Intel"
-    
     # Function to launch app with retry and better error handling
     launch_app() {
       local workspace=$1
