@@ -2,7 +2,7 @@
 
 let
   cfg = config.my.ai.transcriptFormatter;
-  py = pkgs.python312.withPackages (ps: with ps; [ requests ]);
+  py = pkgs.python3.withPackages (ps: with ps; [ requests ]);
   appRoot = "${config.xdg.dataHome}/transcript-formatter";
   inputDirDefault = "${config.xdg.dataHome}/transcripts/input_transcripts";
   outputDirDefault = "${config.xdg.dataHome}/transcripts/cleaned_transcripts";
