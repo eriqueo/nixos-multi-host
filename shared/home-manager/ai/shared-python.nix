@@ -14,6 +14,10 @@
       aiofiles
       python-slugify
       youtube-transcript-api
+      
+      # General development tools
+      pip
+      virtualenv
     ]))
     
     # Also include yt-dlp as separate package (not Python package)

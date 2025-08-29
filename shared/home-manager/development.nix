@@ -5,9 +5,7 @@
 {
   home.packages = with pkgs; [
     # Programming languages
-    python3              # Python interpreter
-    python3Packages.pip  # Python package manager
-    python3Packages.virtualenv # Python virtual environments
+    # Python provided by shared AI environment in shared-python.nix
     nodejs               # Node.js runtime
     
     # Development tools
