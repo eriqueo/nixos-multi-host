@@ -19,6 +19,7 @@ in
     (import ../../shared/home-manager/kitty.nix { inherit colors; })
     (import ../../shared/home-manager/obsidian.nix { inherit lib colors; })
     (import ../../shared/home-manager/thunar.nix { inherit pkgs; })
+    ../../shared/home-manager/ai/shared-python.nix
     ../../shared/home-manager/ai/transcript-formatter.nix
 
     # Laptop-specific modules

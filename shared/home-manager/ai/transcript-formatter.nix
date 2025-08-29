@@ -2,7 +2,6 @@
 
 let
   cfg = config.my.ai.transcriptFormatter;
-  py = pkgs.python3.withPackages (ps: with ps; [ requests ]);
   appRoot = "${config.xdg.dataHome}/transcript-formatter";
   inputDirDefault = "${config.xdg.dataHome}/transcripts/input_transcripts";
   outputDirDefault = "${config.xdg.dataHome}/transcripts/cleaned_transcripts";
@@ -19,7 +18,7 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    home.packages = [ py ];
+    # Python environment provided by shared-python.nix
 
     home.activation.transcriptFormatterDirs = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
       mkdir -p ${appRoot} ${cfg.inputDir} ${cfg.outputDir}
@@ -159,7 +158,7 @@ in
     home.file.".local/bin/transcript-formatter".text = ''
       #!/usr/bin/env bash
       set -euo pipefail
-      exec ${py}/bin/python ${scriptPath} "$@"
+      exec python3 ${scriptPath} "$@"
     '';
     home.file.".local/bin/transcript-formatter".executable = true;
 
