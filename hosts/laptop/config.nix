@@ -12,6 +12,7 @@
     ../../modules/users/eric.nix     # Consolidated user configuration
     ../../modules/filesystem.nix     # Charter-compliant filesystem structure
     ../../modules/vault-sync-system.nix  # NixOS vault sync system
+    ./modules/ai/ollama.nix
 
     # Shared configuration
     ../../shared/secrets.nix         # Shared secrets management
@@ -332,6 +333,9 @@ services.samba = {
     # Graphics testing tools
     glxinfo
 
+    # AI Tools
+    ollama
+
     # VM/QEMU tools
     spice
     spice-gtk
@@ -340,6 +344,7 @@ services.samba = {
     win-spice
     virtiofsd
   ];
+
 
   ####################################################################
   # 16. SYSTEM STATE VERSION

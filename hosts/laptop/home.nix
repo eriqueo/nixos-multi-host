@@ -19,6 +19,7 @@ in
     (import ../../shared/home-manager/kitty.nix { inherit colors; })
     (import ../../shared/home-manager/obsidian.nix { inherit lib colors; })
     (import ../../shared/home-manager/thunar.nix { inherit pkgs; })
+    ../../shared/home-manager/ai/transcript-formatter.nix
 
     # Laptop-specific modules
     ./modules/desktop-apps.nix
@@ -42,7 +43,14 @@ in
     source = ./gtk/bookmarks;   # <- put a canonical file under hosts/laptop/gtk/bookmarks
     force  = true;              # <- skip backups and clobber non-symlink targets
   };
-
+  my.ai.transcriptFormatter = {
+    enable = true;
+    model = "llama3";
+    host = "http://127.0.0.1:11434";
+    inputDir = "${config.xdg.dataHome}/transcripts/input_transcripts";
+    outputDir = "${config.xdg.dataHome}/transcripts/cleaned_transcripts";
+    interval = "15m";
+  };
   # 2) Universal cleanup guard to prevent Home Manager backup conflicts system-wide
   home.activation.pruneAllHmBackups =
     lib.hm.dag.entryBefore [ "checkLinkTargets" ] ''
