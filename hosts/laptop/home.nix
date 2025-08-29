@@ -2,6 +2,11 @@
 # FILE: hosts/laptop/home.nix (ORCHESTRATOR)
 # -----------------------------------------------------------------------------
 { config, pkgs, lib, osConfig, ... }:
+
+let
+  # Define the single source of truth for colors, available to all imports
+  colors = (import ../../shared/colors/deep-nord.nix).colors;
+in
 {
   imports = [
     # Shared modules (used by both laptop and server)
@@ -9,6 +14,11 @@
     ../../shared/home-manager/development.nix
     ../../shared/home-manager/productivity.nix
     ../../shared/home-manager/zsh.nix
+    # --- NEWLY MODULARIZED COMPONENTS ---
+    # We pass the 'colors' palette to the modules that need it
+    (import ../../shared/home-manager/kitty.nix { inherit colors; })
+    (import ../../shared/home-manager/obsidian.nix { inherit lib colors; })
+    (import ../../shared/home-manager/thunar.nix { inherit pkgs; })
 
     # Laptop-specific modules
     ./modules/desktop-apps.nix
