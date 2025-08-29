@@ -46,7 +46,7 @@ in
   };
   my.ai.transcriptFormatter = {
     enable = true;
-    model = "llama3";
+    model = "qwen2.5:7b";
     host = "http://127.0.0.1:11434";
     inputDir = "${config.xdg.dataHome}/transcripts/input_transcripts";
     outputDir = "${config.xdg.dataHome}/transcripts/cleaned_transcripts";
