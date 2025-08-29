@@ -1,8 +1,8 @@
 { config, pkgs, lib, ... }:
 
 let
-  colors = (import ../../../shared/colors/deep-nord.nix).colors;
-in
+ # Import our new patched theme package
+  deepNordGtkTheme = import ../../../shared/themes/deep-nord-gtk.nix { inherit pkgs; };in
 
 {
   # Cursor theme
@@ -19,8 +19,8 @@ in
     enable = true;
 
     theme = {
-      name = "Gruvbox-Dark";
-      package = pkgs.gruvbox-gtk-theme;
+      name = "DeepNord-GTK";
+      package = deepNordGtkTheme;
     };
 
     iconTheme = {
