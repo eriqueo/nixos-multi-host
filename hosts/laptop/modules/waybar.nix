@@ -8,18 +8,18 @@ let
     # Base colors (Gruvbox Material inspired - much softer contrast)
     background = "#282828";      # Gruvbox material bg (warmer, softer than our dark blue)
     foreground = "#d4be98";      # Muted cream (less bright, easier on eyes)
-    
+
     # Selection colors (softer)
     selection_bg = "#7daea3";    # Muted teal instead of bright cyan
     selection_fg = "#282828";
-    
+
     # Cursor (softer)
     cursor = "#d4be98";
     cursor_text = "#282828";
-    
+
     # URL/links (softer)
     url = "#7daea3";
-    
+
     # Gruvbox Material inspired colors (much softer, muted)
     # Dark colors (normal) - desaturated for eye comfort
     color0  = "#32302F";  # softer black
@@ -30,17 +30,17 @@ let
     color5  = "#d3869b";  # soft pink-purple
     color6  = "#89b482";  # muted aqua
     color7  = "#d4be98";  # soft cream (main foreground)
-    
+
     # Bright colors - slightly brighter but still muted
-    color8  = "#45403d";  # muted bright black  
+    color8  = "#45403d";  # muted bright black
     color9  = "#ea6962";  # same muted red
-    color10 = "#a9b665";  # same muted green  
+    color10 = "#a9b665";  # same muted green
     color11 = "#d8a657";  # same muted yellow
     color12 = "#7daea3";  # same soft blue
     color13 = "#d3869b";  # same soft purple
     color14 = "#89b482";  # same muted aqua
     color15 = "#d4be98";  # same soft cream
-    
+
     # Nord semantic colors for UI elements
     nord0  = "#1f2329";  # darkest (our custom background)
     nord1  = "#3b4252";  # dark
@@ -58,11 +58,11 @@ let
     nord13 = "#ebcb8b";  # aurora yellow
     nord14 = "#a3be8c";  # aurora green
     nord15 = "#b48ead";  # aurora purple
-    
+
     # Transparency values
     opacity_terminal = "0.95";
     opacity_inactive = "0.90";
-    
+
     # CSS/Web colors (with # prefix for web use) - Gruvbox Material inspired
     css = {
       background = "#282828";
@@ -176,8 +176,8 @@ let
     #!/usr/bin/env bash
     # Enhanced network status with quality indicators
 
-    # Get active connection
-    ACTIVE_CONN=$(nmcli -t -f NAME,TYPE,DEVICE connection show --active | head -1)
+    # Get primary network connection (exclude loopback, VPN tunnels, and bridges)
+    ACTIVE_CONN=$(nmcli -t -f NAME,TYPE,DEVICE connection show --active | grep -v ":loopback:\|:tun:\|:bridge:" | head -1)
 
     if [[ -z "$ACTIVE_CONN" ]]; then
       echo "{\"text\": \"󰤭\", \"class\": \"disconnected\", \"tooltip\": \"No network connection\"}"
@@ -188,7 +188,7 @@ let
     CONN_TYPE=$(echo "$ACTIVE_CONN" | cut -d: -f2)
     DEVICE=$(echo "$ACTIVE_CONN" | cut -d: -f3)
 
-    if [[ "$CONN_TYPE" == "wifi" ]]; then
+    if [[ "$CONN_TYPE" == "802-11-wireless" ]]; then
       # Get WiFi signal strength
       SIGNAL=$(nmcli -f IN-USE,SIGNAL dev wifi | grep "^\*" | awk '{print $2}')
       SPEED=$(iw dev "$DEVICE" link 2>/dev/null | grep "tx bitrate" | awk '{print $3 " " $4}' || echo "Unknown")
@@ -372,7 +372,27 @@ let
 
   networkSettings = pkgs.writeScriptBin "network-settings" ''
     #!/usr/bin/env bash
-    ${pkgs.networkmanagerapplet}/bin/nm-connection-editor &
+    # Comprehensive network management menu
+
+    CHOICE=$(echo -e "WiFi Manager (nmtui)\nNetwork Connections Editor\nVPN Status\nNetwork Speed Test\nNetwork Diagnostics" | ${pkgs.wofi}/bin/wofi --dmenu --prompt "Network Tools:")
+
+    case "$CHOICE" in
+      "WiFi Manager (nmtui)")
+        ${pkgs.kitty}/bin/kitty --title "WiFi Manager" -e ${pkgs.networkmanager}/bin/nmtui &
+        ;;
+      "Network Connections Editor")
+        ${pkgs.networkmanagerapplet}/bin/nm-connection-editor &
+        ;;
+      "VPN Status")
+        ${pkgs.kitty}/bin/kitty --title "VPN Status" -e sh -c 'echo "=== VPN Status ==="; echo ""; vpnstatus; echo ""; echo "Commands: vpnon (connect) | vpnoff (disconnect)"; echo ""; read -p "Press Enter to close..."' &
+        ;;
+      "Network Speed Test")
+        ${pkgs.kitty}/bin/kitty --title "Network Speed Test" -e sh -c '${pkgs.speedtest-cli}/bin/speedtest-cli; read -p "Press Enter to close..."' &
+        ;;
+      "Network Diagnostics")
+        ${pkgs.kitty}/bin/kitty --title "Network Diagnostics" -e sh -c 'echo "=== Network Diagnostics ==="; echo ""; echo "Current IP:"; curl -s ifconfig.me; echo ""; echo ""; echo "Active Connections:"; nmcli connection show --active; echo ""; echo "WiFi Networks:"; nmcli dev wifi; echo ""; read -p "Press Enter to close..."' &
+        ;;
+    esac
   '';
 
   powerSettings = pkgs.writeScriptBin "power-settings" ''
@@ -424,6 +444,7 @@ in
     # Additional tools for enhanced functionality
     baobab
     networkmanagerapplet
+    blueman
     nvtopPackages.full
     mission-center
     btop
@@ -441,7 +462,10 @@ in
     enable = true;
     package = pkgs.waybar;
 
-    settings = [{
+    settings = [
+    # External monitor configuration (DP-4) - normal size
+    {
+      output = "DP-4";
       layer = "top";
       position = "top";
       height = 60;
@@ -464,6 +488,7 @@ in
         "mpd"
         "pulseaudio"
         "custom/network"
+        "bluetooth"
         "memory"
         "cpu"
         "temperature"
@@ -478,17 +503,7 @@ in
         disable-scroll = true;
         all-outputs = false;
         warp-on-scroll = false;
-        format = "{icon}";
-        swap-icon-label = false; # Fixed: Set to boolean value
-        format-icons = {
-          "1" = "󰈹"; "2" = "󰭹"; "3" = "󰏘"; "4" = "󰎞";
-          "5" = "󰕧"; "6" = "󰊢"; "7" = "󰋩"; "8" = "󰚌";
-          "11" = "󰈹"; "12" = "󰭹"; "13" = "󰏘"; "14" = "󰎞";
-          "15" = "󰕧"; "16" = "󰊢"; "17" = "󰋩"; "18" = "󰚌";
-          active = "";
-          default = "";
-          urgent = "";
-        };
+        format = "{name}";
         persistent-workspaces = {
           "1" = [];
           "2" = [];
@@ -567,59 +582,13 @@ in
         interval = 1;
         format = "{:%H:%M:%S}";
         format-alt = "{:%Y-%m-%d %H:%M:%S}";
-        tooltip-format = "<tt><small>{calendar}</small></tt>";
+        tooltip = false;
       };
 
       # Custom modules for system scripts
       "custom/gpu" = {
         format = "{}";
-        exec = "${pkgs.writeScriptBin "gpu-status" ''
-          #!/usr/bin/env bash
-          # Check current GPU status and return JSON for waybar
-
-          GPU_MODE_FILE="/tmp/gpu-mode"
-          DEFAULT_MODE="intel"
-
-          # Initialize mode file if it doesn't exist
-          if [[ ! -f "$GPU_MODE_FILE" ]]; then
-            echo "$DEFAULT_MODE" > "$GPU_MODE_FILE"
-          fi
-
-          CURRENT_MODE=$(cat "$GPU_MODE_FILE" 2>/dev/null || echo "$DEFAULT_MODE")
-
-          # Get current GPU renderer with better detection
-          CURRENT_GPU=$(glxinfo 2>/dev/null | grep "OpenGL renderer" | cut -d: -f2 | xargs || echo "Unknown")
-
-          # Get GPU power consumption and temperature (if available)
-          NVIDIA_POWER=$(nvidia-smi --query-gpu=power.draw --format=csv,noheader,nounits 2>/dev/null | head -1 || echo "0")
-          NVIDIA_TEMP=$(nvidia-smi --query-gpu=temperature.gpu --format=csv,noheader,nounits 2>/dev/null | head -1 || echo "0")
-
-          case "$CURRENT_MODE" in
-            "intel")
-              ICON="󰢮"
-              CLASS="intel"
-              TOOLTIP="Intel Mode: $CURRENT_GPU"
-              ;;
-            "nvidia")
-              ICON="󰾲"
-              CLASS="nvidia"
-              TOOLTIP="NVIDIA Mode: $CURRENT_GPU\nPower: $NVIDIA_POWER W | Temp: $NVIDIA_TEMP°C"
-              ;;
-            "performance")
-              ICON="⚡"
-              CLASS="performance"
-              TOOLTIP="Performance Mode: Auto-GPU Selection\nNVIDIA: $NVIDIA_POWER W | $NVIDIA_TEMP°C"
-              ;;
-            *)
-              ICON="󰢮"
-              CLASS="intel"
-              TOOLTIP="Intel Mode (Default): $CURRENT_GPU"
-              ;;
-          esac
-
-          # Output JSON for waybar
-          echo "{\"text\": \"$ICON\", \"class\": \"$CLASS\", \"tooltip\": \"$TOOLTIP\"}"
-        ''}";
+        exec = "${gpuStatus}/bin/gpu-status";
         return-type = "json";
         interval = 5;
         on-click = "gpu-toggle";
@@ -627,7 +596,7 @@ in
       };
 
       "custom/disk" = {
-        format = "󰋊 {percentage_used}%";
+        format = "󰋊 {}%";
         exec = "df -h / | awk 'NR==2 {print $5}' | sed 's/%//'";
         interval = 30;
         tooltip = true;
@@ -658,54 +627,23 @@ in
 
       "custom/network" = {
         format = "{}";
-        exec = "${pkgs.writeScriptBin "network-status" ''
-          #!/usr/bin/env bash
-          # Enhanced network status with quality indicators
-
-          # Get active connection
-          ACTIVE_CONN=$(nmcli -t -f NAME,TYPE,DEVICE connection show --active | head -1)
-
-          if [[ -z "$ACTIVE_CONN" ]]; then
-            echo "{\"text\": \"󰤭\", \"class\": \"disconnected\", \"tooltip\": \"No network connection\"}"
-            exit 0
-          fi
-
-          CONN_NAME=$(echo "$ACTIVE_CONN" | cut -d: -f1)
-          CONN_TYPE=$(echo "$ACTIVE_CONN" | cut -d: -f2)
-          DEVICE=$(echo "$ACTIVE_CONN" | cut -d: -f3)
-
-          if [[ "$CONN_TYPE" == "wifi" ]]; then
-            # Get WiFi signal strength
-            SIGNAL=$(nmcli -f IN-USE,SIGNAL dev wifi | grep "^\*" | awk '{print $2}')
-            SPEED=$(iw dev "$DEVICE" link 2>/dev/null | grep "tx bitrate" | awk '{print $3 " " $4}' || echo "Unknown")
-
-            if [[ $SIGNAL -gt 75 ]]; then
-              ICON="󰤨"
-              CLASS="excellent"
-            elif [[ $SIGNAL -gt 50 ]]; then
-              ICON="󰤥"
-              CLASS="good"
-            elif [[ $SIGNAL -gt 25 ]]; then
-              ICON="󰤢"
-              CLASS="fair"
-            else
-              ICON="󰤟"
-              CLASS="poor"
-            fi
-
-            TOOLTIP="WiFi: $CONN_NAME\nSignal: $SIGNAL%\nSpeed: $SPEED"
-          else
-            ICON="󰈀"
-            CLASS="ethernet"
-            SPEED=$(ethtool "$DEVICE" 2>/dev/null | grep "Speed:" | awk '{print $2}' || echo "Unknown")
-            TOOLTIP="Ethernet: $CONN_NAME\nSpeed: $SPEED"
-          fi
-
-          echo "{\"text\": \"$ICON\", \"class\": \"$CLASS\", \"tooltip\": \"$TOOLTIP\"}"
-        ''}";
+        exec = "${networkStatus}/bin/network-status";
         return-type = "json";
         interval = 5;
         on-click = "network-settings";
+      };
+
+      bluetooth = {
+        format = "{icon}";
+        format-icons = {
+          enabled = "󰂯";
+          disabled = "󰂲";
+        };
+        format-connected = "󰂱 {num_connections}";
+        tooltip-format = "{controller_alias}\t{controller_address}";
+        tooltip-format-connected = "{controller_alias}\t{controller_address}\n\n{device_enumerate}";
+        tooltip-format-enumerate-connected = "{device_alias}\t{device_address}";
+        on-click = "blueman-manager";
       };
 
       memory = {
@@ -723,10 +661,9 @@ in
       };
 
       temperature = {
-        thermal-zone = 0;
-        hwmon-path = "/sys/class/hwmon/hwmon2/temp1_input";
+        hwmon-path = "/sys/class/hwmon/hwmon6/temp1_input";
         critical-threshold = 80;
-        format = "󰔏 {temperature}°C";
+        format = "󰔏 {temperatureC}°C";
         interval = 5;
         tooltip = true;
         on-click = "sensor-viewer";
@@ -734,64 +671,7 @@ in
 
       "custom/battery" = {
         format = "{}";
-        exec = "${pkgs.writeScriptBin "battery-health" ''
-          #!/usr/bin/env bash
-          # Monitor battery health and provide detailed info
-
-          BATTERY_PATH="/sys/class/power_supply/BAT0"
-
-          if [[ ! -d "$BATTERY_PATH" ]]; then
-            echo "{\"text\": \"󰂑\", \"tooltip\": \"No battery detected\"}"
-            exit 0
-          fi
-
-          CAPACITY=$(cat "$BATTERY_PATH/capacity" 2>/dev/null || echo "0")
-          STATUS=$(cat "$BATTERY_PATH/status" 2>/dev/null || echo "Unknown")
-          HEALTH=$(cat "$BATTERY_PATH/health" 2>/dev/null || echo "Unknown")
-          CYCLE_COUNT=$(cat "$BATTERY_PATH/cycle_count" 2>/dev/null || echo "Unknown")
-
-          # Calculate time remaining
-          if [[ "$STATUS" == "Discharging" ]]; then
-            POWER_NOW=$(cat "$BATTERY_PATH/power_now" 2>/dev/null || echo "0")
-            ENERGY_NOW=$(cat "$BATTERY_PATH/energy_now" 2>/dev/null || echo "0")
-
-            if [[ $POWER_NOW -gt 0 ]]; then
-              TIME_REMAINING=$(( ENERGY_NOW / POWER_NOW ))
-              HOURS=$(( TIME_REMAINING ))
-              MINUTES=$(( (TIME_REMAINING * 60) % 60 ))
-              TIME_STR=$(printf '%sh %sm' "$HOURS" "$MINUTES")
-            else
-              TIME_STR="Unknown"
-            fi
-          else
-            TIME_STR="N/A"
-          fi
-
-          # Choose icon based on capacity and status
-          if [[ "$STATUS" == "Charging" ]]; then
-            ICON="󰂄"
-            CLASS="charging"
-          elif [[ $CAPACITY -gt 90 ]]; then
-            ICON="󰁹"
-            CLASS="full"
-          elif [[ $CAPACITY -gt 75 ]]; then
-            ICON="󰂂"
-            CLASS="high"
-          elif [[ $CAPACITY -gt 50 ]]; then
-            ICON="󰁿"
-            CLASS="medium"
-          elif [[ $CAPACITY -gt 25 ]]; then
-            ICON="󰁼"
-            CLASS="low"
-          else
-            ICON="󰁺"
-            CLASS="critical"
-          fi
-
-          TOOLTIP="Battery: $CAPACITY%\nStatus: $STATUS\nHealth: $HEALTH\nCycles: $CYCLE_COUNT\nTime: $TIME_STR"
-
-          echo "{\"text\": \"$ICON $CAPACITY%\", \"class\": \"$CLASS\", \"tooltip\": \"$TOOLTIP\"}"
-        ''}";
+        exec = "${batteryHealth}/bin/battery-health";
         return-type = "json";
         interval = 5;
         tooltip = true;
@@ -799,15 +679,236 @@ in
       };
 
       "custom/notification" = {
-        format = "{icon}";
-        exec = "swaynotificationcenter-client -c count";
-        interval = 1;
-        tooltip = true;
-        on-click = "swaynotificationcenter-client -t";
-        format-icons = {
-          "default" = "󰂚";
-          "0" = "󰂛";
+        format = "󰂚";
+        exec = "echo '󰂚'";
+        interval = 30;
+        tooltip = "Notifications";
+        on-click = "notify-send 'Notifications' 'No notification center configured'";
+      };
+
+      "custom/power" = {
+        format = "󰐥";
+        tooltip = "Shutdown";
+        on-click = "wlogout";
+      };
+    }
+    # Laptop monitor configuration (eDP-1) - larger size
+    {
+      output = "eDP-1";
+      layer = "top";
+      position = "top";
+      height = 80;  # Larger for laptop screen
+      spacing = 6;
+
+      modules-left = [
+        "hyprland/workspaces"
+        "hyprland/submap"
+      ];
+
+      modules-center = [
+        "hyprland/window"
+        "clock"
+      ];
+
+      modules-right = [
+        "custom/gpu"
+        "custom/disk"
+        "idle_inhibitor"
+        "mpd"
+        "pulseaudio"
+        "custom/network"
+        "bluetooth"
+        "memory"
+        "cpu"
+        "temperature"
+        "custom/battery"
+        "tray"
+        "custom/notification"
+        "custom/power"
+      ];
+
+      # Copy all the module configurations from the first config
+      "hyprland/workspaces" = {
+        disable-scroll = true;
+        all-outputs = false;
+        warp-on-scroll = false;
+        format = "{name}";
+        persistent-workspaces = {
+          "1" = [];
+          "2" = [];
+          "3" = [];
+          "4" = [];
+          "5" = [];
+          "6" = [];
+          "7" = [];
+          "8" = [];
         };
+        on-click = "activate";
+        on-scroll-up = "hyprctl dispatch workspace e+1";
+        on-scroll-down = "hyprctl dispatch workspace e-1";
+      };
+
+      "hyprland/submap" = {
+        format = "✨ {}";
+        max-length = 8;
+        tooltip = false;
+      };
+
+      "hyprland/window" = {
+        format = "{title}";
+        max-length = 50;
+        separate-outputs = true;
+        rewrite = {
+          "(.*) — Mozilla Firefox" = "🌍 $1";
+          "(.*) - Google Chrome" = "🌍 $1";
+          "(.*) - Chromium" = "🌍 $1";
+          "(.*) - Visual Studio Code" = "💻 $1";
+          "(.*) - nvim" = "📝 $1";
+        };
+      };
+
+      mpd = {
+        format = "{stateIcon} {artist} - {title}";
+        format-disconnected = "󰝛";
+        format-stopped = "󰓛";
+        unknown-tag = "N/A";
+        interval = 2;
+        consume-icons = {
+          on = " ";
+        };
+        random-icons = {
+          off = "<span color=\"#f53c3c\"></span> ";
+          on = " ";
+        };
+        repeat-icons = {
+          on = " ";
+        };
+        single-icons = {
+          on = "1 ";
+        };
+        state-icons = {
+          paused = "";
+          playing = "";
+        };
+        tooltip-format = "MPD (connected)";
+        tooltip-format-disconnected = "MPD (disconnected)";
+        on-click = "mpc toggle";
+        on-click-right = "mpc next";
+        on-click-middle = "mpc prev";
+        on-scroll-up = "mpc volume +2";
+        on-scroll-down = "mpc volume -2";
+      };
+
+      tray = {
+        spacing = 12;  # Slightly larger spacing for laptop
+        icon-size = 20;  # Slightly larger icons for laptop
+      };
+
+      clock = {
+        interval = 1;
+        format = "{:%H:%M:%S}";
+        format-alt = "{:%Y-%m-%d %H:%M:%S}";
+        tooltip = false;
+      };
+
+      "custom/gpu" = {
+        format = "{}";
+        exec = "${gpuStatus}/bin/gpu-status";
+        return-type = "json";
+        interval = 5;
+        on-click = "gpu-toggle";
+        on-click-right = "gpu-menu";
+      };
+
+      "custom/disk" = {
+        format = "󰋊 {}%";
+        exec = "df -h / | awk 'NR==2 {print $5}' | sed 's/%//'";
+        interval = 30;
+        tooltip = true;
+        on-click = "disk-usage-gui";
+      };
+
+      idle_inhibitor = {
+        format = "{icon}";
+        format-icons = {
+          activated = "󰛨";
+          deactivated = "󰛧";
+        };
+        tooltip = true;
+      };
+
+      pulseaudio = {
+        format = "{icon} {volume}%";
+        format-bluetooth = "{icon} {volume}%";
+        format-muted = "󰝟";
+        format-icons = {
+          default = ["󰕿" "󰖀" "󰖁"];
+        };
+        on-click = "pavucontrol";
+        on-scroll-up = "pulsemixer --change-volume +5";
+        on-scroll-down = "pulsemixer --change-volume -5";
+        tooltip = true;
+      };
+
+      "custom/network" = {
+        format = "{}";
+        exec = "${networkStatus}/bin/network-status";
+        return-type = "json";
+        interval = 5;
+        on-click = "network-settings";
+      };
+
+      bluetooth = {
+        format = "{icon}";
+        format-icons = {
+          enabled = "󰂯";
+          disabled = "󰂲";
+        };
+        format-connected = "󰂱 {num_connections}";
+        tooltip-format = "{controller_alias}\t{controller_address}";
+        tooltip-format-connected = "{controller_alias}\t{controller_address}\n\n{device_enumerate}";
+        tooltip-format-enumerate-connected = "{device_alias}\t{device_address}";
+        on-click = "blueman-manager";
+      };
+
+      memory = {
+        format = "󰍛 {percentage}%";
+        interval = 5;
+        tooltip = true;
+        on-click = "system-monitor";
+      };
+
+      cpu = {
+        format = "󰻠 {usage}%";
+        interval = 5;
+        tooltip = true;
+        on-click = "system-monitor";
+      };
+
+      temperature = {
+        hwmon-path = "/sys/class/hwmon/hwmon6/temp1_input";
+        critical-threshold = 80;
+        format = "󰔏 {temperatureC}°C";
+        interval = 5;
+        tooltip = true;
+        on-click = "sensor-viewer";
+      };
+
+      "custom/battery" = {
+        format = "{}";
+        exec = "${batteryHealth}/bin/battery-health";
+        return-type = "json";
+        interval = 5;
+        tooltip = true;
+        on-click = "power-settings";
+      };
+
+      "custom/notification" = {
+        format = "󰂚";
+        exec = "echo '󰂚'";
+        interval = 30;
+        tooltip = "Notifications";
+        on-click = "notify-send 'Notifications' 'No notification center configured'";
       };
 
       "custom/power" = {
@@ -831,6 +932,11 @@ in
         border-radius: 0px;
         font-family: "Fira Sans", sans-serif;
         font-size: 14px;
+      }
+
+      /* Larger font size for laptop monitor */
+      window#waybar.eDP-1 * {
+        font-size: 18px;
       }
 
       window#waybar {

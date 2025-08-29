@@ -102,13 +102,10 @@
       "homeserver" = "ssh eric@100.115.126.41";
       "server" = "ssh eric@100.115.126.41";
 
-      # VPN management (ProtonVPN with WireGuard)
+      # VPN management (ProtonVPN - Simple On-Demand Toggle)
       "vpn" = "vpnstatus";           # Quick status check
-      "vpnon" = "vpnstart";          # Connect VPN (WireGuard preferred)
-      "vpnoff" = "vpnstop";          # Disconnect VPN  
+      # vpnon and vpnoff are now direct commands from VPN module (no aliases needed)
       "vpncheck" = "vpnstatus";      # Check connection status
-      "vpnwg" = "vpnwg";             # Connect via WireGuard directly
-      "vpnp2p" = "vpnp2p";           # P2P server info
     };
 
     # Environment variables

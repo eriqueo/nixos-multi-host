@@ -42,12 +42,10 @@ in
 
     gtk3.extraConfig = {
       gtk-application-prefer-dark-theme = 1;
-      gtk-show-hidden-files = true;
     };
 
     gtk4.extraConfig = {
       gtk-application-prefer-dark-theme = 1;
-      gtk-show-hidden-files = true;
     };
   };
 

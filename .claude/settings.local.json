@@ -38,7 +38,8 @@
       "Bash(sudo podman exec:*)",
       "Bash(sudo sed:*)",
       "Bash(sudo -u postgres:*)",
-      "Bash(sudo git status:*)"
+      "Bash(sudo git status:*)",
+      "Bash(vpnon:*)"
     ],
     "deny": []
   }

@@ -34,13 +34,9 @@
   ####################################################################
   # 3. NETWORK SERVICES CONFIGURATION
   ####################################################################
-  # ProtonVPN service with management functions (Charter V4 style)
+  # ProtonVPN service - Simple on-demand toggle for coffee shop use
   hwc.services.network.vpn = {
-    enable = true;
-    connectionMethod = "wireguard";  # WireGuard is faster and more reliable
-    serverType = "regular";         # Options: "regular", "p2p", "country"
-    country = "US";                # Used when serverType = "country"
-    autoConnect = false;           # Don't auto-connect on boot
+    enable = true;  # Provides vpnon/vpnoff commands
   };
 
   ####################################################################

@@ -283,7 +283,7 @@ in
         "$mod, Q, killactive"
         "$mod, F, fullscreen"
         "$mod, Space, exec, wofi --show drun"
-       # "$mod, B, exec, gpu-launch chromium"
+        "$mod, B, exec, gpu-launch chromium"
         "$mod, 2, exec, gpu-launch chromium"
         "$mod, J, exec, gpu-launch chromium --new-window https://jobtread.com"
         "$mod, 3, exec, gpu-launch chromium --new-window https://jobtread.com"
