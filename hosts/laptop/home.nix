@@ -21,6 +21,8 @@ in
     (import ../../shared/home-manager/thunar.nix { inherit pkgs; })
     ../../shared/home-manager/ai/shared-python.nix
     ../../shared/home-manager/ai/transcript-formatter.nix
+    ../../shared/home-manager/ai/enhanced-transcript-formatter.nix
+    ../../shared/home-manager/ai/transcript-checkpoint-manager.nix
 
     # Laptop-specific modules
     ./modules/desktop-apps.nix
@@ -51,6 +53,21 @@ in
     inputDir = "${config.xdg.dataHome}/transcripts/input_transcripts";
     outputDir = "${config.xdg.dataHome}/transcripts/cleaned_transcripts";
     interval = "15m";
+  };
+
+  # Enhanced transcript formatter with intelligent features
+  my.ai.enhancedTranscriptFormatter = {
+    enable = true;
+    model = "qwen2.5:7b";
+    host = "http://127.0.0.1:11434";
+    inputDir = "${config.xdg.dataHome}/transcripts/input_transcripts";
+    outputDir = "${config.xdg.dataHome}/transcripts/enhanced_transcripts";
+    interval = "30m";  # Run less frequently since it's more intensive
+  };
+
+  # Checkpoint management system
+  my.ai.transcriptCheckpointManager = {
+    enable = true;
   };
   # 2) Universal cleanup guard to prevent Home Manager backup conflicts system-wide
   home.activation.pruneAllHmBackups =

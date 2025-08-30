@@ -39,7 +39,8 @@
       "Bash(sudo sed:*)",
       "Bash(sudo -u postgres:*)",
       "Bash(sudo git status:*)",
-      "Bash(vpnon:*)"
+      "Bash(vpnon:*)",
+      "Bash(transcript-formatter:*)"
     ],
     "deny": []
   }
