@@ -23,6 +23,7 @@ in
     ../../shared/home-manager/ai/transcript-formatter.nix
     ../../shared/home-manager/ai/enhanced-transcript-formatter-fixed.nix
     ../../shared/home-manager/ai/transcript-checkpoint-manager.nix
+    ../../shared/home-manager/ai/transcript-batch-controller.nix
 
     # Laptop-specific modules
     ./modules/desktop-apps.nix
@@ -67,6 +68,11 @@ in
 
   # Checkpoint management system
   my.ai.transcriptCheckpointManager = {
+    enable = true;
+  };
+
+  # Batch processing controller
+  my.ai.transcriptBatchController = {
     enable = true;
   };
   # 2) Universal cleanup guard to prevent Home Manager backup conflicts system-wide
