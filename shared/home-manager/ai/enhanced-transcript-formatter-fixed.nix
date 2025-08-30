@@ -22,7 +22,9 @@ in
       mkdir -p ${appRoot} ${cfg.inputDir} ${cfg.outputDir}
     '';
 
-    home.file."${scriptPath}".text = ''
+    home.file."${scriptPath}" = {
+      executable = true;
+      text = ''
 #!/usr/bin/env python3
 import argparse, json, os, re, sys, time, threading, concurrent.futures
 from datetime import datetime
@@ -119,9 +121,8 @@ def main():
 
 if __name__ == "__main__":
     main()
-    '';
-    
-    home.file."${scriptPath}".executable = true;
+      '';
+    };
 
     home.file.".local/bin/enhanced-transcript-formatter" = {
       text = ''
