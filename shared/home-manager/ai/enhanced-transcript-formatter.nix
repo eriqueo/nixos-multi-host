@@ -39,7 +39,7 @@ in
         TRAILING_SPACE_PAT = re.compile(r"[ \t]+$", re.MULTILINE)
         FENCE_PAT = re.compile(r"(^```[\\s\\S]*?^```)", re.MULTILINE)
         SPEAKER_PAT = re.compile(r"^([A-Z][a-z]+(?:\s+[A-Z][a-z]*)*):|\b([A-Z][a-z]+):\s", re.MULTILINE)
-        TOPIC_BREAK_PAT = re.compile(r"\n\s*(?:now|next|so|moving on|let['']s talk about|let['']s discuss|another|the next)", re.IGNORECASE)
+        TOPIC_BREAK_PAT = re.compile(r"\n\s*(?:now|next|so|moving on|lets talk about|lets discuss|another|the next)", re.IGNORECASE)
 
         # Enhanced system prompts for different content types
         WEBINAR_SYSTEM_PROMPT = """You are a meticulous technical writer specializing in business and educational content. Rewrite the USER transcript into clean, professional Markdown with a clear structure:
