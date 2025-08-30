@@ -21,7 +21,7 @@ in
     (import ../../shared/home-manager/thunar.nix { inherit pkgs; })
     ../../shared/home-manager/ai/shared-python.nix
     ../../shared/home-manager/ai/transcript-formatter.nix
-    ../../shared/home-manager/ai/enhanced-transcript-formatter.nix
+    ../../shared/home-manager/ai/enhanced-transcript-formatter-fixed.nix
     ../../shared/home-manager/ai/transcript-checkpoint-manager.nix
 
     # Laptop-specific modules

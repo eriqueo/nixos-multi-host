@@ -40,7 +40,9 @@
       "Bash(sudo -u postgres:*)",
       "Bash(sudo git status:*)",
       "Bash(vpnon:*)",
-      "Bash(transcript-formatter:*)"
+      "Bash(transcript-formatter:*)",
+      "Bash(cp:*)",
+      "Bash(enhanced-transcript-formatter:*)"
     ],
     "deny": []
   }

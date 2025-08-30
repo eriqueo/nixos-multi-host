@@ -26,15 +26,15 @@ in
 
     home.file."${scriptPath}" = {
       text = ''
-        #!/usr/bin/env python3
-        import argparse, json, os, re, sys, time, threading, concurrent.futures
-        from datetime import datetime
-        from pathlib import Path
-        import requests
-        from typing import List, Dict, Tuple, Optional
+#!/usr/bin/env python3
+import argparse, json, os, re, sys, time, threading, concurrent.futures
+from datetime import datetime
+from pathlib import Path
+import requests
+from typing import List, Dict, Tuple, Optional
 
-        # Enhanced patterns for better cleaning
-        FILLER_PAT = re.compile(r"\b(?:um+|uh+|ah+|er+|hmm+|you know|like|sort of|kind of|i mean|well,|so,|basically|literally|right\?|okay|ok|actually|obviously)\b", re.IGNORECASE)
+# Enhanced patterns for better cleaning
+FILLER_PAT = re.compile(r"\b(?:um+|uh+|ah+|er+|hmm+|you know|like|sort of|kind of|i mean|well,|so,|basically|literally|right\?|okay|ok|actually|obviously)\b", re.IGNORECASE)
         MULTISPACE_PAT = re.compile(r"[ \t]{2,}")
         TRAILING_SPACE_PAT = re.compile(r"[ \t]+$", re.MULTILINE)
         FENCE_PAT = re.compile(r"(^```[\\s\\S]*?^```)", re.MULTILINE)
