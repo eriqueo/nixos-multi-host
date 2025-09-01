@@ -162,7 +162,7 @@ class BatchController:
         default_config = {
             'max_workers': 3,
             'retry_attempts': 2,
-            'timeout_multiplier': 1.5,
+            'timeout_multiplier': 2.0,
             'processing_tools': {
                 'enhanced': 'enhanced-transcript-formatter',
                 'basic': 'transcript-formatter'
@@ -219,23 +219,28 @@ class BatchController:
         return sorted(transcript_files)
         
     def estimate_processing_time(self, file_path: Path) -> float:
-        """Estimate processing time based on file size and complexity."""
+        """Estimate AI processing time based on file size and chunking requirements."""
         try:
             content = file_path.read_text(encoding='utf-8', errors='ignore')
             char_count = len(content)
             
-            # Base time: ~0.1 seconds per 1000 characters
-            base_time = (char_count / 1000) * 0.1
+            # AI processing time: ~15-20 seconds per 3000-character chunk
+            chunk_size = 3000
+            num_chunks = max(1, (char_count + chunk_size - 1) // chunk_size)
             
-            # Complexity multipliers
-            filler_words = len(re.findall(r'\b(?:um|uh|like|you know)\b', content, re.IGNORECASE))
-            if filler_words > 100:
-                base_time *= 1.5
+            # Base processing time per chunk (conservative estimate)
+            seconds_per_chunk = 20  # Allows for model loading, inference, and context switching
+            base_time = num_chunks * seconds_per_chunk
+            
+            # Small file minimum (model loading overhead)
+            if char_count < 5000:
+                base_time = max(base_time, 15)  # Minimum 15 seconds for any AI processing
                 
-            if char_count > 30000:  # Large files
-                base_time *= 2.0
+            # Large file complexity multiplier
+            if char_count > 30000:  # Large files may need more complex chunking
+                base_time *= 1.2
                 
-            return max(base_time, 2.0)  # Minimum 2 seconds
+            return base_time
             
         except Exception:
             return 5.0  # Default estimate

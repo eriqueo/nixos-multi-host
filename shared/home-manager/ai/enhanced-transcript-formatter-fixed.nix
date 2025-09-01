@@ -55,8 +55,56 @@ WEBINAR_SYSTEM_PROMPT = """You are a meticulous technical writer specializing in
 
 Output valid Markdown only, no preamble or commentary. Focus on creating a professional document that preserves all factual content while dramatically improving readability."""
 
+def chunk_content(text: str, max_tokens: int = 3000) -> List[str]:
+    """Intelligently chunk content for optimal AI processing."""
+    if len(text) <= max_tokens:
+        return [text]
+    
+    chunks = []
+    # Find natural breaks (speaker changes, topic transitions)
+    breaks = [m.start() for m in SPEAKER_PAT.finditer(text)] + [m.start() for m in TOPIC_BREAK_PAT.finditer(text)]
+    breaks = sorted(set(breaks + [0, len(text)]))
+    
+    current_chunk = ""
+    for i in range(len(breaks) - 1):
+        segment = text[breaks[i]:breaks[i+1]]
+        if len(current_chunk + segment) <= max_tokens:
+            current_chunk += segment
+        else:
+            if current_chunk:
+                chunks.append(current_chunk.strip())
+            current_chunk = segment
+    
+    if current_chunk:
+        chunks.append(current_chunk.strip())
+    
+    return [c for c in chunks if c.strip()]
+
+def call_ollama(text: str, model: str, host: str, temperature: float, top_p: float, timeout: int = 120) -> str:
+    """Call Ollama API with timeout and error handling."""
+    payload = {
+        "model": model,
+        "stream": False,
+        "prompt": text,
+        "system": WEBINAR_SYSTEM_PROMPT,
+        "options": {
+            "temperature": temperature,
+            "top_p": top_p,
+            "num_ctx": 4096
+        }
+    }
+    
+    try:
+        response = requests.post(f"{host}/api/generate", json=payload, timeout=timeout)
+        response.raise_for_status()
+        return response.json().get("response", "").strip()
+    except requests.exceptions.Timeout:
+        raise Exception(f"Ollama request timed out after {timeout}s")
+    except requests.exceptions.RequestException as e:
+        raise Exception(f"Ollama request failed: {str(e)}")
+
 def process_file(src: Path, dst_dir: Path, model: str, host: str, temperature: float, top_p: float, force: bool) -> Path:
-    """Simple file processing for testing."""
+    """Process transcript file with full AI enhancement and structural organization."""
     
     dst = dst_dir / src.name
     
@@ -70,15 +118,52 @@ def process_file(src: Path, dst_dir: Path, model: str, host: str, temperature: f
         raw = src.read_text(encoding="utf-8", errors="ignore")
         print(f"📏 Original size: {len(raw)} characters")
         
-        # Simple test - just remove filler words
+        # Clean up basic issues first
         cleaned = FILLER_PAT.sub("", raw)
         cleaned = MULTISPACE_PAT.sub(" ", cleaned)
+        cleaned = TRAILING_SPACE_PAT.sub("", cleaned)
         print(f"🧹 After cleanup: {len(cleaned)} characters")
         
-        # For now, just save the cleaned version
-        dst.write_text(f"# Processed Transcript\n\n{cleaned}", encoding="utf-8")
+        # Chunk content for AI processing
+        chunks = chunk_content(cleaned)
+        print(f"📦 Split into {len(chunks)} chunks for AI processing")
         
-        print(f"✅ Successfully processed {src.name}")
+        # Process chunks with AI
+        processed_chunks = []
+        for i, chunk in enumerate(chunks, 1):
+            print(f"🤖 Processing chunk {i}/{len(chunks)}... ", end="", flush=True)
+            
+            # Dynamic timeout based on chunk size
+            timeout = max(60, len(chunk) // 100)
+            
+            try:
+                enhanced = call_ollama(chunk, model, host, temperature, top_p, timeout)
+                processed_chunks.append(enhanced)
+                print("✅")
+            except Exception as e:
+                print(f"❌ Error: {str(e)}")
+                # Fallback to basic cleanup for failed chunks
+                processed_chunks.append(f"## Transcript Section {i}\n\n{chunk}")
+        
+        # Combine processed chunks
+        final_content = "\n\n---\n\n".join(processed_chunks)
+        
+        # Add metadata header
+        metadata = f"""# Enhanced Transcript: {src.stem}
+
+**Processed**: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}  
+**Model**: {model}  
+**Chunks**: {len(chunks)}  
+
+---
+
+"""
+        
+        final_output = metadata + final_content
+        dst.write_text(final_output, encoding="utf-8")
+        
+        print(f"✅ Successfully enhanced {src.name}")
+        print(f"📊 Final size: {len(final_output)} characters")
         return dst
         
     except Exception as e:
@@ -112,7 +197,7 @@ def main():
     
     for file_path in files:
         try:
-            process_file(file_path, out_dir, "", "", 0.2, 0.9, args.force)
+            process_file(file_path, out_dir, "${cfg.model}", "${cfg.host}", 0.2, 0.9, args.force)
         except KeyboardInterrupt:
             print("\n🛑 Process interrupted by user")
             break

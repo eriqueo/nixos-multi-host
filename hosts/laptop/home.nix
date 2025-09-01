@@ -55,6 +55,9 @@ in
     inputDir = "${config.xdg.dataHome}/transcripts/input_transcripts";
     outputDir = "${config.xdg.dataHome}/transcripts/cleaned_transcripts";
     interval = "15m";
+    mode = "preserve-education";
+    minRetainRatio = 0.65;
+    appendFull = true;
   };
 
   # Enhanced transcript formatter with intelligent features

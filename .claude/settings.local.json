@@ -42,8 +42,17 @@
       "Bash(vpnon:*)",
       "Bash(transcript-formatter:*)",
       "Bash(cp:*)",
-      "Bash(enhanced-transcript-formatter:*)"
+      "Bash(enhanced-transcript-formatter:*)",
+      "Bash(transcript-batch-controller:*)",
+      "Bash(nvidia-smi:*)",
+      "Bash(git add:*)",
+      "Bash(watch:*)",
+      "Bash(python3:*)",
+      "Bash(command -v:*)"
     ],
-    "deny": []
+    "deny": [],
+    "additionalDirectories": [
+      "/tmp/tiny-test-output"
+    ]
   }
 }

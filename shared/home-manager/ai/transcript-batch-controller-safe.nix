@@ -609,7 +609,7 @@ def main():
         files = controller.discover_files(input_dir, args.pattern)
         
         for file_path in files:
-            job = controller.create_job(file_path, args.output)
+            job = controller.create_job(file_path, output_dir)
             print(f"📄 {file_path.name}")
             print(f"   Type: {job.content_type.value} | Priority: {job.priority.name}")
             print(f"   Size: {job.size_chars:,} chars | Est. time: {job.estimated_time:.1f}s")

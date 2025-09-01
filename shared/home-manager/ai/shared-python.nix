@@ -7,6 +7,7 @@
     (pkgs.python3.withPackages (ps: with ps; [
       # For transcript-formatter
       requests
+      pyyaml
       
       # For transcript-cli  
       pydantic
