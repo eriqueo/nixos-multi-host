@@ -48,7 +48,8 @@
       "Bash(git add:*)",
       "Bash(watch:*)",
       "Bash(python3:*)",
-      "Bash(command -v:*)"
+      "Bash(command -v:*)",
+      "Bash(git checkout:*)"
     ],
     "deny": [],
     "additionalDirectories": [
