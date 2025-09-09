@@ -237,7 +237,7 @@ EOF
           "${hotRoot}/downloads:/downloads"
           "${mediaRoot}/music:/data/music:ro"
           "${mediaRoot}/music-soulseek:/data/music-soulseek:ro"
-          "${mediaRoot}/music:/data/downloads"
+          "${hotRoot}/downloads/music/complete:/data/downloads"
         ];
       };
 
@@ -460,7 +460,7 @@ EOF
       # Fix ownership for all *arr config directories and files
       for app in sonarr radarr lidarr prowlarr sabnzbd qbittorrent gluetun; do
         if [ -d "${cfgRoot}/$app" ]; then
-          chown -R 1000:100 "${cfgRoot}/$app"
+          chown -R 1000:1000 "${cfgRoot}/$app"
           echo "Fixed permissions for $app config"
         fi
       done
@@ -474,11 +474,11 @@ EOF
       mkdir -p "${mediaRoot}/music" "${mediaRoot}/movies" "${mediaRoot}/tv"
       
       # Set proper ownership and permissions for hot storage
-      chown -R 1000:100 "${hotRoot}/downloads" "${hotRoot}/cache" "${hotRoot}/processing" "${hotRoot}/quarantine"
+      chown -R 1000:1000 "${hotRoot}/downloads" "${hotRoot}/cache" "${hotRoot}/processing" "${hotRoot}/quarantine"
       chmod -R 775 "${hotRoot}/downloads" "${hotRoot}/cache" "${hotRoot}/processing" "${hotRoot}/quarantine"
       
       # Set proper ownership and permissions for media storage
-      chown -R 1000:100 "${mediaRoot}/music" "${mediaRoot}/movies" "${mediaRoot}/tv"
+      chown -R 1000:1000 "${mediaRoot}/music" "${mediaRoot}/movies" "${mediaRoot}/tv"
       chmod -R 775 "${mediaRoot}/music" "${mediaRoot}/movies" "${mediaRoot}/tv"
       
       echo "Media directory permissions fixed successfully"
@@ -509,15 +509,23 @@ EOF
     description = "Clean up old downloads and temporary files";
     startAt = "daily";
     script = ''
-      ${pkgs.findutils}/bin/find ${hotRoot}/downloads -type f -mtime +30 -delete 2>/dev/null || true
-      ${pkgs.findutils}/bin/find ${hotRoot}/quarantine -type f -mtime +7 -delete 2>/dev/null || true
-      ${pkgs.findutils}/bin/find ${hotRoot}/processing -type f -mtime +1 -delete 2>/dev/null || true
-      ${pkgs.findutils}/bin/find ${hotRoot}/downloads -type d -empty -delete 2>/dev/null || true
-      ${pkgs.findutils}/bin/find ${hotRoot}/quarantine -type d -empty -delete 2>/dev/null || true
-      ${pkgs.findutils}/bin/find ${hotRoot}/processing -type d -empty -delete 2>/dev/null || true
-      USAGE=$(${pkgs.coreutils}/bin/df ${hotRoot} | ${pkgs.coreutils}/bin/tail -1 | ${pkgs.gawk}/bin/awk '{print $5}' | ${pkgs.gnused}/bin/sed 's/%//')
+      ROOT_DL="${hotRoot}/downloads"
+      ROOT_Q="${hotRoot}/quarantine"
+      ROOT_P="${hotRoot}/processing"
+
+      # Remove only temp/partial files
+      ${pkgs.findutils}/bin/find "$ROOT_DL" -type f \( -name "*.part" -o -name "*.!qB" -o -name ".___padding_file_*" \) -mtime +7 -delete 2>/dev/null || true
+      ${pkgs.findutils}/bin/find "$ROOT_Q" -type f -mtime +14 -delete 2>/dev/null || true
+      ${pkgs.findutils}/bin/find "$ROOT_P" -type f -mtime +3 -delete 2>/dev/null || true
+
+      # Remove only empty subdirectories, never roots
+      ${pkgs.findutils}/bin/find "$ROOT_DL" -mindepth 2 -type d -empty -delete 2>/dev/null || true
+      ${pkgs.findutils}/bin/find "$ROOT_Q"  -mindepth 2 -type d -empty -delete 2>/dev/null || true
+      ${pkgs.findutils}/bin/find "$ROOT_P"  -mindepth 2 -type d -empty -delete 2>/dev/null || true
+
+      USAGE=$(${pkgs.coreutils}/bin/df ${hotRoot} | ${pkgs.coreutils}/bin/tail -1 | ${pkgs.gawk}/bin/awk '''{print $5}''' | ${pkgs.gnused}/bin/sed '''s/%//''')
       if [ "$USAGE" -gt 80 ]; then
-        echo "WARNING: Hot storage is ''${USAGE}% full" | ${pkgs.util-linux}/bin/logger -t media-cleanup
+        echo "WARNING: Hot storage is $USAGE% full" | ${pkgs.util-linux}/bin/logger -t media-cleanup
       fi
     '';
   };
@@ -576,11 +584,17 @@ EOF
   systemd.services.arr-health-monitor = {
     description = "Monitor *arr application health";
     startAt = "*:*:0/60";
+    serviceConfig.EnvironmentFile = "${config.sops.secrets.arr_api_keys_env.path}";
     script = ''
       ${pkgs.coreutils}/bin/mkdir -p /var/lib/node_exporter/textfile_collector
       check() {
-        local name="$1" port="$2" ep="$3"
-        if ${pkgs.curl}/bin/curl -s -f "http://localhost:$port$ep" >/dev/null 2>&1; then
+        local name="$1" port="$2" ep="$3" key="$4"
+        if [ -n "$key" ]; then
+          HDR="-H \"X-Api-Key: $key\""
+        else
+          HDR=""
+        fi
+        if ${pkgs.curl}/bin/curl -s -f $HDR "http://localhost:$port$ep" >/dev/null 2>&1; then
           echo "media_service_up{service=\"$name\"} 1"
         else
           echo "media_service_up{service=\"$name\"} 0"
@@ -589,10 +603,10 @@ EOF
       {
         echo "# HELP media_service_up Service availability (1=up, 0=down)"
         echo "# TYPE media_service_up gauge"
-        check "sonarr" "8989" "/api/v3/system/status"
-        check "radarr" "7878" "/api/v3/system/status"
-        check "lidarr" "8686" "/api/v1/system/status"
-        check "prowlarr" "9696" "/api/v1/system/status"
+        check "sonarr" "8989" "/api/v3/system/status" "$SONARR_API_KEY"
+        check "radarr" "7878" "/api/v3/system/status" "$RADARR_API_KEY"
+        check "lidarr" "8686" "/api/v1/system/status" "$LIDARR_API_KEY"
+        check "prowlarr" "9696" "/api/v1/system/status" "$PROWLARR_API_KEY"
         check "qbittorrent" "8080" "/api/v2/app/version"
         check "navidrome" "4533" "/ping"
       } > /var/lib/node_exporter/textfile_collector/media_services.prom

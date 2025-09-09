@@ -42,6 +42,7 @@
     ./modules/hot-storage.nix           # SSD hot storage tier
     ./modules/media-core.nix
     ./modules/media-containers.nix      # Complete media stack with containers and Caddy proxy
+    ./modules/media-orchestrator.nix    # Event-driven media orchestrator
     ./networking/media-network.nix
 
     # Monitoring stack
