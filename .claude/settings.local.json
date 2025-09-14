@@ -37,8 +37,26 @@
       "Bash(sudo podman exec radarr sh:*)",
       "Bash(sudo podman exec:*)",
       "Bash(sudo sed:*)",
-      "Bash(sudo -u postgres:*)"
+      "Bash(sudo -u postgres:*)",
+      "Bash(sudo rm /etc/nixos/hosts/server/modules/media-stack-fixed.nix /etc/nixos/hosts/server/modules/caddy-config.nix)",
+      "Bash(sudo ufw:*)",
+      "Bash(rsync:*)",
+      "Bash(for app in sonarr radarr lidarr prowlarr)",
+      "Bash(do)",
+      "Bash(done)",
+      "Bash(sudo podman inspect:*)",
+      "WebSearch",
+      "Bash(sudo tailscale status:*)",
+      "Bash(wget:*)",
+      "Bash(sudo podman stats:*)",
+      "Bash(sudo nano:*)",
+      "Bash(sudo cp:*)",
+      "Bash(sudo nixos-rebuild:*)"
     ],
-    "deny": []
+    "deny": [],
+    "defaultMode": "acceptEdits",
+    "additionalDirectories": [
+      "/opt/downloads/radarr"
+    ]
   }
 }
