@@ -197,7 +197,10 @@ EOF
         image = "lscr.io/linuxserver/sabnzbd:latest";
         downloadPath = usenetDownloads;
         network = "vpn";
-        extraVolumes = [ "${hotRoot}/cache:/incomplete-downloads" ];
+        extraVolumes = [ 
+          "${hotRoot}/cache:/incomplete-downloads" 
+          "/opt/downloads/scripts:/config/scripts:ro" 
+        ];
       };
 
       # *arr apps
