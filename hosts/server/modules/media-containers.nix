@@ -311,24 +311,40 @@ EOF
 
 
 
-         # Seed Soularr /data/config.ini
+  # Seed Soularr /data/config.ini from SOPS env
   systemd.services.soularr-config = {
-    # ... (no changes to metadata)
+    description = "Seed Soularr /data/config.ini from SOPS env";
+    wantedBy = [ "podman-soularr.service" ];
+    before   = [ "podman-soularr.service" ];
+    after    = [ "sops-install-secrets.service" ];
+    wants    = [ "sops-install-secrets.service" ];
+    serviceConfig.Type = "oneshot";
     script = ''
       set -e
-      rm -f ${cfgRoot}/soularr/config.ini
-      mkdir -p ${cfgRoot}/soularr
+      echo "--- Running soularr-config seeder (Final Version) ---"
+
       SECRETS_FILE="${config.sops.secrets.arr_api_keys_env.path}"
-      cfg=${cfgRoot}/soularr/config.ini
+      CONFIG_FILE="${cfgRoot}/soularr/config.ini"
+
+      # Forcefully remove the old config file to ensure changes are applied
+      echo "Removing old config file at $CONFIG_FILE..."
+      rm -f "$CONFIG_FILE"
 
       # Robustly get keys from the secrets file
       LIDARR_API_KEY=$(grep '^LIDARR_API_KEY=' "$SECRETS_FILE" | cut -d'=' -f2)
       SLSKD_API_KEY=$(grep '^SLSKD_API_KEY=' "$SECRETS_FILE" | cut -d'=' -f2)
 
-      cat > "$cfg" <<EOF
+      echo "DEBUG: LIDARR Key found: $([ -n "$LIDARR_API_KEY" ] && echo 'yes' || echo 'no')"
+      echo "DEBUG: SLSKD Key found:  $([ -n "$SLSKD_API_KEY" ] && echo 'yes' || echo 'no')"
+
+      mkdir -p "${cfgRoot}/soularr"
+      echo "Writing new config file to $CONFIG_FILE..."
+      # This version provides download_dir under [Lidarr] as the error demands
+      cat > "$CONFIG_FILE" <<EOF
 [Lidarr]
 host_url = http://lidarr:8686
 api_key  = "$LIDARR_API_KEY"
+download_dir = /downloads/music/complete
 
 [Slskd]
 host_url = http://slskd:5030
@@ -338,9 +354,12 @@ download_dir = /downloads/music/complete
 [General]
 interval = 300
 EOF
-      chmod 600 "$cfg"
+      chmod 600 "$CONFIG_FILE"
+      echo "Config file written successfully."
+      echo "--- soularr-config seeder finished ---"
     '';
   };
+
 
 
 
