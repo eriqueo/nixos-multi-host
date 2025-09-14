@@ -1,10 +1,9 @@
 # modules/server/slskd/parts/caddy.nix
 # Returns the Caddy extraConfig string for this service.
 ''
-  # ---- slskd
-  handle /slskd { redir /slskd/ 301 }
-  route /slskd* {
-    reverse_proxy 127.0.0.1:5030 {
+  # ---- slskd - exposed on port 5030
+  :5030 {
+    reverse_proxy slskd:5030 {
       header_up Host {host}
       header_up X-Forwarded-Host {host}
       header_up X-Forwarded-Proto {scheme}
