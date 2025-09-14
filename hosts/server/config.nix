@@ -43,6 +43,7 @@
     ./modules/media-core.nix
     ./modules/media-containers.nix      # Complete media stack with containers and Caddy proxy
     ./modules/media-orchestrator.nix    # Event-driven media orchestrator
+    ./modules/slskd/index.nix                     # Modular slskd Soulseek daemon
     ./networking/media-network.nix
 
     # Monitoring stack
