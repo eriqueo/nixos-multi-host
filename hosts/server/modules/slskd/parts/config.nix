@@ -12,6 +12,7 @@
     https = {
       disabled = true;
     };
+    url_base = "/slskd";
     content_path = "wwwroot";
     logging = false;
     authentication = {

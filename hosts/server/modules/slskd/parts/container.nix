@@ -21,7 +21,8 @@ in
     },destination=/app/slskd.yml,readonly"
   ];
 
-  ports = [ "127.0.0.1:5030:5030" ];
+  # No direct port binding - access via media-network and Caddy proxy
+  ports = [ ];
 
   volumes = [
     "${mediaRoot}/music:/music:ro"
