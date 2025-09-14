@@ -482,7 +482,7 @@ EOF
       # ---- slskd
       handle /slskd { redir /slskd/ 301 }
       handle_path /slskd/* {
-        uri strip_prefix /slskd
+        #uri strip_prefix /slskd
         reverse_proxy 127.0.0.1:5030 {
           header_up Host {host}
           header_up X-Forwarded-Host {host}
