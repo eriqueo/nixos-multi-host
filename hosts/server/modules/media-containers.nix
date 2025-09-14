@@ -42,89 +42,6 @@ let
   # Volume helpers
   hotCache          = service: "${hotRoot}/cache/${service}:/cache";
 
-  ####################################################################  
-  # HARDENED SLSKD CONFIGURATION
-  ####################################################################
-  
-  # slskd state directory 
-  slskdStateDir = "/var/lib/slskd";
-  
-  # slskd configuration template (no secrets in Nix store)
-  slskdTemplate = pkgs.writeText "slskd.yml.tmpl" ''
-    debug: false
-    headless: true
-    remoteConfiguration: false
-    remoteFileManagement: false
-    instanceName: default
-
-    web:
-      # Bind behind Caddy only (localhost)
-      port: 5030
-      https:
-        disabled: true
-      url_base: /slskd
-      content_path: wwwroot
-      logging: false
-      authentication:
-        disabled: false
-        username: $${SLSKD_UI_USERNAME}
-        password: $${SLSKD_UI_PASSWORD}
-        jwt:
-          key: $${SLSKD_JWT_KEY}
-          ttl: 604800000   # 7 days
-
-    feature:
-      swagger: false
-
-    metrics:
-      enabled: false
-
-    # Properly configured directories for volume mounts
-    directories:
-      incomplete: /downloads/incomplete
-      downloads: /downloads/complete
-
-    # Music sharing configuration  
-    shares:
-      directories:
-        - /music
-      filters:
-        - \.ini$
-        - Thumbs.db$
-        - \.DS_Store$
-      cache:
-        storage_mode: memory
-        workers: 16
-        retention: null
-
-    soulseek:
-      address: vps.slsknet.org
-      port: 2271
-      username: $${SLSK_USER}
-      password: $${SLSK_PASS}
-      description: A slskd user. https://github.com/slskd/slskd
-      listen_ip_address: 0.0.0.0
-      listen_port: 50300
-  '';
-
-  # Script to render config with secrets at runtime  
-  renderSlskdConfig = pkgs.writeShellScript "slskd-render-config" ''
-    set -euo pipefail
-    umask 077
-    install -d -m 0750 ${slskdStateDir}
-
-    # Source environment file with secrets
-    source ${config.sops.secrets.arr_api_keys_env.path}
-
-    ${pkgs.envsubst}/bin/envsubst \
-      < ${slskdTemplate} \
-      > ${slskdStateDir}/slskd.yml
-
-    chown 1000:1000 ${slskdStateDir}/slskd.yml
-    chmod 0640 ${slskdStateDir}/slskd.yml
-  '';
-  torrentDownloads  = "${hotRoot}/downloads:/downloads";
-  usenetDownloads   = "${hotRoot}/downloads:/downloads";
 
   # Builders
   buildMediaServiceContainer = { name, image, mediaType, extraVolumes ? [], extraOptions ? [], environment ? {} }: {
@@ -185,83 +102,7 @@ in
     mode = "0400"; owner = "root"; group = "root";
   };
 
-  ####################################################################
-  # HARDENED SLSKD SERVICES
-  ####################################################################
 
-  # Ensure state directory exists
-  systemd.tmpfiles.rules = [
-    "d ${slskdStateDir} 0750 1000 1000 -"
-    "d ${hotRoot}/downloads/incomplete 0775 1000 1000 -"  
-    "d ${hotRoot}/downloads/complete 0775 1000 1000 -"
-  ];
-
-  # Render config before starting slskd
-  systemd.services."slskd-config-hardened" = {
-    description = "Render hardened slskd config with secrets";
-    wantedBy = [ "multi-user.target" ];
-    before = [ "podman-slskd-hardened.service" ];
-    wants = [ "sops-install-secrets.service" ];
-    after = [ "sops-install-secrets.service" ];
-    serviceConfig = {
-      Type = "oneshot";
-      ExecStart = "${renderSlskdConfig}";
-      User = "root";
-      Group = "root";
-    };
-  };
-
-  # Hardened slskd container service
-  systemd.services."podman-slskd-hardened" = {
-    description = "Hardened slskd container";
-    after = [ "network-online.target" "slskd-config-hardened.service" "init-media-network.service" ];
-    requires = [ "slskd-config-hardened.service" ];
-    wants = [ "network-online.target" ];
-    wantedBy = [ "multi-user.target" ];
-
-    serviceConfig = {
-      Restart = "always";
-      RestartSec = "10s";
-      TimeoutStartSec = "60s";
-      TimeoutStopSec = "30s";
-
-      # Hardened slskd with security constraints
-      ExecStart = pkgs.writeShellScript "start-hardened-slskd" ''
-        ${pkgs.podman}/bin/podman run --rm --name slskd-hardened \
-          --network ${mediaNetworkName} \
-          --hostname slskd \
-          --user 1000:1000 \
-          --read-only \
-          --tmpfs /tmp:rw,noexec,nosuid,size=100m \
-          --pids-limit=256 \
-          --cpus=1.0 \
-          --memory=1g \
-          --cap-drop=ALL \
-          --security-opt no-new-privileges \
-          --security-opt=label=disable \
-          --mount type=bind,src=${slskdStateDir}/slskd.yml,dst=/app/slskd.yml,ro=true \
-          --mount type=bind,src=${hotRoot}/downloads/incomplete,dst=/downloads/incomplete,rw=true \
-          --mount type=bind,src=${hotRoot}/downloads/complete,dst=/downloads/complete,rw=true \
-          --mount type=bind,src=${mediaRoot}/music,dst=/music,ro=true \
-          --publish 127.0.0.1:5030:5030 \
-          ghcr.io/slskd/slskd:0.23.2 \
-          --config /app/slskd.yml
-      '';
-
-      ExecStop = "${pkgs.podman}/bin/podman stop -t 15 slskd-hardened";
-      ExecStopPost = "${pkgs.podman}/bin/podman rm -f slskd-hardened || true";
-
-      # Additional systemd hardening (host side)
-      ProtectHome = true;
-      PrivateTmp = true;  
-      NoNewPrivileges = true;
-      RestrictAddressFamilies = "AF_UNIX AF_INET AF_INET6";
-      RestrictSUIDSGID = true;
-      SystemCallFilter = "@system-service";
-      LockPersonality = true;
-      CapabilityBoundingSet = "";
-    };
-  };
 
   ####################################################################
   # 1. Media network + unit ordering
@@ -403,20 +244,6 @@ EOF
         volumes = [ (configVol "prowlarr") ];
       };
 
-      # slskd with hardcoded config file
-      slskd = {
-        image = "ghcr.io/slskd/slskd:0.23.2";
-        autoStart = true;
-        extraOptions = mediaNetworkOptions;
-        environment = mediaServiceEnv;
-        ports = [ "127.0.0.1:5030:5030" ];
-        volumes = [
-          "/var/lib/slskd/slskd.yml:/app/slskd.yml:ro"
-          "/mnt/hot/downloads/incomplete:/downloads/incomplete"
-          "/mnt/hot/downloads/complete:/downloads/complete"
-          "/mnt/media/music:/music:ro"
-        ];
-      };
 
 
       # Soularr (no web UI; /data contains config.ini)
@@ -456,32 +283,6 @@ EOF
   ####################################################################
   # 3. Config seeders & helpers
   ####################################################################
-        # OLD slskd config seeder (COMMENTED OUT)
-        ## Seed slskd /config/slskd.yml
-        #systemd.services.slskd-config-seeder = {
-        #  # ... (no changes to metadata)
-        #  script = ''
-        #    set -e
-        #    CONFIG_DIR="${cfgRoot}/slskd"
-        #    CONFIG_FILE="$CONFIG_DIR/slskd.yml"
-        #    SECRETS_FILE="${config.sops.secrets.arr_api_keys_env.path}"
-        #    mkdir -p "$CONFIG_DIR"
-
-        #    # Robustly get the API key from the secrets file
-        #    SLSKD_API_KEY=$(grep '^SLSKD_API_KEY=' "$SECRETS_FILE" | cut -d'=' -f2)
-
-        #    if [ ! -f "$CONFIG_FILE" ]; then
-        #      echo "Creating boilerplate slskd.yml"
-        #      cat > "$CONFIG_FILE" <<EOF
-        # # ...
-        # api:
-        #key: "$SLSKD_API_KEY"
-        # # ...
-        # EOF
-        #      chown 1000:1000 "$CONFIG_FILE"
-        #    fi
-        #  '';
-        #};
 
 
 
