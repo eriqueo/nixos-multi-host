@@ -239,23 +239,21 @@ in
           --cap-drop=ALL \
           --security-opt no-new-privileges \
           --security-opt=label=disable \
-          --mount type=bind,src=${slskdStateDir}/slskd.yml,dst=/config/slskd.yml,ro=true \
+          --mount type=bind,src=${slskdStateDir}/slskd.yml,dst=/app/slskd.yml,ro=true \
           --mount type=bind,src=${hotRoot}/downloads/incomplete,dst=/downloads/incomplete,rw=true \
           --mount type=bind,src=${hotRoot}/downloads/complete,dst=/downloads/complete,rw=true \
           --mount type=bind,src=${mediaRoot}/music,dst=/music,ro=true \
           --publish 127.0.0.1:5030:5030 \
           ghcr.io/slskd/slskd:0.23.2 \
-          --config /config/slskd.yml
+          --config /app/slskd.yml
       '';
 
       ExecStop = "${pkgs.podman}/bin/podman stop -t 15 slskd-hardened";
       ExecStopPost = "${pkgs.podman}/bin/podman rm -f slskd-hardened || true";
 
       # Additional systemd hardening (host side)
-      ProtectSystem = "strict";
       ProtectHome = true;
       PrivateTmp = true;  
-      PrivateDevices = true;
       NoNewPrivileges = true;
       RestrictAddressFamilies = "AF_UNIX AF_INET AF_INET6";
       RestrictSUIDSGID = true;
@@ -296,7 +294,7 @@ in
   #   wants = [ "slskd-config-seeder.service" ];
   # };
   systemd.services."podman-soularr" = {
-    after = [ "init-media-network.service" "podman-lidarr.service" ];
+    after = [ "init-media-network.service" "podman-lidarr.service" "podman-slskd.service" ];
     requires = [ "podman-lidarr.service" ];
     serviceConfig.ExecStartPre = pkgs.writeShellScript "wait-for-lidarr" ''
       for i in 1 1 2 3 5 8; do
@@ -405,24 +403,20 @@ EOF
         volumes = [ (configVol "prowlarr") ];
       };
 
-      # OLD slskd (COMMENTED OUT - REPLACED WITH HARDENED VERSION)
-      # slskd = {
-      #   image = "slskd/slskd:latest";
-      #   autoStart = true;
-      #   extraOptions = mediaNetworkOptions;
-      #   environment = mediaServiceEnv // {
-      #     # These are for the Soulseek network connection
-      #     SLSKD_SLSK_USERNAME = "eriqueok";
-      #     SLSKD_SLSK_PASSWORD = "il0wwlm?";
-      #   };
-      #   ports = [ "0.0.0.0:5030:5030" ];
-      #   cmd = [ "--config" "/config/slskd.yml" ];
-      #   volumes = [
-      #     (configVol "slskd")
-      #     "${hotRoot}/downloads:/downloads"
-      #     "${mediaRoot}/music:/music:ro"
-      #   ];
-      # };
+      # slskd with hardcoded config file
+      slskd = {
+        image = "ghcr.io/slskd/slskd:0.23.2";
+        autoStart = true;
+        extraOptions = mediaNetworkOptions;
+        environment = mediaServiceEnv;
+        ports = [ "127.0.0.1:5030:5030" ];
+        volumes = [
+          "/var/lib/slskd/slskd.yml:/app/slskd.yml:ro"
+          "/mnt/hot/downloads/incomplete:/downloads/incomplete"
+          "/mnt/hot/downloads/complete:/downloads/complete"
+          "/mnt/media/music:/music:ro"
+        ];
+      };
 
 
       # Soularr (no web UI; /data contains config.ini)
@@ -436,7 +430,7 @@ EOF
           "${hotRoot}/downloads:/downloads"
           "${cfgRoot}/soularr/app:/app"
         ];
-        dependsOn = [ "slskd-hardened" "lidarr" ];
+        dependsOn = [ "lidarr" ];
       };
 
       # Navidrome - Enable reverse proxy support for Caddy subpath
