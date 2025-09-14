@@ -42,6 +42,10 @@ let
   # Volume helpers
   hotCache          = service: "${hotRoot}/cache/${service}:/cache";
 
+  # Download paths for container volume mounts
+  torrentDownloads  = "${hotRoot}/downloads:/downloads";
+  usenetDownloads   = "${hotRoot}/downloads:/downloads";
+
 
   # Builders
   buildMediaServiceContainer = { name, image, mediaType, extraVolumes ? [], extraOptions ? [], environment ? {} }: {

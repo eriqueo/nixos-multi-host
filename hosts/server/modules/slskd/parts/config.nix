@@ -2,7 +2,7 @@
 # Returns a Nix attribute set representing the slskd.yml config.
 {
   debug = false;
-  headless = true;
+  headless = false;
   remoteConfiguration = false;
   remoteFileManagement = false;
   instanceName = "default";
@@ -12,7 +12,6 @@
     https = {
       disabled = true;
     };
-    url_base = "/slskd";
     content_path = "wwwroot";
     logging = false;
     authentication = {

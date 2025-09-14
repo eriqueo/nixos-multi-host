@@ -51,7 +51,8 @@
       "Bash(sudo podman stats:*)",
       "Bash(sudo nano:*)",
       "Bash(sudo cp:*)",
-      "Bash(sudo nixos-rebuild:*)"
+      "Bash(sudo nixos-rebuild:*)",
+      "Bash(sudo git rm:*)"
     ],
     "deny": [],
     "defaultMode": "acceptEdits",
