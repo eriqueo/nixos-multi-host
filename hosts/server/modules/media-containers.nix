@@ -134,10 +134,10 @@ systemd.services."podman-slskd" = {
   systemd.services."podman-soularr" = {
     after = [ "init-media-network.service" "podman-lidarr.service" ];
     requires = [ "podman-lidarr.service" ];
-    serviceConfig.ExecStartPre = pkgs.writeShellScript "wait-for-lidarr" '
+    serviceConfig.ExecStartPre = pkgs.writeShellScript "wait-for-lidarr" ''
       for i in 1 1 2 3 5 8; do
         if ${pkgs.curl}/bin/curl -sf -H "X-Api-Key: e70370fd157849b09ceb7e159b11eb4e" \
-          "http://lidarr:8686/lidarr/api/v1/system/status" >/dev/null 2>&1; then
+          "http://localhost:8686/lidarr/api/v1/system/status" >/dev/null 2>&1; then
           echo "Lidarr is ready"
           exit 0
         fi
@@ -146,7 +146,7 @@ systemd.services."podman-slskd" = {
       done
       echo "Lidarr failed to become ready"
       exit 1
-    ';
+    '';
   };
   systemd.services."podman-qbittorrent".after = [ "podman-gluetun.service" ];
   systemd.services."podman-sabnzbd".after     = [ "podman-gluetun.service" ];
