@@ -341,6 +341,7 @@ EOF
           serviceConfig.Type = "oneshot";
           script = ''
             set -e
+            rm -f ${cfgRoot}/soularr/config.ini
             mkdir -p ${cfgRoot}/soularr
             . ${config.sops.secrets.arr_api_keys_env.path} || true
             cfg=${cfgRoot}/soularr/config.ini
@@ -352,7 +353,7 @@ EOF
       [Slskd]
       host_url = http://slskd:5030
       api_key  = "$${SLSKD_API_KEY:-dummy-sls}"
-      download_dir = /downloads
+      download_dir = /downloads/music/complete
 
       [General]
       interval = 300
