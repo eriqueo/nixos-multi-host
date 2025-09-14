@@ -1,5 +1,6 @@
 { config, pkgs, lib, ... }:
 let
+  pythonWithRequests = pkgs.python3.withPackages (ps: with ps; [ requests ]);
   cfgRoot = "/opt/downloads";
   hotRoot = "/mnt/hot";
 in
@@ -35,7 +36,7 @@ in
         "RADARR_URL=http://localhost:7878"
         "LIDARR_URL=http://localhost:8686"
       ];
-      ExecStart = "${pkgs.python3}/bin/python3 ${cfgRoot}/scripts/media-orchestrator.py";
+      ExecStart = "${pythonWithRequests}/bin/python3 ${cfgRoot}/scripts/media-orchestrator.py";
       Restart = "always";
       RestartSec = "3s";
     };
