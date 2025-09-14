@@ -342,7 +342,7 @@ EOF
       # This version provides download_dir under [Lidarr] as the error demands
       cat > "$CONFIG_FILE" <<EOF
 [Lidarr]
-host_url = http://lidarr:8686
+host_url = http://lidarr:8686/lidarr
 api_key  = "$LIDARR_API_KEY"
 download_dir = /downloads/music/complete
 
