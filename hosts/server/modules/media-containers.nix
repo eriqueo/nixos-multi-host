@@ -251,7 +251,7 @@ EOF
           SLSKD_SLSK_USERNAME = "eriqueok";
           SLSKD_SLSK_PASSWORD = "il0wwlm?";
         };
-        ports = [ "127.0.0.1:5030:5030" ];
+        ports = [ "0.0.0.0:5030:5030" ];
         cmd = [ "--config" "/config/slskd.yml" ];
         volumes = [
           (configVol "slskd")
@@ -479,12 +479,6 @@ EOF
         }
       }
 
-      # ---- slskd
-      handle /slskd { redir /slskd/ 301 }
-      handle_path /slskd/* {
-        #uri strip_prefix /slskd
-        reverse_proxy 127.0.0.1:5030 {
-          header_up Host {host}
           header_up X-Forwarded-Host {host}
           header_up X-Forwarded-Proto {scheme}
           header_up X-Forwarded-Port {server_port}
@@ -521,7 +515,7 @@ EOF
   # Firewall: only expose HTTP/S publicly, other services only on Tailscale
   networking.firewall.allowedTCPPorts = [ 80 443 ];
   networking.firewall.interfaces."tailscale0" = {
-    allowedTCPPorts = [ 5984 8000 8501 8282 2283 ];
+    allowedTCPPorts = [ 5984 8000 8501 8282 2283 5030 ]; # Added slskd
   };
 
   # Fix config file permissions for container access
