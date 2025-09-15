@@ -12,6 +12,7 @@
     https = {
       disabled = true;
     };
+    url_base = "/";
     content_path = "wwwroot";
     logging = false;
     authentication = {

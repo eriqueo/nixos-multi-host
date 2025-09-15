@@ -52,7 +52,8 @@
       "Bash(sudo nano:*)",
       "Bash(sudo cp:*)",
       "Bash(sudo nixos-rebuild:*)",
-      "Bash(sudo git rm:*)"
+      "Bash(sudo git rm:*)",
+      "WebFetch(domain:github.com)"
     ],
     "deny": [],
     "defaultMode": "acceptEdits",

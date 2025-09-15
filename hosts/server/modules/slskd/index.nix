@@ -15,9 +15,10 @@ in
   virtualisation.oci-containers.containers.slskd = slskdContainer;
 
   # CORRECTED CADDY CONFIGURATION
-  # Simply define the string to be added. The NixOS module system
-  # will automatically concatenate this with definitions from other modules.
-  services.caddy.virtualHosts."hwc.ocelot-wahoo.ts.net".extraConfig = slskdCaddyCfg;
+  # Create a separate Caddy virtual host for port 5030 access
+  services.caddy.virtualHosts.":5030" = {
+    extraConfig = slskdCaddyCfg;
+  };
 
   systemd.services."podman-soularr".after = [ "podman-slskd.service" ];
   systemd.services."podman-soularr".wants = [ "podman-slskd.service" ];
