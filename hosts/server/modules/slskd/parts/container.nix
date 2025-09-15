@@ -21,8 +21,8 @@ in
     },destination=/app/slskd.yml,readonly"
   ];
 
-  # Direct port binding for both local and Tailscale access
-  ports = [ "0.0.0.0:5030:5030" ];
+  # No port binding - Caddy handles port 5030 and proxies to container
+  ports = [ ];
 
   volumes = [
     "${mediaRoot}/music:/music:ro"
