@@ -443,10 +443,6 @@ EOF
         }
       }
 
-      # slskd (Soulseek daemon) - preserve /slskd prefix for application-level base path
-      handle /slskd/* {
-        reverse_proxy 127.0.0.1:5031
-      }
 
       # Business services
       handle /business* {

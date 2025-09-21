@@ -2,20 +2,31 @@
 { config, lib, pkgs, ... }:
 
 let
-  # ... (let block is unchanged)
   slskdConfigSet = import ./parts/config.nix;
-  slskdCaddyCfg  = import ./parts/caddy.nix;
-  slskdYamlString = pkgs.lib.generators.toYAML {} slskdConfigSet;
+  slskdCaddyCfg = import ./parts/caddy.nix;
+  yamlFormat = pkgs.formats.yaml {};
+  slskdConfigFile = yamlFormat.generate "slskd.yml" slskdConfigSet;
   slskdContainer = import ./parts/container.nix {
     inherit config lib pkgs;
-    yamlConfig = slskdYamlString;
+    configFile = slskdConfigFile;
   };
 in
 {
+  systemd.tmpfiles.rules = [
+    "d /var/lib/slskd 0755 root root -"
+  ];
+
+  environment.etc."slskd/slskd.yml" = {
+    source = slskdConfigFile;
+    mode = "0644";
+  };
+
   virtualisation.oci-containers.containers.slskd = slskdContainer;
 
-  # slskd Caddy configuration is now handled in media-containers.nix
+  networking.firewall.allowedTCPPorts = [ 50300 ];
 
-  systemd.services."podman-soularr".after = [ "podman-slskd.service" ];
-  systemd.services."podman-soularr".wants = [ "podman-slskd.service" ];
+  services.caddy.virtualHosts."hwc.ocelot-wahoo.ts.net".extraConfig = slskdCaddyCfg;
+
+  systemd.services."podman-slskd".after = [ "network-online.target" ];
+  systemd.services."podman-slskd".wants = [ "network-online.target" ];
 }

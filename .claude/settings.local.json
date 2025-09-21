@@ -65,7 +65,8 @@
       "Bash(watch:*)",
       "Bash(python3:*)",
       "Bash(command -v:*)",
-      "Bash(git checkout:*)"
+      "Bash(git checkout:*)",
+      "Bash(top:*)"
     ],
     "deny": [],
     "defaultMode": "acceptEdits",

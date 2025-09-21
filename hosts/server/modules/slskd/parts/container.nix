@@ -1,38 +1,36 @@
 # modules/server/slskd/parts/container.nix
 # Returns the attribute set for the virtualisation.oci-containers definition.
-{ config, lib, pkgs, yamlConfig }:
+{ config, lib, pkgs, configFile }:
 
 let
-  # These paths should be defined in your main configuration
-  # and passed down, but for a self-contained module, we can
-  # redefine them or assume they exist.
-  hotRoot   = "/mnt/hot";
+  hotRoot = "/mnt/hot";
   mediaRoot = "/mnt/media";
-  configFile = pkgs.writeText "slskd.yml" yamlConfig;
 in
 {
-  image = "ghcr.io/slskd/slskd:0.23.2";
+  image = "ghcr.io/slskd/slskd:latest";
   autoStart = true;
 
   extraOptions = [
     "--network=media-network"
-    "--mount=type=bind,source=${
-      pkgs.writeText "slskd.yml" yamlConfig
-    },destination=/app/slskd.yml,readonly"
+    "--config"
+    "/slskd.yml"
   ];
 
-  # Port binding for localhost access only (Caddy proxy)
-  ports = [ "127.0.0.1:5031:5030" ];
+  ports = [
+    "127.0.0.1:5031:5030"
+    "0.0.0.0:50300:50300/tcp"
+  ];
 
   volumes = [
     "${mediaRoot}/music:/music:ro"
     "${hotRoot}/downloads/incomplete:/downloads/incomplete"
     "${hotRoot}/downloads/complete:/downloads/complete"
+    "/etc/slskd/slskd.yml:/slskd.yml:ro"
   ];
 
   environment = {
     PUID = "1000";
     PGID = "1000";
-    TZ   = "America/Denver";
+    TZ = "America/Denver";
   };
 }

@@ -3,16 +3,34 @@
 {
   debug = false;
   headless = false;
-  remoteConfiguration = false;
-  remoteFileManagement = false;
-  instanceName = "default";
+  remote_configuration = false;
+  remote_file_management = false;
+  instance_name = "default";
+
+  flags = {
+    no_logo = false;
+    no_start = false;
+    no_config_watch = false;
+    no_connect = false;
+    no_share_scan = false;
+    force_share_scan = false;
+    force_migrations = false;
+    no_version_check = false;
+    log_sql = false;
+    experimental = false;
+    volatile = false;
+    case_sensitive_reg_ex = false;
+    legacy_windows_tcp_keepalive = false;
+  };
 
   web = {
     port = 5030;
+    url_base = "/slskd";
     https = {
       disabled = true;
+      port = 5031;
+      force = false;
     };
-    url_base = "/slskd";
     content_path = "wwwroot";
     logging = false;
     authentication = {
@@ -23,6 +41,7 @@
         key = "Nd5g9X1AcVck7z7Q4Yq0IuULeQ7ci/Zu7++Lmcq7jOqF0e6ZbCvp5SmWVBN3EAVE";
         ttl = 604800000;
       };
+      api_keys = {};
     };
   };
 
@@ -44,14 +63,14 @@
       "/music"
     ];
     filters = [
-      "\.ini$"
-      "Thumbs\.db$"
-      "\.DS_Store$"
+      "\\.ini$"
+      "Thumbs\\.db$"
+      "\\.DS_Store$"
     ];
     cache = {
       storage_mode = "memory";
       workers = 16;
-      retention = null;
+      retention = 10080;
     };
   };
 
