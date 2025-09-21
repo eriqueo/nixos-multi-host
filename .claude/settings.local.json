@@ -53,12 +53,25 @@
       "Bash(sudo cp:*)",
       "Bash(sudo nixos-rebuild:*)",
       "Bash(sudo git rm:*)",
-      "WebFetch(domain:github.com)"
+      "WebFetch(domain:github.com)",
+      "Bash(sudo git status:*)",
+      "Bash(vpnon:*)",
+      "Bash(transcript-formatter:*)",
+      "Bash(cp:*)",
+      "Bash(enhanced-transcript-formatter:*)",
+      "Bash(transcript-batch-controller:*)",
+      "Bash(nvidia-smi:*)",
+      "Bash(git add:*)",
+      "Bash(watch:*)",
+      "Bash(python3:*)",
+      "Bash(command -v:*)",
+      "Bash(git checkout:*)"
     ],
     "deny": [],
     "defaultMode": "acceptEdits",
     "additionalDirectories": [
-      "/opt/downloads/radarr"
+      "/opt/downloads/radarr",
+      "/tmp/tiny-test-output"
     ]
   }
 }

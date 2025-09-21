@@ -245,8 +245,8 @@ in
         "$mod, B, exec, gpu-launch chromium"
         "$mod, O, exec, gpu-launch obsidian"
         "$mod, E, exec, gpu-launch electron-mail"
-        "$mod, N, exec, kitty nvim
-        "$mod, T, exec, thunar""
+        "$mod, N, exec, kitty nvim"
+        "$mod, T, exec, thunar"
         "$mod, G, exec, gpu-toggle"  # GPU mode toggle
         "$mod SHIFT, M, exec, monitor-toggle"
         "$mod, TAB, exec, workspace-overview"

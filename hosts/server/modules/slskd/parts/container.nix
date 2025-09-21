@@ -21,8 +21,8 @@ in
     },destination=/app/slskd.yml,readonly"
   ];
 
-  # No port binding - Caddy handles port 5030 and proxies to container
-  ports = [ ];
+  # Port binding for localhost access only (Caddy proxy)
+  ports = [ "127.0.0.1:5031:5030" ];
 
   volumes = [
     "${mediaRoot}/music:/music:ro"

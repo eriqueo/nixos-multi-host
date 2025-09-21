@@ -2,6 +2,11 @@
 # FILE: hosts/laptop/home.nix (ORCHESTRATOR)
 # -----------------------------------------------------------------------------
 { config, pkgs, lib, osConfig, ... }:
+
+let
+  # Define the single source of truth for colors, available to all imports
+  colors = (import ../../shared/colors/deep-nord.nix).colors;
+in
 {
   imports = [
     # Shared modules (used by both laptop and server)
@@ -9,6 +14,17 @@
     ../../shared/home-manager/development.nix
     ../../shared/home-manager/productivity.nix
     ../../shared/home-manager/zsh.nix
+    # --- NEWLY MODULARIZED COMPONENTS ---
+    # We pass the 'colors' palette to the modules that need it
+    (import ../../shared/home-manager/kitty.nix { inherit colors; })
+    (import ../../shared/home-manager/obsidian.nix { inherit lib colors; })
+    (import ../../shared/home-manager/thunar.nix { inherit pkgs; })
+    ../../shared/home-manager/ai/shared-python.nix
+    ../../shared/home-manager/ai/transcript-formatter.nix
+    ../../shared/home-manager/ai/enhanced-transcript-formatter-fixed.nix
+    ../../shared/home-manager/ai/transcript-checkpoint-manager.nix
+    ../../shared/home-manager/ai/transcript-batch-controller.nix
+    ../../shared/home-manager/ai/transcript-batch-controller-safe.nix
 
     # Laptop-specific modules
     ./modules/desktop-apps.nix
@@ -32,7 +48,42 @@
     source = ./gtk/bookmarks;   # <- put a canonical file under hosts/laptop/gtk/bookmarks
     force  = true;              # <- skip backups and clobber non-symlink targets
   };
+  my.ai.transcriptFormatter = {
+    enable = true;
+    model = "qwen2.5:7b";
+    host = "http://127.0.0.1:11434";
+    inputDir = "${config.xdg.dataHome}/transcripts/input_transcripts";
+    outputDir = "${config.xdg.dataHome}/transcripts/cleaned_transcripts";
+    interval = "15m";
+    mode = "preserve-education";
+    minRetainRatio = 0.65;
+    appendFull = true;
+  };
 
+  # Enhanced transcript formatter with intelligent features
+  my.ai.enhancedTranscriptFormatter = {
+    enable = true;
+    model = "qwen2.5:7b";
+    host = "http://127.0.0.1:11434";
+    inputDir = "${config.xdg.dataHome}/transcripts/input_transcripts";
+    outputDir = "${config.xdg.dataHome}/transcripts/enhanced_transcripts";
+    interval = "30m";  # Run less frequently since it's more intensive
+  };
+
+  # Checkpoint management system
+  my.ai.transcriptCheckpointManager = {
+    enable = true;
+  };
+
+  # Batch processing controller
+  my.ai.transcriptBatchController = {
+    enable = true;
+  };
+
+  # Thermal-safe batch processing controller
+  my.ai.transcriptBatchControllerSafe = {
+    enable = true;
+  };
   # 2) Universal cleanup guard to prevent Home Manager backup conflicts system-wide
   home.activation.pruneAllHmBackups =
     lib.hm.dag.entryBefore [ "checkLinkTargets" ] ''

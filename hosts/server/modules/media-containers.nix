@@ -443,17 +443,9 @@ EOF
         }
       }
 
-      # ---- slskd (Hardened)
-      handle /slskd { redir /slskd/ 301 }
-      route /slskd* {
-        reverse_proxy 127.0.0.1:5030 {
-          header_up Host {host}
-          header_up X-Forwarded-Host {host}
-          header_up X-Forwarded-Proto {scheme}
-          header_up X-Forwarded-Port {server_port}
-          header_up X-Forwarded-For {remote}
-          header_up X-Real-IP {remote}
-        }
+      # slskd (Soulseek daemon) - preserve /slskd prefix for application-level base path
+      handle /slskd/* {
+        reverse_proxy 127.0.0.1:5031
       }
 
       # Business services

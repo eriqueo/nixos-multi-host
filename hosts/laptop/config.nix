@@ -12,10 +12,14 @@
     ../../modules/users/eric.nix     # Consolidated user configuration
     ../../modules/filesystem.nix     # Charter-compliant filesystem structure
     ../../modules/vault-sync-system.nix  # NixOS vault sync system
+    ./modules/ai/ollama.nix
 
     # Shared configuration
     ../../shared/secrets.nix         # Shared secrets management
     ../../shared/networking.nix      # Shared networking configuration
+
+    # Network services
+    ../../modules/services/network/vpn.nix  # ProtonVPN service with management functions
 
     # YouTube transcript CLI tool
     ./modules/transcript-cli.nix     # YouTube transcript extraction CLI
@@ -27,6 +31,14 @@
   # 2. FILESYSTEM CONFIGURATION - Enable user directories only
   ####################################################################
   hwc.filesystem.userDirectories.enable = true;  # PARA directories, XDG config, symlinks
+
+  ####################################################################
+  # 3. NETWORK SERVICES CONFIGURATION
+  ####################################################################
+  # ProtonVPN service - Simple on-demand toggle for coffee shop use
+  hwc.services.network.vpn = {
+    enable = true;  # Provides vpnon/vpnoff commands
+  };
 
   ####################################################################
   # 16. HOST IDENTITY
@@ -41,7 +53,7 @@
   boot.loader.efi.canTouchEfiVariables = true;
   time.timeZone = "America/Denver";
   i18n.defaultLocale = "en_US.UTF-8";
-
+  
   ####################################################################
   # 16. NIX CONFIGURATION
   ####################################################################
@@ -321,6 +333,9 @@ services.samba = {
     # Graphics testing tools
     glxinfo
 
+    # AI Tools
+    ollama
+
     # VM/QEMU tools
     spice
     spice-gtk
@@ -329,6 +344,7 @@ services.samba = {
     win-spice
     virtiofsd
   ];
+
 
   ####################################################################
   # 16. SYSTEM STATE VERSION

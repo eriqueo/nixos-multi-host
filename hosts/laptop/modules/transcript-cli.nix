@@ -5,20 +5,11 @@
 {
   # Install CLI tool and dependencies system-wide
   environment.systemPackages = with pkgs; [
-    # Core Python dependencies for transcript extraction
-    python311
-    python311Packages.pydantic
-    python311Packages.httpx
-    python311Packages.aiofiles
-    python311Packages.python-slugify
-    yt-dlp
-    python311Packages.youtube-transcript-api
-    
     # CLI wrapper script with proper Python environment
     (pkgs.writeShellScriptBin "yt-transcript" ''
       export PYTHONPATH="/etc/nixos/scripts"
-      # Use python311 with the installed packages
-      exec ${pkgs.python311.withPackages (ps: with ps; [ 
+      # Use python3 (3.13) with the installed packages
+      exec ${pkgs.python3.withPackages (ps: with ps; [ 
         pydantic httpx aiofiles python-slugify youtube-transcript-api yt-dlp
       ])}/bin/python /etc/nixos/scripts/yt-transcript.py "$@"
     '')

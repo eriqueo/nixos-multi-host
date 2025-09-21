@@ -14,11 +14,7 @@ in
 {
   virtualisation.oci-containers.containers.slskd = slskdContainer;
 
-  # CORRECTED CADDY CONFIGURATION
-  # Create a separate Caddy virtual host for port 5030 access
-  services.caddy.virtualHosts.":5030" = {
-    extraConfig = slskdCaddyCfg;
-  };
+  # slskd Caddy configuration is now handled in media-containers.nix
 
   systemd.services."podman-soularr".after = [ "podman-slskd.service" ];
   systemd.services."podman-soularr".wants = [ "podman-slskd.service" ];
