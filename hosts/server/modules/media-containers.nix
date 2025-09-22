@@ -335,7 +335,7 @@ download_dir = /downloads/music/complete
 [General]
 interval = 300
 EOF
-      chmod 600 "$CONFIG_FILE"
+      chmod 644 "$CONFIG_FILE"
       echo "Config file written successfully."
       echo "--- soularr-config seeder finished ---"
     '';
