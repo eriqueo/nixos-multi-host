@@ -259,7 +259,6 @@ EOF
           (configVol "soularr")
           "${cfgRoot}/soularr:/data"
           "${hotRoot}/downloads:/downloads"
-          "${cfgRoot}/soularr/app:/app"
         ];
         dependsOn = [ "lidarr" ];
       };
