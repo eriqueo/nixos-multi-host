@@ -299,7 +299,10 @@ EOF
     before   = [ "podman-soularr.service" ];
     after    = [ "sops-install-secrets.service" ];
     wants    = [ "sops-install-secrets.service" ];
-    serviceConfig.Type = "oneshot";
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+    };
     script = ''
       set -e
       echo "--- Running soularr-config seeder (Final Version) ---"
