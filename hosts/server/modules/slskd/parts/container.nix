@@ -12,9 +12,9 @@ in
 
   extraOptions = [
     "--network=media-network"
-    "--config"
-    "/slskd.yml"
   ];
+
+  cmd = [ "--config" "/slskd.yml" ];
 
   ports = [
     "127.0.0.1:5031:5030"

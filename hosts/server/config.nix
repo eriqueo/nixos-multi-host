@@ -280,6 +280,13 @@
     home = "/mnt/hot/ai";
   };
 
+  # Ensure ollama directories have proper permissions
+  systemd.tmpfiles.rules = [
+    "d /mnt/hot/ai 0755 eric users -"
+    "d /mnt/hot/ai/models 0755 eric users -"
+    "Z /mnt/hot/ai/models 0755 eric users -"  # Recursively fix permissions
+  ];
+
 # Tailscale permitCertUid configuration moved above to services.tailscale section
   ####################################################################
   # 11. FIREWALL CONFIGURATION - Updated ports
