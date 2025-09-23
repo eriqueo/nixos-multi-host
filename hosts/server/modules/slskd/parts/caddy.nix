@@ -2,7 +2,7 @@
 # Returns the reverse proxy config for slskd subpath with proper headers
 ''
 handle /slskd { redir /slskd/ 301 }
-handle /slskd/* {
+handle_path /slskd/* {
   reverse_proxy 127.0.0.1:5031 {
     header_up Host {host}
     header_up X-Forwarded-Proto {scheme}

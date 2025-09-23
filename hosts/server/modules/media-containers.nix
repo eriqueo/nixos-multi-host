@@ -564,18 +564,62 @@ EOF
     script = ''
       safe_move() {
         local src="$1"; local dest="$2"
+        echo "Checking migration: $src -> $dest"
         if [ -d "$src" ] && [ "$(${pkgs.coreutils}/bin/ls -A "$src" 2>/dev/null)" ]; then
+          echo "Found files in $src, migrating..."
           ${pkgs.coreutils}/bin/mkdir -p "$dest"
           ${pkgs.rsync}/bin/rsync -av --remove-source-files "$src/" "$dest/"
           ${pkgs.findutils}/bin/find "$src" -type d -empty -delete 2>/dev/null || true
+          echo "Migration completed: $src -> $dest"
+        else
+          echo "No files to migrate in $src"
         fi
       }
-      safe_move "${hotRoot}/downloads/tv/complete"     "${mediaRoot}/tv"
-      safe_move "${hotRoot}/downloads/movies/complete" "${mediaRoot}/movies"
-      safe_move "${hotRoot}/downloads/music/complete"  "${mediaRoot}/music"
-      safe_move "${hotRoot}/processing/sonarr-temp/complete"  "${mediaRoot}/tv"
-      safe_move "${hotRoot}/processing/radarr-temp/complete"  "${mediaRoot}/movies"
-      safe_move "${hotRoot}/processing/lidarr-temp/complete"  "${mediaRoot}/music"
+      
+      migrate_media_files() {
+        local downloads_dir="${hotRoot}/downloads"
+        local dest_base="$1"
+        local pattern="$2"
+        
+        # Find and migrate TV shows (with S##E## pattern)
+        ${pkgs.findutils}/bin/find "$downloads_dir" -type f \( -name "*.mkv" -o -name "*.mp4" -o -name "*.avi" \) | \
+        ${pkgs.gnugrep}/bin/grep -E "$pattern" | while read -r file; do
+          if [ -f "$file" ]; then
+            filename=$(${pkgs.coreutils}/bin/basename "$file")
+            echo "Migrating $pattern file: $filename"
+            ${pkgs.coreutils}/bin/mkdir -p "$dest_base"
+            ${pkgs.coreutils}/bin/mv "$file" "$dest_base/"
+          fi
+        done
+      }
+      
+      # Migrate TV shows (files with S##E## pattern)
+      migrate_media_files "${mediaRoot}/tv" "S[0-9][0-9]E[0-9][0-9]"
+      
+      # Migrate movies (look for movie-like patterns or in movies directory)
+      safe_move "${hotRoot}/downloads/movies"          "${mediaRoot}/movies"
+      
+      # Migrate music files
+      safe_move "${hotRoot}/downloads/music"           "${mediaRoot}/music"
+      
+      # Process individual movie files (not in S##E## format, common movie extensions)
+      ${pkgs.findutils}/bin/find "${hotRoot}/downloads" -maxdepth 2 -type f \( -name "*.mkv" -o -name "*.mp4" -o -name "*.avi" \) | \
+      ${pkgs.gnugrep}/bin/grep -v -E "S[0-9][0-9]E[0-9][0-9]" | while read -r file; do
+        if [ -f "$file" ]; then
+          filename=$(${pkgs.coreutils}/bin/basename "$file")
+          # Skip if it's clearly not a movie (contains series indicators)
+          if ! echo "$filename" | ${pkgs.gnugrep}/bin/grep -qE "(Season|Episode|S[0-9]|E[0-9])"; then
+            echo "Migrating movie file: $filename"
+            ${pkgs.coreutils}/bin/mkdir -p "${mediaRoot}/movies"
+            ${pkgs.coreutils}/bin/mv "$file" "${mediaRoot}/movies/"
+          fi
+        fi
+      done
+      
+      # Handle *arr processing directories
+      safe_move "${hotRoot}/processing/sonarr-temp"    "${mediaRoot}/tv"
+      safe_move "${hotRoot}/processing/radarr-temp"    "${mediaRoot}/movies"
+      safe_move "${hotRoot}/processing/lidarr-temp"    "${mediaRoot}/music"
     '';
   };
 
