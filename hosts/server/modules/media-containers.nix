@@ -226,6 +226,7 @@ EOF
         extraVolumes = [
           "${hotRoot}/cache:/incomplete-downloads"
           "/opt/downloads/scripts:/config/scripts:ro"
+          "${hotRoot}/events:/mnt/hot/events"
         ];
       };
 
